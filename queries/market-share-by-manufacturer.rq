@@ -1,0 +1,21 @@
+# Market share by manufacturer within SGLT2 inhibitors and GLP-1 receptor agonists (claims and cost).
+# Combination products count for every class they contain; multi-source generics have no single
+# manufacturer and are grouped as "generic". Byetta has two application holders and appears under both.
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+
+SELECT ?class ?company (SUM(?claims) AS ?claimsTotal) (ROUND(SUM(?cost)) AS ?costTotal)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  VALUES ?cls { dmtc:SGLT2Inhibitor dmtc:GLP1ReceptorAgonist }
+  ?sub dm:inTherapeuticClass/skos:broader* ?cls .
+  ?prod dm:hasActiveSubstance ?sub .
+  ?rx dm:forProduct ?prod ; dm:totalClaims ?claims ; dm:totalDrugCost ?cost .
+  OPTIONAL { ?prod dm:manufacturedBy/rdfs:label ?org FILTER(lang(?org) = "en") }
+  BIND(COALESCE(?org, "generic (no single manufacturer)") AS ?company)
+  ?cls skos:prefLabel ?class FILTER(lang(?class) = "en")
+}
+GROUP BY ?class ?company
+ORDER BY ?class DESC(?claimsTotal)

@@ -1,0 +1,4 @@
+rdflib==7.6.0
+owlrl==7.6.2
+pyoxigraph==0.5.11
+mcp==2.3.0

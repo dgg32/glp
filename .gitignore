@@ -1,0 +1,13 @@
+# Raw and cleaned data contain real prescriber names/NPIs; publish only pseudonymized derivatives.
+data/raw/
+data/clean/
+.env
+__pycache__/
+*.part
+.venv/
+vocab/nucc-specialty.ttl
+# Pseudonymized but re-identifiable by joining with the public CMS file; publish scripts, not data.
+data/rdf/
+data/validation/
+# Holds local MCP config incl. credentials (e.g. Neo4j password)
+.mcp.json

@@ -1,0 +1,128 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dm: <https://dgg32.github.io/glp/ontology#> .
+@prefix dmind: <https://dgg32.github.io/glp/vocab/indication/> .
+@prefix mesh: <http://id.nlm.nih.gov/mesh/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+dmind:Obesity a skos:Concept,
+        dm:Indication ;
+    rdfs:label "Obesity"@en,
+        "肥満"@ja,
+        "肥胖症"@zh ;
+    skos:definition "A status with BODY WEIGHT that is grossly above the recommended standards, usually due to accumulation of excess FATS in the body. The standards may vary with age, sex, genetic or cultural background. In the BODY MASS INDEX, a BMI greater than 30.0 kg/m2 is considered obese, and a BMI greater than 40.0 kg/m2 is considered morbidly obese (MORBID OBESITY)."@en ;
+    skos:editorialNote "Japanese label from Wikidata Q12174 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D009765,
+        wd:Q12174 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/indication> ;
+    skos:prefLabel "Obesity"@en,
+        "肥満"@ja,
+        "肥胖症"@zh ;
+    skos:scopeNote "Wegovy's US label also covers cardiovascular risk reduction, which is not modelled here."@en ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/indication> .
+
+dmind:T1DM a skos:Concept,
+        dm:Indication ;
+    rdfs:label "Diabetes Mellitus, Type 1"@en,
+        "1型糖尿病"@ja,
+        "1型糖尿病"@zh ;
+    skos:altLabel "Autoimmune Diabetes"@en,
+        "Brittle Diabetes Mellitus"@en,
+        "Diabetes Mellitus, Brittle"@en,
+        "Diabetes Mellitus, Insulin Dependent"@en,
+        "Diabetes Mellitus, Insulin-Dependent"@en,
+        "Diabetes Mellitus, Insulin-Dependent, 1"@en,
+        "Diabetes Mellitus, Juvenile Onset"@en,
+        "Diabetes Mellitus, Juvenile-Onset"@en,
+        "Diabetes Mellitus, Ketosis Prone"@en,
+        "Diabetes Mellitus, Ketosis-Prone"@en,
+        "Diabetes Mellitus, Sudden Onset"@en,
+        "Diabetes Mellitus, Sudden-Onset"@en,
+        "Diabetes Mellitus, Type I"@en,
+        "Diabetes, Autoimmune"@en,
+        "Diabetes, Juvenile-Onset"@en,
+        "Diabetes, Type 1"@en,
+        "IDDM"@en,
+        "Insulin Dependent Diabetes Mellitus 1"@en,
+        "Insulin-Dependent Diabetes Mellitus"@en,
+        "Insulin-Dependent Diabetes Mellitus 1"@en,
+        "Juvenile Onset Diabetes"@en,
+        "Juvenile-Onset Diabetes"@en,
+        "Juvenile-Onset Diabetes Mellitus"@en,
+        "Ketosis-Prone Diabetes Mellitus"@en,
+        "Sudden-Onset Diabetes Mellitus"@en,
+        "Type 1 Diabetes"@en,
+        "Type 1 Diabetes Mellitus"@en ;
+    skos:definition "A subtype of DIABETES MELLITUS that is characterized by INSULIN deficiency. It is manifested by the sudden onset of severe HYPERGLYCEMIA, rapid progression to DIABETIC KETOACIDOSIS, and DEATH unless treated with insulin. The disease may occur at any age, but is most common in childhood or adolescence."@en ;
+    skos:editorialNote "Japanese label from Wikidata Q124407 (CC0); Chinese label from Wikidata Q124407 (CC0)."@en ;
+    skos:exactMatch mesh:D003922,
+        wd:Q124407 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/indication> ;
+    skos:prefLabel "Diabetes Mellitus, Type 1"@en,
+        "1型糖尿病"@ja,
+        "1型糖尿病"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/indication> .
+
+dmind:T2DM a skos:Concept,
+        dm:Indication ;
+    rdfs:label "Diabetes Mellitus, Type 2"@en,
+        "2型糖尿病"@ja,
+        "2型糖尿病"@zh ;
+    skos:altLabel "Adult-Onset Diabetes Mellitus"@en,
+        "Diabetes Mellitus, Adult Onset"@en,
+        "Diabetes Mellitus, Adult-Onset"@en,
+        "Diabetes Mellitus, Ketosis Resistant"@en,
+        "Diabetes Mellitus, Ketosis-Resistant"@en,
+        "Diabetes Mellitus, Maturity Onset"@en,
+        "Diabetes Mellitus, Maturity-Onset"@en,
+        "Diabetes Mellitus, Non Insulin Dependent"@en,
+        "Diabetes Mellitus, Non-Insulin-Dependent"@en,
+        "Diabetes Mellitus, Noninsulin Dependent"@en,
+        "Diabetes Mellitus, Noninsulin-Dependent"@en,
+        "Diabetes Mellitus, Slow Onset"@en,
+        "Diabetes Mellitus, Slow-Onset"@en,
+        "Diabetes Mellitus, Stable"@en,
+        "Diabetes Mellitus, Type II"@en,
+        "Diabetes, Maturity-Onset"@en,
+        "Diabetes, Type 2"@en,
+        "Ketosis-Resistant Diabetes Mellitus"@en,
+        "MODY (Maturity-onset diabetes of the young)"@en,
+        "Maturity Onset Diabetes"@en,
+        "Maturity Onset Diabetes Mellitus"@en,
+        "Maturity-Onset Diabetes"@en,
+        "Maturity-Onset Diabetes Mellitus"@en,
+        "NIDDM"@en,
+        "Non-Insulin-Dependent Diabetes Mellitus"@en,
+        "Noninsulin Dependent Diabetes Mellitus"@en,
+        "Noninsulin-Dependent Diabetes Mellitus"@en,
+        "Slow-Onset Diabetes Mellitus"@en,
+        "Stable Diabetes Mellitus"@en,
+        "Type 2 Diabetes"@en,
+        "Type 2 Diabetes Mellitus"@en ;
+    skos:definition "A subclass of DIABETES MELLITUS that is not INSULIN-responsive or dependent (NIDDM). It is characterized initially by INSULIN RESISTANCE and HYPERINSULINEMIA; and eventually by GLUCOSE INTOLERANCE; HYPERGLYCEMIA; and overt diabetes. Type II diabetes mellitus is no longer considered a disease exclusively found in adults. Patients seldom develop KETOSIS but often exhibit OBESITY."@en ;
+    skos:editorialNote "Japanese label from Wikidata Q3025883 (CC0); Chinese label from Wikidata Q3025883 (CC0)."@en ;
+    skos:exactMatch mesh:D003924,
+        wd:Q3025883 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/indication> ;
+    skos:prefLabel "Diabetes Mellitus, Type 2"@en,
+        "2型糖尿病"@ja,
+        "2型糖尿病"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/indication> .
+
+<https://dgg32.github.io/glp/vocab/indication> a skos:ConceptScheme ;
+    dcterms:creator "Sixing Huang" ;
+    dcterms:description "Conditions the medicinal products in the dataset are authorized to treat, as MeSH descriptors."@en ;
+    dcterms:modified "2026-10-15"^^xsd:date ;
+    dcterms:title "Indications"@en,
+        "適応症"@ja,
+        "适应症"@zh ;
+    skos:editorialNote "Japanese and Chinese labels not taken from Wikidata were drafted 2026-10-14 and are pending native-speaker review (docs/label-review.md)."@en ;
+    skos:hasTopConcept dmind:Obesity,
+        dmind:T1DM,
+        dmind:T2DM ;
+    prov:wasDerivedFrom <https://id.nlm.nih.gov/mesh/>,
+        <https://www.wikidata.org/> .
+

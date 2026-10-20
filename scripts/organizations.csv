@@ -1,0 +1,14 @@
+sponsor_name,applicant_name,match,applicant_lei,organization,legal_name,country,lei,evidence
+AMYLIN,Amylin Pharmaceuticals,none,,amylin,AMYLIN,,,no current LEI for Amylin Pharmaceuticals; no GLEIF match for 'Amylin'
+ASTRAZENECA AB,AstraZeneca AB,applicant,636700ITSLXVAJVLAY33,PY6ZZQWO2IZFZC3IOL08,ASTRAZENECA PLC,GB,PY6ZZQWO2IZFZC3IOL08,legal-name search 'AstraZeneca AB' finds AstraZeneca AB = 636700ITSLXVAJVLAY33
+BOEHRINGER INGELHEIM,"Boehringer Ingelheim Pharmaceuticals, Inc.",group,,529900P5FAANZASUYL28,C.H. Boehringer Sohn AG & Co. KG,DE,529900P5FAANZASUYL28,"no current LEI for Boehringer Ingelheim Pharmaceuticals, Inc.; 10/10 'Boehringer Ingelheim' matches have top parent 529900P5FAANZASUYL28"
+ELI LILLY AND CO,Eli Lilly and Company,applicant,FRDRIPF3EKNDJ2CQJL29,FRDRIPF3EKNDJ2CQJL29,ELI LILLY AND COMPANY,US,FRDRIPF3EKNDJ2CQJL29,legal-name search 'Eli Lilly and Company' finds Eli Lilly and Company = FRDRIPF3EKNDJ2CQJL29
+JANSSEN PHARMS,"Janssen Pharmaceuticals, Inc.",applicant,549300KW7Q8FTDG2UO48,549300G0CFPGEF6X2043,Johnson & Johnson,US,549300G0CFPGEF6X2043,"legal-name search 'Janssen Pharmaceuticals' finds Janssen Pharmaceuticals, Inc. = 549300KW7Q8FTDG2UO48"
+MSD,Merck Sharp & Dohme LLC,applicant,5493000ND1PV2SKBAY41,4YV9Y5M8S0BRK1RP0397,"MERCK & CO., INC.",US,4YV9Y5M8S0BRK1RP0397,legal-name search 'Merck Sharp & Dohme' finds Merck Sharp & Dohme LLC = 5493000ND1PV2SKBAY41
+MSD SUB MERCK,Merck Sharp & Dohme LLC,applicant,5493000ND1PV2SKBAY41,4YV9Y5M8S0BRK1RP0397,"MERCK & CO., INC.",US,4YV9Y5M8S0BRK1RP0397,legal-name search 'Merck Sharp & Dohme' finds Merck Sharp & Dohme LLC = 5493000ND1PV2SKBAY41
+MYLAN PHARMS INC,Mylan Pharmaceuticals Inc.,applicant,894500ZQWJQXJPI6B828,254900ZZTSW7NL773X71,VIATRIS INC.,US,254900ZZTSW7NL773X71,legal-name search 'Mylan Pharmaceuticals' finds Mylan Pharmaceuticals Inc. = 894500ZQWJQXJPI6B828
+NOVO,Novo Nordisk Inc.,group,,549300DAQ1CVT6CXN342,NOVO NORDISK A/S,DK,549300DAQ1CVT6CXN342,no current LEI for Novo Nordisk Inc.; 3/8 'Novo Nordisk' matches have top parent 549300DAQ1CVT6CXN342
+NOVO NORDISK INC,Novo Nordisk Inc.,group,,549300DAQ1CVT6CXN342,NOVO NORDISK A/S,DK,549300DAQ1CVT6CXN342,no current LEI for Novo Nordisk Inc.; 3/8 'Novo Nordisk' matches have top parent 549300DAQ1CVT6CXN342
+SANOFI AVENTIS US,Sanofi-Aventis U.S. LLC,group,,549300E9PC51EN656011,SANOFI,FR,549300E9PC51EN656011,no current LEI for Sanofi-Aventis U.S. LLC; 6/10 'Sanofi' matches have top parent 549300E9PC51EN656011
+SANOFI US SERVICES,Sanofi US Services Inc.,group,,549300E9PC51EN656011,SANOFI,FR,549300E9PC51EN656011,no current LEI for Sanofi US Services Inc.; 6/10 'Sanofi' matches have top parent 549300E9PC51EN656011
+SANOFI-AVENTIS US,Sanofi-Aventis U.S. LLC,group,,549300E9PC51EN656011,SANOFI,FR,549300E9PC51EN656011,no current LEI for Sanofi-Aventis U.S. LLC; 6/10 'Sanofi' matches have top parent 549300E9PC51EN656011

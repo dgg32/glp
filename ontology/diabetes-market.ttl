@@ -1,0 +1,318 @@
+@prefix dm:         <https://dgg32.github.io/glp/ontology#> .
+@prefix dmtc:       <https://dgg32.github.io/glp/vocab/therapeutic-class/> .
+@prefix idmp-mprd:  <https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/> .
+@prefix idmp-sub:   <https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11238-Substances/> .
+@prefix cmns-org:   <https://www.omg.org/spec/Commons/Organizations/> .
+@prefix cmns-rlcmp: <https://www.omg.org/spec/Commons/RolesAndCompositions/> .
+@prefix dcterms:    <http://purl.org/dc/terms/> .
+@prefix owl:        <http://www.w3.org/2002/07/owl#> .
+@prefix prov:       <http://www.w3.org/ns/prov#> .
+@prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:       <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+#  Ontology header
+#################################################################
+
+<https://dgg32.github.io/glp/ontology> a owl:Ontology ;
+    dcterms:title "Diabetes Drug Market Ontology"@en , "糖尿病治療薬市場オントロジー"@ja , "糖尿病药物市场本体"@zh ;
+    dcterms:description "A small OWL ontology for US Medicare Part D prescribing of type 2 diabetes drugs: who prescribes which product, containing which substance, in which therapeutic class. Product and substance classes are aligned to IDMP-O 1.4.0; commercial concepts (prescriber, prescription aggregate) are not covered by IDMP-O and are defined here."@en ;
+    dcterms:creator "Sixing Huang" ;
+    dcterms:created "2026-10-14"^^xsd:date ;
+    dcterms:license <https://opensource.org/licenses/MIT> ;
+    owl:versionIRI <https://dgg32.github.io/glp/ontology/0.4.0> ;
+    owl:versionInfo "0.4.0" ;
+    owl:priorVersion <https://dgg32.github.io/glp/ontology/0.3.0> ;
+    skos:changeNote "0.4.0 (2026-10-15): definitions only, no axiom changes. dm:Indication: indications are MeSH descriptors stated in FDA labels (example 'obesity' replaces 'chronic weight management'). dm:Organization: a company is the corporate group of a Drugs@FDA application holder, identified by the LEI of its GLEIF ultimate parent."@en ;
+    skos:changeNote "0.3.0 (2026-10-14): added dm:pseudonymousId (prescribers are identified by a keyed hash, never by NPI or name, in loaded data) and dm:cmsGenericName."@en ;
+    skos:changeNote "0.2.0 (2026-10-14): removed the age 65+ datatype properties to stay well inside the Stardog Cloud Free 1M-edge limit; dm:writes is now inferred only; IDMP-O definitions moved to imports/idmp-o-1.4.0-extract.ttl."@en ;
+    rdfs:comment "IDMP-O and OMG Commons terms are referenced, not imported. The few external terms used are declared below (label + isDefinedBy only), following the MIREOT approach that IDMP-O itself adopted in release 1.8.0. Load the full IDMP-O into its own named graph if its axioms are needed."@en .
+
+#################################################################
+#  Classes
+#################################################################
+
+dm:HealthcareProfessional a owl:Class ;
+    rdfs:subClassOf prov:Person ;
+    rdfs:label "healthcare professional"@en , "医療従事者"@ja , "医疗专业人员"@zh ;
+    skos:definition "An individual (NPI type 1) who prescribes drugs reimbursed under Medicare Part D."@en ;
+    rdfs:seeAlso <http://hl7.org/fhir/Practitioner> ;
+    rdfs:comment "Not covered by IDMP-O, which models regulatory product identity rather than commercial data. HL7 FHIR Practitioner is the closest standard concept (seeAlso, not a logical alignment)."@en .
+
+dm:Prescription a owl:Class ;
+    rdfs:label "prescription aggregate"@en , "処方集計"@ja , "处方汇总"@zh ;
+    skos:definition "The total Part D claims, fills, days of supply, cost and beneficiaries of one healthcare professional for one medicinal product in one data year. One row of the CMS 'Prescribers by Provider and Drug' dataset."@en ;
+    rdfs:comment "Modelled as a node (not as an edge with properties, as in a property graph) because RDF statements cannot carry attributes without reification."@en .
+
+dm:MedicinalProduct a owl:Class ;
+    rdfs:subClassOf idmp-mprd:MedicinalProduct ;
+    rdfs:label "medicinal product"@en , "医薬品"@ja , "药品"@zh ;
+    skos:definition "A drug product as named in Part D claims (CMS Brnd_Name), e.g. Jardiance. Unbranded generics appear under their generic name."@en .
+
+dm:Substance a owl:Class ;
+    rdfs:subClassOf idmp-sub:Substance ;
+    rdfs:label "substance"@en , "有効成分"@ja , "活性成分"@zh ;
+    skos:definition "An active substance of a medicinal product, e.g. empagliflozin. A combination product has more than one."@en .
+
+dm:TherapeuticClass a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "therapeutic class"@en , "薬効分類"@ja , "治疗类别"@zh ;
+    skos:definition "A concept in the therapeutic class scheme (e.g. SGLT2 inhibitors). The hierarchy itself is maintained as a SKOS concept scheme, not as OWL subclasses."@en .
+
+dm:Specialty a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "specialty"@en , "専門分野"@ja , "专科"@zh ;
+    skos:definition "A concept from the NUCC Health Care Provider Taxonomy, published as a SKOS concept scheme."@en .
+
+dm:Indication a owl:Class ;
+    rdfs:subClassOf idmp-mprd:TherapeuticIndication ;
+    rdfs:label "indication"@en , "適応症"@ja , "适应症"@zh ;
+    skos:definition "A disease or condition a medicinal product is authorized to treat, as stated in its FDA label, e.g. type 2 diabetes mellitus or obesity."@en ;
+    rdfs:comment "Indication concepts are MeSH descriptors (skos:exactMatch to MeSH) in the SKOS indication scheme."@en .
+
+dm:Organization a owl:Class ;
+    rdfs:subClassOf cmns-org:Organization ;
+    rdfs:label "organization"@en , "組織"@ja , "组织"@zh ;
+    skos:definition "A company that holds the US marketing application for a medicinal product, taken as its corporate group, e.g. Boehringer Ingelheim."@en ;
+    rdfs:comment "Drugs@FDA application holders are grouped by their GLEIF ultimate parent; the LEI of that parent is the dcterms:identifier and the last segment of the IRI."@en .
+
+# --- Defined classes: membership is inferred by the reasoner, never asserted ---
+
+dm:SGLT2Prescriber a owl:Class ;
+    rdfs:label "SGLT2 inhibitor prescriber"@en , "SGLT2阻害薬処方医"@ja , "SGLT2抑制剂处方者"@zh ;
+    skos:definition "A healthcare professional who wrote at least one prescription for a product containing a substance in the SGLT2 inhibitor class."@en ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            dm:HealthcareProfessional
+            [ a owl:Restriction ;
+              owl:onProperty dm:writes ;
+              owl:someValuesFrom [ a owl:Restriction ;
+                  owl:onProperty dm:forProduct ;
+                  owl:someValuesFrom [ a owl:Restriction ;
+                      owl:onProperty dm:hasActiveSubstance ;
+                      owl:someValuesFrom [ a owl:Restriction ;
+                          owl:onProperty dm:inTherapeuticClass ;
+                          owl:hasValue dmtc:SGLT2Inhibitor ] ] ] ]
+        )
+    ] .
+
+dm:GLP1Prescriber a owl:Class ;
+    rdfs:label "GLP-1 receptor agonist prescriber"@en , "GLP-1受容体作動薬処方医"@ja , "GLP-1受体激动剂处方者"@zh ;
+    skos:definition "A healthcare professional who wrote at least one prescription for a product containing a substance in the GLP-1 receptor agonist class (including narrower classes such as dual GIP/GLP-1 agonists)."@en ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            dm:HealthcareProfessional
+            [ a owl:Restriction ;
+              owl:onProperty dm:writes ;
+              owl:someValuesFrom [ a owl:Restriction ;
+                  owl:onProperty dm:forProduct ;
+                  owl:someValuesFrom [ a owl:Restriction ;
+                      owl:onProperty dm:hasActiveSubstance ;
+                      owl:someValuesFrom [ a owl:Restriction ;
+                          owl:onProperty dm:inTherapeuticClass ;
+                          owl:hasValue dmtc:GLP1ReceptorAgonist ] ] ] ]
+        )
+    ] .
+
+#################################################################
+#  Object properties (relationships)
+#################################################################
+
+dm:writes a owl:ObjectProperty ;
+    rdfs:label "writes"@en ;
+    rdfs:comment "Not stored in the data: only dm:prescribedBy is asserted and dm:writes is inferred through owl:inverseOf (saves one triple per prescription). Queries without reasoning must use ^dm:prescribedBy."@en ;
+    rdfs:domain dm:HealthcareProfessional ;
+    rdfs:range dm:Prescription ;
+    owl:inverseOf dm:prescribedBy .
+
+dm:prescribedBy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "prescribed by"@en ;
+    rdfs:domain dm:Prescription ;
+    rdfs:range dm:HealthcareProfessional .
+
+dm:forProduct a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "for product"@en ;
+    rdfs:domain dm:Prescription ;
+    rdfs:range dm:MedicinalProduct .
+
+dm:hasActiveSubstance a owl:ObjectProperty ;
+    rdfs:label "has active substance"@en ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range dm:Substance ;
+    rdfs:comment "Shortcut for the IDMP-O pattern product -hasActiveIngredient-> ActiveIngredient role -isPlayedBy-> Substance. The property chain makes data modelled the IDMP-O way also answer queries that use this shortcut."@en .
+
+# IDMP-O alignment: the active-ingredient role chain implies the shortcut.
+dm:hasActiveSubstance owl:propertyChainAxiom ( idmp-mprd:hasActiveIngredient cmns-rlcmp:isPlayedBy ) .
+
+dm:inTherapeuticClass a owl:ObjectProperty ;
+    rdfs:label "in therapeutic class"@en ;
+    rdfs:domain dm:Substance ;
+    rdfs:range dm:TherapeuticClass ;
+    rdfs:comment "Assert only the most specific class. The property chain rolls membership up the SKOS hierarchy, so empagliflozin in 'SGLT2 inhibitors' is also inferred to be in 'blood glucose lowering drugs'."@en ;
+    owl:propertyChainAxiom ( dm:inTherapeuticClass skos:broaderTransitive ) .
+
+dm:hasSpecialty a owl:ObjectProperty ;
+    rdfs:label "has specialty"@en ;
+    rdfs:domain dm:HealthcareProfessional ;
+    rdfs:range dm:Specialty .
+
+dm:hasPrimarySpecialty a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:subPropertyOf dm:hasSpecialty ;
+    rdfs:label "has primary specialty"@en ;
+    rdfs:comment "The NPI Registry taxonomy flagged primary."@en .
+
+dm:hasIndication a owl:ObjectProperty ;
+    rdfs:subPropertyOf idmp-mprd:hasTherapeuticIndication ;
+    rdfs:label "has indication"@en ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range dm:Indication .
+
+dm:manufacturedBy a owl:ObjectProperty ;
+    rdfs:label "manufactured by"@en ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range dm:Organization .
+
+#################################################################
+#  Datatype properties (attributes)
+#################################################################
+
+# --- HealthcareProfessional ---
+dm:npi a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "NPI"@en ;
+    rdfs:domain dm:HealthcareProfessional ;
+    rdfs:range xsd:string ;
+    skos:definition "US National Provider Identifier (10 digits)."@en ;
+    rdfs:comment "Privacy by design: never written to the generated RDF. Prescribers are identified by dm:pseudonymousId instead."@en .
+
+dm:pseudonymousId a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "pseudonymous ID"@en , "仮名ID"@ja , "假名化ID"@zh ;
+    rdfs:domain dm:HealthcareProfessional ;
+    rdfs:range xsd:string ;
+    skos:definition "First 16 hex characters of HMAC-SHA256(secret key, NPI). Stable across runs with the same key; not reversible without it."@en ;
+    rdfs:comment "The source data is public and names the prescribers, so a determined reader could still re-identify someone by matching claim counts. The pseudonym keeps names and NPIs out of the graph, demos and screenshots; it is not anonymization."@en .
+
+dm:cmsPrescriberType a owl:DatatypeProperty ;
+    rdfs:label "CMS prescriber type"@en ;
+    rdfs:domain dm:HealthcareProfessional ;
+    rdfs:range xsd:string ;
+    skos:definition "Specialty as reported by CMS (Prscrbr_Type), a free-text label that differs from the NUCC code."@en .
+
+dm:city a owl:DatatypeProperty ;
+    rdfs:label "city"@en ;
+    rdfs:domain dm:HealthcareProfessional ;
+    rdfs:range xsd:string .
+
+dm:state a owl:DatatypeProperty ;
+    rdfs:label "state"@en ;
+    rdfs:domain dm:HealthcareProfessional ;
+    rdfs:range xsd:string .
+
+# --- Prescription aggregate: all-ages figures ---
+dm:dataYear a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "data year"@en ;
+    rdfs:domain dm:Prescription ;
+    rdfs:range xsd:gYear .
+
+dm:totalClaims a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "total claims"@en ;
+    rdfs:domain dm:Prescription ;
+    rdfs:range xsd:nonNegativeInteger ;
+    skos:definition "Number of Part D claims, including refills (CMS Tot_Clms)."@en .
+
+dm:total30DayFills a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "total 30-day fills"@en ;
+    rdfs:domain dm:Prescription ;
+    rdfs:range xsd:decimal ;
+    skos:definition "Claims standardized to 30-day fills; a 90-day fill counts as 3.0 (CMS Tot_30day_Fills)."@en .
+
+dm:totalDaySupply a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "total day supply"@en ;
+    rdfs:domain dm:Prescription ;
+    rdfs:range xsd:nonNegativeInteger .
+
+dm:totalDrugCost a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "total drug cost (USD)"@en ;
+    rdfs:domain dm:Prescription ;
+    rdfs:range xsd:decimal ;
+    skos:definition "Aggregate gross drug cost paid by Part D plan, beneficiary and other payers, in US dollars (CMS Tot_Drug_Cst)."@en .
+
+dm:totalBeneficiaries a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "total beneficiaries"@en ;
+    rdfs:domain dm:Prescription ;
+    rdfs:range xsd:nonNegativeInteger ;
+    skos:definition "Number of distinct Medicare beneficiaries (CMS Tot_Benes). Absent when 1-10, to protect privacy."@en .
+
+dm:beneficiaryCountSuppressed a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "beneficiary count suppressed"@en ;
+    rdfs:domain dm:Prescription ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "Derived: CMS blanks Tot_Benes for 1-10 beneficiaries but publishes no flag for it."@en .
+
+# --- MedicinalProduct ---
+dm:cmsGenericName a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "CMS generic name"@en ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range xsd:string ;
+    skos:definition "Generic name exactly as spelled in the CMS data (Gnrc_Name), e.g. 'Dapaglifloz Propaned/Metformin'."@en .
+
+dm:isCombinationProduct a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "is combination product"@en ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range xsd:boolean .
+
+#################################################################
+#  External terms (MIREOT-style declarations, not imports)
+#################################################################
+
+idmp-mprd:MedicinalProduct a owl:Class ;
+    rdfs:label "medicinal product"@en ;
+    rdfs:isDefinedBy <https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/> .
+
+idmp-mprd:TherapeuticIndication a owl:Class ;
+    rdfs:label "therapeutic indication"@en ;
+    rdfs:isDefinedBy <https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/> .
+
+idmp-mprd:hasActiveIngredient a owl:ObjectProperty ;
+    rdfs:label "has active ingredient"@en ;
+    rdfs:isDefinedBy <https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/> .
+
+idmp-mprd:hasTherapeuticIndication a owl:ObjectProperty ;
+    rdfs:label "has therapeutic indication"@en ;
+    rdfs:isDefinedBy <https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/> .
+
+idmp-sub:Substance a owl:Class ;
+    rdfs:label "substance"@en ;
+    rdfs:isDefinedBy <https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11238-Substances/> .
+
+cmns-org:Organization a owl:Class ;
+    rdfs:label "organization"@en ;
+    rdfs:isDefinedBy <https://www.omg.org/spec/Commons/Organizations/> .
+
+cmns-rlcmp:isPlayedBy a owl:ObjectProperty ;
+    rdfs:label "is played by"@en ;
+    rdfs:isDefinedBy <https://www.omg.org/spec/Commons/RolesAndCompositions/> .
+
+prov:Person a owl:Class ;
+    rdfs:label "person"@en ;
+    rdfs:isDefinedBy <http://www.w3.org/ns/prov#> .
+
+skos:Concept a owl:Class ;
+    rdfs:label "concept"@en ;
+    rdfs:isDefinedBy <http://www.w3.org/2004/02/skos/core> .
+
+skos:broaderTransitive a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:label "has broader transitive"@en ;
+    rdfs:isDefinedBy <http://www.w3.org/2004/02/skos/core> .
+
+skos:broader a owl:ObjectProperty ;
+    rdfs:subPropertyOf skos:broaderTransitive ;
+    rdfs:label "has broader"@en ;
+    rdfs:isDefinedBy <http://www.w3.org/2004/02/skos/core> .
+
+# Therapeutic class concepts referenced by the defined classes; the SKOS scheme defines them fully.
+dmtc:SGLT2Inhibitor a owl:NamedIndividual , dm:TherapeuticClass .
+dmtc:GLP1ReceptorAgonist a owl:NamedIndividual , dm:TherapeuticClass .

@@ -1,0 +1,21 @@
+# Ask in Japanese: which specialties prescribe SGLT2阻害薬 (SGLT2 inhibitors) most?
+# The class is found by its Japanese label (preferred or alternative), and specialties are
+# shown with their Japanese label where one exists, otherwise in English.
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?専門分野 (SUM(?claims) AS ?処方件数) (COUNT(DISTINCT ?doc) AS ?処方医数)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  ?cls skos:prefLabel|skos:altLabel "SGLT2阻害薬"@ja .
+  ?sub dm:inTherapeuticClass/skos:broader* ?cls .
+  ?prod dm:hasActiveSubstance ?sub .
+  ?rx dm:forProduct ?prod ; dm:totalClaims ?claims ; dm:prescribedBy ?doc .
+  ?doc dm:hasPrimarySpecialty ?sp .
+  ?sp skos:prefLabel ?en FILTER(lang(?en) = "en")
+  OPTIONAL { ?sp skos:prefLabel ?ja FILTER(lang(?ja) = "ja") }
+  BIND(COALESCE(?ja, ?en) AS ?専門分野)
+}
+GROUP BY ?専門分野
+ORDER BY DESC(?処方件数)
+LIMIT 10

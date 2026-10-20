@@ -1,0 +1,52 @@
+brnd_name,gnrc_name,rxnorm_brand,rxnorm_brand_rxcui,fda_brand,indications,label_source,fda_labels,label_votes
+Alogliptin,Alogliptin Benzoate,,,,T2DM,same ingredients,6,T2DM 6/6
+Basaglar Kwikpen U-100,"Insulin Glargine,hum.Rec.Anlog",Basaglar,1736859,BASAGLAR,T1DM|T2DM,brand,1,T1DM 1/1; T2DM 1/1
+Bydureon Bcise,Exenatide Microspheres,Bydureon,1242964,BYDUREON,T2DM,same ingredients,2,T2DM 2/2
+Byetta,Exenatide,Byetta,604751,BYETTA,T2DM,brand,1,T2DM 1/1
+Dapagliflozin,Dapagliflozin Propanediol,,,,T2DM,same ingredients,25,T2DM 24/25
+Farxiga,Dapagliflozin Propanediol,Farxiga,1486972,FARXIGA,T2DM,brand,2,T2DM 2/2
+Glimepiride,Glimepiride,,,,T2DM,same ingredients,71,T2DM 71/71
+Glipizide,Glipizide,,,,T2DM,same ingredients,99,T2DM 99/99
+Glipizide Er,Glipizide,,,,T2DM,same ingredients,99,T2DM 99/99
+Glipizide Xl,Glipizide,,,,T2DM,same ingredients,99,T2DM 99/99
+Glipizide-Metformin,Glipizide/Metformin Hcl,,,,T2DM,same ingredients,8,T2DM 7/8
+Glyburide,Glyburide,,,,T2DM,same ingredients,36,T2DM 36/36
+Glyxambi,Empagliflozin/Linagliptin,Glyxambi,1602110,GLYXAMBI,T2DM,brand,1,T2DM 1/1
+Insulin Glargine Solostar,"Insulin Glargine,hum.Rec.Anlog",,,,T1DM|T2DM,same ingredients,15,T1DM 15/15; T2DM 15/15
+Insulin Glargine-Yfgn,Insulin Glargine-Yfgn,,,,T1DM|T2DM,same ingredients,15,T1DM 15/15; T2DM 15/15
+Invokamet,Canagliflozin/Metformin Hcl,Invokamet,1545151,INVOKAMET,T2DM,brand,1,T2DM 1/1
+Invokana,Canagliflozin,Invokana,1373464,INVOKANA,T2DM,brand,4,T2DM 4/4
+Janumet,Sitagliptin Phos/Metformin Hcl,Janumet,1372738,JANUMET,T2DM,brand,5,T2DM 5/5
+Janumet Xr,Sitagliptin Phos/Metformin Hcl,Janumet,1372738,JANUMET,T2DM,brand,5,T2DM 5/5
+Januvia,Sitagliptin Phosphate,Januvia,638596,JANUVIA,T2DM,brand,9,T2DM 9/9
+Jardiance,Empagliflozin,Jardiance,1545659,JARDIANCE,T2DM,brand,9,T2DM 9/9
+Jentadueto,Linagliptin/Metformin Hcl,Jentadueto,1372706,JENTADUETO,T2DM,brand,2,T2DM 2/2
+Jentadueto Xr,Linagliptin/Metformin Hcl,Jentadueto,1372706,JENTADUETO,T2DM,brand,2,T2DM 2/2
+Lantus,"Insulin Glargine,hum.Rec.Anlog",Lantus,261551,LANTUS,T1DM|T2DM,brand,4,T1DM 4/4; T2DM 4/4
+Lantus Solostar,"Insulin Glargine,hum.Rec.Anlog",Lantus,261551,LANTUS,T1DM|T2DM,brand,4,T1DM 4/4; T2DM 4/4
+Liraglutide,Liraglutide,,,,T2DM,same ingredients,21,Obesity 5/21; T2DM 16/21
+Metformin Er Gastric,Metformin Hcl,,,,T2DM,same ingredients,295,T2DM 293/295
+Metformin Er Osmotic,Metformin Hcl,,,,T2DM,same ingredients,295,T2DM 293/295
+Metformin Hcl,Metformin Hcl,,,,T2DM,same ingredients,295,T2DM 293/295
+Metformin Hcl Er,Metformin Hcl,,,,T2DM,same ingredients,295,T2DM 293/295
+Mounjaro,Tirzepatide,Mounjaro,2601734,MOUNJARO,T2DM,brand,7,T2DM 7/7
+Ozempic,Semaglutide,Ozempic,1991307,OZEMPIC,T2DM,brand,4,T2DM 4/4
+Pioglitazone Hcl,Pioglitazone Hcl,,,,T2DM,same ingredients,41,T2DM 41/41
+Pioglitazone-Metformin,Pioglitazone Hcl/Metformin Hcl,,,,T2DM,same ingredients,8,T2DM 8/8
+Rybelsus,Semaglutide,Rybelsus,2200645,RYBELSUS,T2DM,brand,1,T2DM 1/1
+Saxagliptin Hcl,Saxagliptin Hcl,,,,T2DM,same ingredients,3,T2DM 3/3
+Semglee (Yfgn) Pen,Insulin Glargine-Yfgn,Semglee,2377130,SEMGLEE,T1DM|T2DM,brand,1,T1DM 1/1; T2DM 1/1
+Soliqua 100-33,Insulin Glargine/Lixisenatide,Soliqua,1858996,SOLIQUA,T2DM,brand,1,T2DM 1/1
+Steglatro,Ertugliflozin Pidolate,Steglatro,1992811,STEGLATRO,T2DM,brand,1,T2DM 1/1
+Synjardy,Empagliflozin/Metformin Hcl,Synjardy,1664316,SYNJARDY,T2DM,brand,2,T2DM 2/2
+Synjardy Xr,Empagliflozin/Metformin Hcl,Synjardy,1664316,SYNJARDY,T2DM,brand,2,T2DM 2/2
+Toujeo Max Solostar,"Insulin Glargine,hum.Rec.Anlog",Toujeo,1604540,TOUJEO,T1DM|T2DM,brand,3,T1DM 3/3; T2DM 3/3
+Toujeo Solostar,"Insulin Glargine,hum.Rec.Anlog",Toujeo,1604540,TOUJEO,T1DM|T2DM,brand,3,T1DM 3/3; T2DM 3/3
+Tradjenta,Linagliptin,Tradjenta,1100703,TRADJENTA,T2DM,brand,3,T2DM 3/3
+Trijardy Xr,Empaglifloz/Linaglip/Metformin,Trijardy,2359280,TRIJARDY,T2DM,brand,1,T2DM 1/1
+Trulicity,Dulaglutide,Trulicity,1551296,TRULICITY,T2DM,brand,7,T2DM 7/7
+Victoza 2-Pak,Liraglutide,Victoza,897123,VICTOZA,T2DM,brand,3,T2DM 3/3
+Victoza 3-Pak,Liraglutide,Victoza,897123,VICTOZA,T2DM,brand,3,T2DM 3/3
+Wegovy,Semaglutide,Wegovy,2553502,WEGOVY,Obesity,brand,1,Obesity 1/1
+Xigduo Xr,Dapaglifloz Propaned/Metformin,Xigduo,1592713,XIGDUO,T2DM,brand,1,T2DM 1/1
+Xultophy 100-3.6,Insulin Degludec/Liraglutide,Xultophy,1860168,XULTOPHY,T2DM,brand,1,T2DM 1/1

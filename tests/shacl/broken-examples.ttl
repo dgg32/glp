@@ -1,0 +1,70 @@
+# One deliberately broken record per SHACL rule (made-up data). Every rule must fire on this file.
+@prefix dm:   <https://dgg32.github.io/glp/ontology#> .
+@prefix t:    <https://dgg32.github.io/glp/test/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# --- vocabulary ---
+t:scheme a skos:ConceptScheme .
+t:okClass a skos:Concept , dm:TherapeuticClass ; skos:inScheme t:scheme ;
+    skos:prefLabel "ok class"@en , "クラス"@ja , "类别"@zh .
+t:twoEnglishLabels a skos:Concept ; skos:inScheme t:scheme ;
+    skos:prefLabel "first"@en , "second"@en .                      # uniqueLang, exactly one @en
+t:noScheme a skos:Concept ; skos:prefLabel "orphan"@en .            # no inScheme
+t:noJapanese a skos:Concept , dm:TherapeuticClass ; skos:inScheme t:scheme ;
+    skos:prefLabel "no Japanese"@en , "无日文"@zh .                  # missing @ja
+t:badSubstance a skos:Concept , dm:Substance ; skos:inScheme t:scheme ;
+    skos:prefLabel "bad substance"@en , "物質"@ja .                  # no class, no RxNorm, missing @zh
+t:okSubstance a skos:Concept , dm:Substance ; skos:inScheme t:scheme ;
+    skos:prefLabel "ok substance"@en , "物質"@ja , "物质"@zh ;
+    dm:inTherapeuticClass t:okClass ;
+    skos:exactMatch <http://purl.bioontology.org/ontology/RXNORM/1> .
+t:twoClassSubstance a skos:Concept , dm:Substance ; skos:inScheme t:scheme ;
+    skos:prefLabel "two-class substance"@en , "物質"@ja , "物质"@zh ;
+    dm:inTherapeuticClass t:okClass , t:noJapanese ;                # two unrelated most specific classes
+    skos:exactMatch <http://purl.bioontology.org/ontology/RXNORM/2> .
+t:indication a dm:Indication .
+
+# --- products ---
+t:noSubstanceProduct a dm:MedicinalProduct ; rdfs:label "Empty"@en ;
+    dm:isCombinationProduct false .                                  # no substance, no generic name, no indication
+t:fakeCombination a dm:MedicinalProduct ; rdfs:label "Fake combo"@en ; dm:cmsGenericName "x" ;
+    dm:hasIndication t:indication ; dm:hasActiveSubstance t:okSubstance ;
+    dm:isCombinationProduct true ;                                   # flag says combination, 1 substance
+    dm:manufacturedBy t:orgA , t:orgB .                              # two manufacturers (warning)
+t:twoNames a dm:MedicinalProduct ; rdfs:label "Name A"@en , "Name B"@en ; dm:cmsGenericName "y" ;
+    dm:hasIndication t:indication ; dm:hasActiveSubstance t:okSubstance ;
+    dm:isCombinationProduct false .                                  # two English names
+t:okProduct a dm:MedicinalProduct ; rdfs:label "OK"@en ; dm:cmsGenericName "ok" ;
+    dm:hasIndication t:indication ; dm:hasActiveSubstance t:okSubstance ; dm:isCombinationProduct false .
+
+# --- prescribers ---
+t:leakyDoctor a dm:HealthcareProfessional ;
+    dm:pseudonymousId "NOT-HEX" ;                                    # bad pseudonym
+    dm:npi "12345" ;                                                 # privacy + NPI format
+    dm:hasPrimarySpecialty t:okClass , t:noJapanese .                # two primary specialties; no hasSpecialty (warning)
+                                                                     # no prescriptions, no CMS prescriber type
+t:okDoctor a dm:HealthcareProfessional ; dm:pseudonymousId "0123456789abcdef" ; dm:cmsPrescriberType "Internal Medicine" .
+t:student a dm:HealthcareProfessional ; dm:pseudonymousId "fedcba9876543210" ; dm:cmsPrescriberType "Internal Medicine" ;
+    dm:hasPrimarySpecialty <https://dgg32.github.io/glp/vocab/specialty/390200000X> .   # info
+t:rxStudent a dm:Prescription ; dm:prescribedBy t:student ; dm:forProduct t:okProduct ;
+    dm:dataYear "2024"^^xsd:gYear ; dm:totalClaims 20 ; dm:totalDaySupply 600 ; dm:totalDrugCost 10.0 ;
+    dm:beneficiaryCountSuppressed true .
+
+# --- prescriptions ---
+t:badRx a dm:Prescription ;
+    dm:prescribedBy t:okDoctor , t:student ;                         # two prescribers
+    dm:dataYear "2024" ;                                             # not xsd:gYear; no product
+    dm:totalClaims 5 ;                                               # < 11 and more than day supply
+    dm:totalDaySupply 3 ;
+    dm:total30DayFills -1.0 ;                                        # negative fills
+    dm:totalDrugCost -10.0 ;                                         # negative cost
+    dm:totalBeneficiaries 9 ;                                        # more beneficiaries than claims
+    dm:beneficiaryCountSuppressed true .                             # count AND suppression flag (xone)
+t:typeRx a dm:Prescription ; dm:prescribedBy t:okDoctor ; dm:forProduct t:okProduct ; dm:dataYear "2024"^^xsd:gYear ;
+    dm:totalClaims "twelve" ; dm:totalDaySupply "lots" ;            # not integers
+    dm:total30DayFills "x" ; dm:totalDrugCost 0.0 ;                  # not decimal; zero cost (warning)
+    dm:totalBeneficiaries "y" .                                      # not integer
+t:noCountRx a dm:Prescription ; dm:prescribedBy t:okDoctor ; dm:forProduct t:okProduct ; dm:dataYear "2024"^^xsd:gYear ;
+    dm:totalDaySupply 900 .                                          # no claims, no cost; neither count nor flag (xone)

@@ -1,0 +1,4 @@
+id,mesh_id,pref_ja,pref_zh,scope_note_en
+T2DM,D003924,2型糖尿病,2型糖尿病,
+T1DM,D003922,1型糖尿病,1型糖尿病,
+Obesity,D009765,肥満症,肥胖症,"Wegovy's US label also covers cardiovascular risk reduction, which is not modelled here."

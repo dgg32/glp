@@ -1,0 +1,14 @@
+sponsor_name,applicant_name,match,lei,gleif_search,note
+AMYLIN,Amylin Pharmaceuticals,none,,Amylin,"Dissolved after its 2012 acquisition; no GLEIF record. Applicant name expanded by hand (Drugs@FDA lists no labeler)."
+ASTRAZENECA AB,AstraZeneca AB,applicant,636700ITSLXVAJVLAY33,AstraZeneca AB,Sponsor name is the full legal name.
+BOEHRINGER INGELHEIM,"Boehringer Ingelheim Pharmaceuticals, Inc.",group,529900P5FAANZASUYL28,Boehringer Ingelheim,"Applicant name is the labeler on the same applications; it has no LEI."
+ELI LILLY AND CO,Eli Lilly and Company,applicant,FRDRIPF3EKNDJ2CQJL29,Eli Lilly and Company,Applicant name is the labeler on the same applications.
+JANSSEN PHARMS,"Janssen Pharmaceuticals, Inc.",applicant,549300KW7Q8FTDG2UO48,Janssen Pharmaceuticals,Applicant name is the labeler on the same applications.
+MSD,Merck Sharp & Dohme LLC,applicant,5493000ND1PV2SKBAY41,Merck Sharp & Dohme,Applicant name is the labeler on the same applications.
+MSD SUB MERCK,Merck Sharp & Dohme LLC,applicant,5493000ND1PV2SKBAY41,Merck Sharp & Dohme,Applicant name is the labeler on the same applications.
+MYLAN PHARMS INC,Mylan Pharmaceuticals Inc.,applicant,894500ZQWJQXJPI6B828,Mylan Pharmaceuticals,"PHARMS expanded by hand; the current labelers (Biocon Biologics, Civica) are not the application holder."
+NOVO,Novo Nordisk Inc.,group,549300DAQ1CVT6CXN342,Novo Nordisk,"Applicant name is the US company (labeler on the same applications: Novo Nordisk); it has no LEI."
+NOVO NORDISK INC,Novo Nordisk Inc.,group,549300DAQ1CVT6CXN342,Novo Nordisk,Novo Nordisk Inc. has no LEI.
+SANOFI AVENTIS US,Sanofi-Aventis U.S. LLC,group,549300E9PC51EN656011,Sanofi,"Applicant name is the labeler on the same applications; its LEI has lapsed without parent data."
+SANOFI US SERVICES,Sanofi US Services Inc.,group,549300E9PC51EN656011,Sanofi,"Applicant name expanded by hand (labeler: Sanofi-Aventis U.S. LLC); its LEI has lapsed."
+SANOFI-AVENTIS US,Sanofi-Aventis U.S. LLC,group,549300E9PC51EN656011,Sanofi,Applicant name is the labeler on the same applications; its LEI has lapsed without parent data.

@@ -1,0 +1,260 @@
+@prefix dm:   <https://dgg32.github.io/glp/ontology#> .
+@prefix dms:  <https://dgg32.github.io/glp/shapes#> .
+@prefix dmsp: <https://dgg32.github.io/glp/vocab/specialty/> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# The modeling contract for the Diabetes Drug Market knowledge graph.
+# OWL says what the data means and lets the reasoner add facts (open world);
+# these shapes say what the data must look like and report what breaks the rules (closed world).
+# Severity: sh:Violation = wrong data, sh:Warning = needs a look, sh:Info = known quirk worth counting.
+
+<https://dgg32.github.io/glp/shapes> a owl:Ontology ;
+    dcterms:title "SHACL shapes for the Diabetes Drug Market knowledge graph"@en ;
+    owl:versionInfo "0.1.0" ;
+    owl:imports <https://dgg32.github.io/glp/ontology> ;
+    sh:declare [ sh:prefix "dm" ; sh:namespace "https://dgg32.github.io/glp/ontology#"^^xsd:anyURI ] ,
+               [ sh:prefix "skos" ; sh:namespace "http://www.w3.org/2004/02/skos/core#"^^xsd:anyURI ] .
+
+#################################################################
+#  Vocabularies (SKOS)
+#################################################################
+
+dms:ConceptShape a sh:NodeShape ;
+    sh:name "SKOS concept" ;
+    sh:targetClass skos:Concept ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:uniqueLang true ;
+        sh:message "A concept has at most one preferred label per language." ] ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ;
+        sh:qualifiedMinCount 1 ; sh:qualifiedMaxCount 1 ;
+        sh:message "A concept needs exactly one English preferred label." ] ;
+    sh:property [
+        sh:path skos:inScheme ;
+        sh:minCount 1 ;
+        sh:message "A concept must belong to a concept scheme." ] .
+
+dms:MultilingualShape a sh:NodeShape ;
+    sh:name "multilingual drug vocabulary" ;
+    sh:description "Drug classes and substances are the vocabulary users search with, so they need English, Japanese and Chinese names." ;
+    sh:targetClass dm:TherapeuticClass , dm:Substance ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:qualifiedValueShape [ sh:languageIn ( "ja" ) ] ; sh:qualifiedMinCount 1 ;
+        sh:message "Missing Japanese preferred label." ] ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:qualifiedValueShape [ sh:languageIn ( "zh" ) ] ; sh:qualifiedMinCount 1 ;
+        sh:message "Missing Chinese preferred label." ] .
+
+dms:SubstanceShape a sh:NodeShape ;
+    sh:name "active substance" ;
+    sh:targetClass dm:Substance ;
+    sh:property [
+        sh:path dm:inTherapeuticClass ;
+        sh:minCount 1 ;
+        sh:class dm:TherapeuticClass ;
+        sh:message "A substance needs a therapeutic class." ] ;
+    # Not sh:maxCount 1: with reasoning on, the property chain adds every ancestor class. Counting only the
+    # classes with no narrower class of the same substance gives the same answer with reasoning off and on.
+    sh:sparql [
+        sh:message "A substance is in exactly one most specific therapeutic class." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this WHERE {
+              { SELECT $this (COUNT(DISTINCT ?c) AS ?n) WHERE {
+                  $this dm:inTherapeuticClass ?c .
+                  FILTER NOT EXISTS { $this dm:inTherapeuticClass ?narrower . ?narrower skos:broader+ ?c }
+                } GROUP BY $this }
+              FILTER (?n > 1)
+            }""" ] ;
+    # SPARQL rather than sh:qualifiedValueShape + sh:pattern: Stardog 12 does not apply sh:pattern to IRIs there.
+    sh:sparql [
+        sh:message "A substance needs an exactMatch to RxNorm." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this WHERE {
+              FILTER NOT EXISTS {
+                $this skos:exactMatch ?m .
+                FILTER STRSTARTS(STR(?m), "http://purl.bioontology.org/ontology/RXNORM/")
+              }
+            }""" ] .
+
+#################################################################
+#  Products
+#################################################################
+
+dms:ProductShape a sh:NodeShape ;
+    sh:name "medicinal product" ;
+    sh:targetClass dm:MedicinalProduct ;
+    sh:property [
+        sh:path dm:hasActiveSubstance ;
+        sh:minCount 1 ;
+        sh:class dm:Substance ;
+        sh:message "A product must have at least one active substance from the substance vocabulary." ] ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ; sh:uniqueLang true ;
+        sh:message "A product needs one name per language." ] ;
+    sh:property [
+        sh:path dm:cmsGenericName ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "A product needs exactly one CMS generic name." ] ;
+    sh:property [
+        sh:path dm:hasIndication ;
+        sh:minCount 1 ;
+        sh:class dm:Indication ;
+        sh:message "A product needs at least one indication." ] ;
+    sh:property [
+        sh:path dm:manufacturedBy ;
+        sh:maxCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Product has more than one manufacturer (application holder) on record." ] ;
+    sh:sparql [
+        sh:message "The combination flag does not match the number of active substances." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this ?value WHERE {
+              $this dm:isCombinationProduct ?value .
+              { SELECT $this (COUNT(?s) AS ?n) WHERE { $this dm:hasActiveSubstance ?s } GROUP BY $this }
+              FILTER ((?value && ?n < 2) || (!?value && ?n > 1))
+            }""" ] .
+
+#################################################################
+#  Prescribers
+#################################################################
+
+dms:PrescriberShape a sh:NodeShape ;
+    sh:name "healthcare professional" ;
+    sh:targetClass dm:HealthcareProfessional ;
+    sh:property [
+        sh:path dm:pseudonymousId ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:pattern "^[0-9a-f]{16}$" ;
+        sh:message "A prescriber needs exactly one pseudonymous ID (16 hex characters)." ] ;
+    sh:property [
+        sh:path dm:npi ;
+        sh:maxCount 0 ;
+        sh:message "Privacy: real NPIs must never be loaded; use dm:pseudonymousId." ] ;
+    sh:property [
+        sh:path [ sh:inversePath dm:prescribedBy ] ;
+        sh:minCount 1 ;
+        sh:message "A prescriber should have at least one prescription." ] ;
+    sh:property [
+        sh:path dm:cmsPrescriberType ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "A prescriber needs exactly one CMS prescriber type." ] ;
+    sh:property [
+        sh:path dm:hasSpecialty ;
+        sh:minCount 1 ;
+        sh:class dm:Specialty ;
+        sh:severity sh:Warning ;
+        sh:message "No NUCC specialty (prescriber not found in the NPI Registry)." ] ;
+    sh:property [
+        sh:path dm:hasPrimarySpecialty ;
+        sh:maxCount 1 ;
+        sh:message "A prescriber has at most one primary specialty." ] ;
+    sh:property [
+        sh:path dm:hasPrimarySpecialty ;
+        sh:not [ sh:hasValue dmsp:390200000X ] ;
+        sh:severity sh:Info ;
+        sh:message "Primary specialty is 'Student in an Organized Health Care Education/Training Program'; use the CMS prescriber type for analysis." ] .
+
+# Kept for pipelines that handle real NPIs (e.g. the smoke test); never fires on pseudonymized data.
+dms:NpiFormatShape a sh:NodeShape ;
+    sh:name "NPI format" ;
+    sh:targetSubjectsOf dm:npi ;
+    sh:property [
+        sh:path dm:npi ;
+        sh:pattern "^[0-9]{10}$" ;
+        sh:message "NPI must be exactly 10 digits." ] .
+
+#################################################################
+#  Prescription aggregates (one row of CMS Part D)
+#################################################################
+
+dms:PrescriptionShape a sh:NodeShape ;
+    sh:name "prescription aggregate" ;
+    sh:targetClass dm:Prescription ;
+    sh:property [
+        sh:path dm:prescribedBy ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class dm:HealthcareProfessional ;
+        sh:message "A prescription has exactly one prescriber." ] ;
+    sh:property [
+        sh:path dm:forProduct ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class dm:MedicinalProduct ;
+        sh:message "A prescription is for exactly one product." ] ;
+    sh:property [
+        sh:path dm:dataYear ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:gYear ;
+        sh:message "A prescription needs exactly one data year." ] ;
+    # Counts are checked as xsd:integer plus a range, not as xsd:nonNegativeInteger: Stardog stores
+    # integer subtypes in canonical form (xsd:integer), so a nonNegativeInteger datatype check would
+    # fail on every row there. One message per constraint, so reports say exactly what failed.
+    sh:property [
+        sh:path dm:totalClaims ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Total claims must be present exactly once." ] ;
+    sh:property [
+        sh:path dm:totalClaims ;
+        sh:datatype xsd:integer ;
+        sh:message "Total claims must be an integer." ] ;
+    sh:property [
+        sh:path dm:totalClaims ;
+        sh:minInclusive 11 ;
+        sh:message "CMS publishes a prescriber/drug row only with 11 or more claims." ] ;
+    sh:property [
+        sh:path dm:totalClaims ;
+        sh:lessThanOrEquals dm:totalDaySupply ;
+        sh:message "Claims exceed days of supply (every claim covers at least one day)." ] ;
+    sh:property [
+        sh:path dm:totalDaySupply ;
+        sh:minCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:message "Days of supply must be present as an integer." ] ;
+    sh:property [
+        sh:path dm:total30DayFills ;
+        sh:datatype xsd:decimal ;
+        sh:message "30-day fills must be a decimal." ] ;
+    sh:property [
+        sh:path dm:total30DayFills ;
+        sh:minInclusive 0 ;
+        sh:message "30-day fills cannot be negative." ] ;
+    sh:property [
+        sh:path dm:totalDrugCost ;
+        sh:minCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Drug cost must be present as a decimal." ] ;
+    sh:property [
+        sh:path dm:totalDrugCost ;
+        sh:minInclusive 0 ;
+        sh:message "Drug cost cannot be negative." ] ;
+    sh:property [
+        sh:path dm:totalDrugCost ;
+        sh:minExclusive 0 ;
+        sh:severity sh:Warning ;
+        sh:message "Zero total drug cost." ] ;
+    sh:property [
+        sh:path dm:totalBeneficiaries ;
+        sh:datatype xsd:integer ;
+        sh:message "Beneficiary count must be an integer." ] ;
+    sh:property [
+        sh:path dm:totalBeneficiaries ;
+        sh:lessThanOrEquals dm:totalClaims ;
+        sh:message "More beneficiaries than claims (each beneficiary has at least one claim)." ] ;
+    # A count is present OR its suppression flag is set, never both, never neither.
+    sh:xone (
+        [ sh:path dm:totalBeneficiaries ; sh:minCount 1 ]
+        [ sh:path dm:beneficiaryCountSuppressed ; sh:hasValue true ]
+    ) ;
+    sh:message "Either the beneficiary count is present or it is flagged as suppressed (exactly one of the two)." .

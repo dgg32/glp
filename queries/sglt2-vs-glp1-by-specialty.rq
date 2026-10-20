@@ -1,0 +1,22 @@
+# SGLT2 vs GLP-1 claims by prescriber primary specialty (Connecticut, Medicare Part D 2024).
+# Works with reasoning OFF: the class roll-up uses the skos:broader* property path, so
+# tirzepatide (dual GIP/GLP-1) counts as GLP-1 and combination products count for every class they contain.
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+
+SELECT ?specialty
+       (COUNT(DISTINCT ?doc) AS ?prescribers)
+       (SUM(IF(?cls = dmtc:SGLT2Inhibitor, ?claims, 0)) AS ?sglt2Claims)
+       (SUM(IF(?cls = dmtc:GLP1ReceptorAgonist, ?claims, 0)) AS ?glp1Claims)
+FROM <tag:stardog:api:context:all>   # all named graphs (Stardog only reads the default graph otherwise)
+WHERE {
+  VALUES ?cls { dmtc:SGLT2Inhibitor dmtc:GLP1ReceptorAgonist }
+  ?rx dm:prescribedBy ?doc ; dm:forProduct ?prod ; dm:totalClaims ?claims .
+  ?prod dm:hasActiveSubstance ?sub .
+  ?sub dm:inTherapeuticClass/skos:broader* ?cls .
+  ?doc dm:hasPrimarySpecialty/skos:prefLabel ?specialty .
+  FILTER(lang(?specialty) = "en")
+}
+GROUP BY ?specialty
+ORDER BY DESC(?sglt2Claims + ?glp1Claims)

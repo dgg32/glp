@@ -1,0 +1,33 @@
+gnrc_name,drug_class,is_combination,substances,rxcui,rxnorm_name,rxnorm_match
+Empagliflozin,Sodium-glucose co-transporter 2 (SGLT2) inhibitors,false,empagliflozin,1545653,empagliflozin,exact
+Dapagliflozin Propanediol,Sodium-glucose co-transporter 2 (SGLT2) inhibitors,false,dapagliflozin,1486966,dapagliflozin propanediol,exact
+Canagliflozin,Sodium-glucose co-transporter 2 (SGLT2) inhibitors,false,canagliflozin,1373458,canagliflozin,exact
+Ertugliflozin Pidolate,Sodium-glucose co-transporter 2 (SGLT2) inhibitors,false,ertugliflozin,1992674,ertugliflozin pidolate,exact
+Semaglutide,Glucagon-like peptide-1 (GLP-1) analogues,false,semaglutide,1991302,semaglutide,exact
+Tirzepatide,Glucose-dependent Insulinotropic Polypeptide Receptor Agonists,false,tirzepatide,2601723,tirzepatide,exact
+Dulaglutide,Glucagon-like peptide-1 (GLP-1) analogues,false,dulaglutide,1551291,dulaglutide,exact
+Exenatide Microspheres,Glucagon-like peptide-1 (GLP-1) analogues,false,exenatide,60548,exenatide,exact
+Liraglutide,Glucagon-like peptide-1 (GLP-1) analogues,false,liraglutide,475968,liraglutide,exact
+Exenatide,Glucagon-like peptide-1 (GLP-1) analogues,false,exenatide,60548,exenatide,exact
+Sitagliptin Phosphate,Dipeptidyl peptidase 4 (DPP-4) inhibitors,false,sitagliptin,621590,sitagliptin phosphate,exact
+Linagliptin,Dipeptidyl peptidase 4 (DPP-4) inhibitors,false,linagliptin,1100699,linagliptin,exact
+Alogliptin Benzoate,Dipeptidyl peptidase 4 (DPP-4) inhibitors,false,alogliptin,1368000,alogliptin benzoate,exact
+Saxagliptin Hcl,Dipeptidyl peptidase 4 (DPP-4) inhibitors,false,saxagliptin,1043560,saxagliptin hydrochloride,exact
+Metformin Hcl,Biguanides,false,metformin,235743,metformin hydrochloride,exact
+Glipizide,Sulfonylureas,false,glipizide,4821,glipizide,exact
+Glimepiride,Sulfonylureas,false,glimepiride,25789,glimepiride,exact
+Glyburide,Sulfonylureas,false,glyburide,4815,glyburide,exact
+Pioglitazone Hcl,Thiazolidinediones,false,pioglitazone,259319,pioglitazone hydrochloride,exact
+"Insulin Glargine,hum.Rec.Anlog","Insulins and analogues for injection, long-acting",false,insulinGlargine,274783,insulin glargine,exact
+Insulin Glargine-Yfgn,"Insulins and analogues for injection, long-acting",false,insulinGlargine,2563969,insulin glargine-yfgn,exact
+Sitagliptin Phos/Metformin Hcl,Biguanides + Dipeptidyl peptidase 4 (DPP-4) inhibitors,true,metformin|sitagliptin,729717,metformin / sitagliptin,exact
+Empagliflozin/Metformin Hcl,Biguanides + Sodium-glucose co-transporter 2 (SGLT2) inhibitors,true,metformin|empagliflozin,1664314,empagliflozin / metformin,exact
+Linagliptin/Metformin Hcl,Biguanides + Dipeptidyl peptidase 4 (DPP-4) inhibitors,true,metformin|linagliptin,1243019,linagliptin / metformin,exact
+Insulin Glargine/Lixisenatide,"Insulins and analogues for injection, long-acting + Glucagon-like peptide-1 (GLP-1) analogues",true,insulinGlargine|lixisenatide,1858994,insulin glargine / lixisenatide,exact
+Empagliflozin/Linagliptin,Dipeptidyl peptidase 4 (DPP-4) inhibitors + Sodium-glucose co-transporter 2 (SGLT2) inhibitors,true,linagliptin|empagliflozin,1598392,empagliflozin / linagliptin,exact
+Glipizide/Metformin Hcl,Biguanides + Sulfonylureas,true,metformin|glipizide,352381,glipizide / metformin,exact
+Dapaglifloz Propaned/Metformin,Biguanides + Sodium-glucose co-transporter 2 (SGLT2) inhibitors,true,metformin|dapagliflozin,1486436,dapagliflozin / metformin,exact
+Empaglifloz/Linaglip/Metformin,Biguanides + Dipeptidyl peptidase 4 (DPP-4) inhibitors + Sodium-glucose co-transporter 2 (SGLT2) inhibitors,true,metformin|linagliptin|empagliflozin,2281864,empagliflozin / linagliptin / metformin,approximate
+Insulin Degludec/Liraglutide,"Insulins and analogues for injection, long-acting + Glucagon-like peptide-1 (GLP-1) analogues",true,insulinDegludec|liraglutide,1727493,insulin degludec / liraglutide,exact
+Canagliflozin/Metformin Hcl,Biguanides + Sodium-glucose co-transporter 2 (SGLT2) inhibitors,true,metformin|canagliflozin,1545149,canagliflozin / metformin,exact
+Pioglitazone Hcl/Metformin Hcl,Biguanides + Thiazolidinediones,true,metformin|pioglitazone,607999,metformin / pioglitazone,exact

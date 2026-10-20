@@ -1,0 +1,21 @@
+# Cost per claim and per 30-day fill by therapeutic class (Connecticut, Medicare Part D 2024).
+# Single-ingredient products only, so a combination pill's cost is not counted twice.
+# Per 30-day fill is the fairer comparison: a 90-day fill is one claim but three 30-day fills.
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+
+SELECT ?class (SUM(?claims) AS ?claimsTotal) (ROUND(SUM(?cost)) AS ?costTotal)
+       (ROUND(SUM(?cost) / SUM(?claims)) AS ?costPerClaim)
+       (ROUND(SUM(?cost) / SUM(?fills)) AS ?costPer30DayFill)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  VALUES ?cls { dmtc:Biguanide dmtc:Sulfonylurea dmtc:Thiazolidinedione dmtc:DPP4Inhibitor
+                dmtc:SGLT2Inhibitor dmtc:GLP1ReceptorAgonist dmtc:LongActingInsulin }
+  ?prod dm:isCombinationProduct false ; dm:hasActiveSubstance ?sub .
+  ?sub dm:inTherapeuticClass/skos:broader* ?cls .
+  ?rx dm:forProduct ?prod ; dm:totalClaims ?claims ; dm:totalDrugCost ?cost ; dm:total30DayFills ?fills .
+  ?cls skos:prefLabel ?class FILTER(lang(?class) = "en")
+}
+GROUP BY ?class
+ORDER BY DESC(?costPer30DayFill)

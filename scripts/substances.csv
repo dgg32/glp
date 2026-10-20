@@ -1,0 +1,22 @@
+substance,rxcui,rxnorm_name,atc,therapeutic_class,class_evidence,alt_en,cms_names,mesh
+alogliptin,1368001,alogliptin,A10BH04,DPP4Inhibitor,ATC A10BH04,alogliptin benzoate,Alogliptin Benzoate,C520853
+canagliflozin,1373458,canagliflozin,A10BK02,SGLT2Inhibitor,ATC A10BK02,canagliflozin anhydrous,Canagliflozin,D000068896
+dapagliflozin,1488564,dapagliflozin,A10BK01,SGLT2Inhibitor,ATC A10BK01,"dapagliflozin 2,3-butanediol monohydrate|dapagliflozin propanediol",Dapagliflozin Propanediol,C529054
+dulaglutide,1551291,dulaglutide,A10BJ05,GLP1ReceptorAgonist,ATC A10BJ05,,Dulaglutide,C555680
+empagliflozin,1545653,empagliflozin,A10BK03,SGLT2Inhibitor,ATC A10BK03,,Empagliflozin,C570240
+ertugliflozin,1992672,ertugliflozin,A10BK04,SGLT2Inhibitor,ATC A10BK04,ertugliflozin pidolate,Ertugliflozin Pidolate,C570288
+exenatide,60548,exenatide,A10BJ01,GLP1ReceptorAgonist,ATC A10BJ01,,Exenatide Microspheres|Exenatide,D000077270
+glimepiride,25789,glimepiride,A10BB12,Sulfonylurea,ATC A10BB12,,Glimepiride,C057619
+glipizide,4821,glipizide,A10BB07,Sulfonylurea,ATC A10BB07,,Glipizide,D005913
+glyburide,4815,glyburide,A10BB01,Sulfonylurea,ATC A10BB01,"glibenclamide|glyburide, micronized",Glyburide,D005905
+insulinDegludec,1670007,insulin degludec,A10AE06,LongActingInsulin,ATC A10AE06,,,C571886
+insulinGlargine,274783,insulin glargine,A10AE04,LongActingInsulin,ATC A10AE04,insulin glargine-aglr|insulin glargine-aldy|insulin glargine-yfgn,"Insulin Glargine,hum.Rec.Anlog|Insulin Glargine-Yfgn",D000069036
+linagliptin,1100699,linagliptin,A10BH05,DPP4Inhibitor,ATC A10BH05,,Linagliptin,D000069476
+liraglutide,475968,liraglutide,A10BJ02,GLP1ReceptorAgonist,ATC A10BJ02,,Liraglutide,D000069450
+lixisenatide,1440051,lixisenatide,A10BJ03,GLP1ReceptorAgonist,ATC A10BJ03,,,C479460
+metformin,6809,metformin,A10BA02,Biguanide,ATC A10BA02,metformin hydrochloride,Metformin Hcl,D008687
+pioglitazone,33738,pioglitazone,A10BG03,Thiazolidinedione,ATC A10BG03,pioglitazone hydrochloride,Pioglitazone Hcl,D000077205
+saxagliptin,857974,saxagliptin,A10BH03,DPP4Inhibitor,ATC A10BH03,saxagliptin anhydrous|saxagliptin hydrochloride|saxagliptin hydrochloride dihydrate,Saxagliptin Hcl,C502994
+semaglutide,1991302,semaglutide,A10BJ06,GLP1ReceptorAgonist,ATC A10BJ06,,Semaglutide,D000099194
+sitagliptin,593411,sitagliptin,A10BH01,DPP4Inhibitor,ATC A10BH01,sitagliptin hydrochloride|sitagliptin phosphate,Sitagliptin Phosphate,D000068900
+tirzepatide,2601723,tirzepatide,A10BX16,GIPGLP1Agonist,FDA EPC N0000194015,,Tirzepatide,D000098860

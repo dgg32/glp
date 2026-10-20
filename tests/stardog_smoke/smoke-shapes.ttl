@@ -1,0 +1,18 @@
+# Two SHACL shapes for the smoke test (the full shape set comes in the SHACL step).
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix dm:  <https://dgg32.github.io/glp/ontology#> .
+@prefix dms: <https://dgg32.github.io/glp/shapes#> .
+
+dms:NpiShape a sh:NodeShape ;
+    sh:targetSubjectsOf dm:npi ;
+    sh:property [
+        sh:path dm:npi ;
+        sh:pattern "^[0-9]{10}$" ;
+        sh:message "NPI must be exactly 10 digits." ] .
+
+dms:ClaimCountShape a sh:NodeShape ;
+    sh:targetSubjectsOf dm:totalClaims ;
+    sh:property [
+        sh:path dm:totalClaims ;
+        sh:minInclusive 0 ;
+        sh:message "Claim counts cannot be negative." ] .

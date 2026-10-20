@@ -1,0 +1,36 @@
+# Toy data for the reasoning and SHACL smoke tests. Not real people or claims.
+@prefix dm:         <https://dgg32.github.io/glp/ontology#> .
+@prefix dmtc:       <https://dgg32.github.io/glp/vocab/therapeutic-class/> .
+@prefix d:          <https://dgg32.github.io/glp/data/> .
+@prefix skos:       <http://www.w3.org/2004/02/skos/core#> .
+@prefix idmp-mprd:  <https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/> .
+@prefix cmns-rlcmp: <https://www.omg.org/spec/Commons/RolesAndCompositions/> .
+@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> .
+
+# A tiny therapeutic-class tree (the real one comes with the SKOS step)
+dmtc:GIPGLP1Agonist      skos:broader dmtc:GLP1ReceptorAgonist .
+dmtc:GLP1ReceptorAgonist skos:broader dmtc:BloodGlucoseLowering .
+dmtc:SGLT2Inhibitor      skos:broader dmtc:BloodGlucoseLowering .
+dmtc:Biguanide           skos:broader dmtc:BloodGlucoseLowering .
+
+d:empagliflozin dm:inTherapeuticClass dmtc:SGLT2Inhibitor .
+d:tirzepatide   dm:inTherapeuticClass dmtc:GIPGLP1Agonist .
+d:metformin     dm:inTherapeuticClass dmtc:Biguanide .
+
+d:Synjardy   dm:hasActiveSubstance d:empagliflozin , d:metformin .   # combination product
+d:Glucophage dm:hasActiveSubstance d:metformin .
+# Mounjaro modelled the IDMP-O way: product -> active ingredient role -> substance
+d:Mounjaro idmp-mprd:hasActiveIngredient d:mounjaroActive .
+d:mounjaroActive cmns-rlcmp:isPlayedBy d:tirzepatide .
+
+# Only prescribedBy is stored; dm:writes is inferred (ontology 0.2.0)
+d:drA dm:npi "1000000001" .
+d:rx1 dm:prescribedBy d:drA ; dm:forProduct d:Synjardy ;   dm:totalClaims 26 .
+d:drB dm:npi "1000000002" .
+d:rx2 dm:prescribedBy d:drB ; dm:forProduct d:Mounjaro ;   dm:totalClaims 14 .
+d:drC dm:npi "1000000003" .
+d:rx3 dm:prescribedBy d:drC ; dm:forProduct d:Glucophage ; dm:totalClaims 40 .
+
+# Deliberately broken records for SHACL to catch
+d:drD dm:npi "12345" .                                       # NPI not 10 digits
+d:rx4 dm:prescribedBy d:drD ; dm:forProduct d:Glucophage ; dm:totalClaims -3 .   # negative count

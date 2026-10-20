@@ -1,0 +1,16 @@
+# reasoning: true
+# How many prescribers use SGLT2 inhibitors, GLP-1 receptor agonists, or both?
+# dm:SGLT2Prescriber and dm:GLP1Prescriber are never stored: Stardog infers them from the OWL
+# definitions at query time. Run with reasoning off and every count except "all" is 0.
+PREFIX dm: <https://dgg32.github.io/glp/ontology#>
+
+SELECT ?group (COUNT(DISTINCT ?doc) AS ?prescribers)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  { ?doc a dm:HealthcareProfessional BIND("1 all prescribers" AS ?group) }
+  UNION { ?doc a dm:SGLT2Prescriber BIND("2 SGLT2 prescribers" AS ?group) }
+  UNION { ?doc a dm:GLP1Prescriber BIND("3 GLP-1 prescribers" AS ?group) }
+  UNION { ?doc a dm:SGLT2Prescriber , dm:GLP1Prescriber BIND("4 both" AS ?group) }
+}
+GROUP BY ?group
+ORDER BY ?group

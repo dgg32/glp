@@ -1,0 +1,15 @@
+# Where did the manufacturer graph come from? Sources with release and retrieval time, and curated inputs.
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?input ?release ?retrieved ?hash
+WHERE {
+  GRAPH <https://dgg32.github.io/glp/graph/provenance> {
+    <https://dgg32.github.io/glp/graph/drugsfda> prov:wasDerivedFrom ?entity .
+    ?entity rdfs:label ?input .
+    OPTIONAL { ?entity dcterms:hasVersion ?release }
+    OPTIONAL { ?entity prov:wasGeneratedBy/prov:endedAtTime ?retrieved }
+    OPTIONAL { ?entity dcterms:identifier ?hash }
+  }
+}
+ORDER BY ?input
