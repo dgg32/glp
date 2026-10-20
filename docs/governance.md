@@ -68,7 +68,8 @@ every named graph that is loaded, in PROV-O:
   is recorded.
 - **Graphs:** `prov:wasDerivedFrom` their source snapshots, curated input files and generated
   intermediate files, `prov:wasGeneratedBy` the build (with its git commit when the build runs in a
-  git checkout; `provenance.py` omits it otherwise), a triple count and a content hash
+  git checkout, suffixed `-dirty` if tracked files had uncommitted changes; `provenance.py` omits it
+  outside a checkout), a triple count and a content hash
   (`dcterms:identifier`, sha256 of the canonical N-Triples, stable across rebuilds that change
   nothing). The schema graph also carries the ontology version.
 - **Curated files:** a `prov:Entity` each, with its sha256 and author.
@@ -81,13 +82,17 @@ All API responses are cached in `data/raw/`, so a rebuild is offline and reprodu
 deleting a cache folder refreshes that source. Asking the graph where a graph came from is one query,
 [queries/provenance-of-a-graph.rq](../queries/provenance-of-a-graph.rq):
 
-| input | release | retrieved |
+| input | release | retrieved / generated |
 |---|---|---|
 | GLEIF LEI records | 2026-10-14T16:00:00Z | 2026-10-15T02:14:42Z |
 | Wikidata (CC0), labels by identifier | | 2026-10-15T02:35:08Z |
 | openFDA Drugs@FDA | 2026-10-14 | 2026-10-15T01:43:35Z |
-| vocab/src/organization_labels_ja_zh.csv | (sha256 recorded) | |
-| vocab/src/sponsor_lei.csv | (sha256 recorded) | |
+| scripts/labels_ja_zh.csv (generated, sha256 recorded) | | build time |
+| scripts/organizations.csv (generated, sha256 recorded) | | build time |
+| vocab/src/organization_labels_ja_zh.csv (curated, sha256 recorded) | | |
+| vocab/src/sponsor_lei.csv (curated, sha256 recorded) | | |
+
+The full output, with the hashes, is in [query-results.md](query-results.md).
 
 Inside the vocabularies, provenance goes down to the label: every concept has a `skos:editorialNote`
 saying whether its Japanese and Chinese labels come from Wikidata (with the item) or are curated

@@ -329,3 +329,15 @@ Wikidata, for native-speaker review. The scheme-level review note now has a fixe
 - Network retries in `resolve_organizations.gleif()` and `build_rdf.drugsfda_sponsors()` now also
   cover URLError and timeouts; a failing rollback in `load_stardog.py` no longer hides the original
   error.
+
+## 2026-10-20: Round 2 of the bug hunt
+
+- The project is now a git repository (github.com/dgg32/glp). The provenance graph records the
+  build's commit, suffixed `-dirty` when tracked files had uncommitted changes, so a graph built from
+  an edited tree never claims a clean commit. Rebuild and reload after committing to record a clean one.
+- Shapes 0.2.0 (`owl:versionIRI`, `owl:priorVersion`, `skos:changeNote`), versioned like the ontology.
+- `build_rdf.py` stops if a prescriber's claim rows disagree on city or CMS specialty, instead of
+  keeping the first row's value (latent: no such prescriber in the 2024 data).
+- Not changed: `clean_data.py`'s rows-per-class report stays keyed by ATC class name (BUG.md L7).
+  Combination products have composite class names ("Biguanides + DPP-4 inhibitors") with no single
+  class id, and the report is an internal check, not a published table.

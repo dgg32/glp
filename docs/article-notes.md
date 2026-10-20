@@ -36,7 +36,8 @@ data. It found two problems in **my own pipeline**.
 
 ### The twist: proving the rules can fail
 
-After the fixes the real data showed **0 violations**. That raises a fair question: are the rules
+After the fixes the real data showed **0 violations**. (The counts in this section are from that
+run; since 2026-10-20 there are 38 rules, all proven to fire.) That raises a fair question: are the rules
 working, or silently passing? So I wrote one deliberately broken record per rule
 (`tests/shacl/broken-examples.ttl`) and validated it in a temporary graph. The first attempt
 showed **34 of 37** rules firing. The 3 gaps were in my test file, not in the rules. After

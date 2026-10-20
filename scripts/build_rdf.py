@@ -182,6 +182,13 @@ def build_claims(key, report):
     g = new_graph()
     claims = read_csv(CLEAN / "partd_claims.csv")
     pseudonyms = {}
+    # The prescriber's city and CMS specialty are taken from its first claim row; stop if rows disagree
+    # (clean_data.py would join them with " | ") rather than silently keep one.
+    attrs = {}
+    for r in claims:
+        attrs.setdefault(r["prscrbr_npi"], set()).add((r["prscrbr_type"], r["prscrbr_city"], r["prscrbr_state_abrvtn"]))
+    if inconsistent := sum(len(v) > 1 for v in attrs.values()):
+        sys.exit(f"{inconsistent} prescribers have more than one city or CMS specialty; decide how to model them")
 
     def hcp(npi):
         if npi not in pseudonyms:

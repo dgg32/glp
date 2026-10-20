@@ -15,7 +15,10 @@
 
 <https://dgg32.github.io/glp/shapes> a owl:Ontology ;
     dcterms:title "SHACL shapes for the Diabetes Drug Market knowledge graph"@en ;
-    owl:versionInfo "0.1.0" ;
+    owl:versionIRI <https://dgg32.github.io/glp/shapes/0.2.0> ;
+    owl:versionInfo "0.2.0" ;
+    owl:priorVersion <https://dgg32.github.io/glp/shapes/0.1.0> ;
+    skos:changeNote "0.2.0 (2026-10-20): the substance class rule no longer uses sh:maxCount 1, which the ontology's property chain broke under reasoning. It is split into 'A substance needs a therapeutic class.' (sh:minCount 1) and a SPARQL constraint that counts only the most specific classes, so the shapes give the same result with reasoning off and on. 38 rules (was 37)."@en ;
     owl:imports <https://dgg32.github.io/glp/ontology> ;
     sh:declare [ sh:prefix "dm" ; sh:namespace "https://dgg32.github.io/glp/ontology#"^^xsd:anyURI ] ,
                [ sh:prefix "skos" ; sh:namespace "http://www.w3.org/2004/02/skos/core#"^^xsd:anyURI ] .

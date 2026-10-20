@@ -117,9 +117,13 @@ DESCRIPTIONS = {
 
 
 def git_commit():
+    """HEAD's commit, with "-dirty" when tracked files have uncommitted changes (the commit alone would
+    then not describe the code that built the graphs); None outside a git checkout."""
+    def git(*args):
+        return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     try:
-        return subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
-                              text=True, check=True).stdout.strip()
+        commit = git("rev-parse", "HEAD")
+        return commit + "-dirty" if git("status", "--porcelain", "--untracked-files=no") else commit
     except Exception:
         return None
 

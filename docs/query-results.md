@@ -1,12 +1,12 @@
 # Query results
 
-*Generated 2026-10-15 by `scripts/run_queries.py` against Stardog database `glp`. Interpretation: [findings.md](findings.md).*
+*Generated 2026-10-20 by `scripts/run_queries.py` against Stardog database `glp`. Interpretation: [findings.md](findings.md).*
 
 ## cost-per-claim-by-class
 
 [queries/cost-per-claim-by-class.rq](../queries/cost-per-claim-by-class.rq): Cost per claim and per 30-day fill by therapeutic class (Connecticut, Medicare Part D 2024). Single-ingredient products only, so a combination pill's cost is not counted twice. Per 30-day fill is the fairer comparison: a 90-day fill is one claim but three 30-day fills.
 
-*7 rows, 1.0 s*
+*7 rows, 0.6 s*
 
 | class | claimsTotal | costTotal | costPerClaim | costPer30DayFill |
 |---|---|---|---|---|
@@ -48,7 +48,7 @@
 |---|---|
 | 1 all prescribers | 3,896 |
 
-*reasoning on, 4 rows, 1.0 s*
+*reasoning on, 4 rows, 0.7 s*
 
 | group | prescribers |
 |---|---|
@@ -59,15 +59,17 @@
 
 ## provenance-of-a-graph
 
-[queries/provenance-of-a-graph.rq](../queries/provenance-of-a-graph.rq): Where did the manufacturer graph come from? Sources with release and retrieval time, and curated inputs.
+[queries/provenance-of-a-graph.rq](../queries/provenance-of-a-graph.rq): Where did the manufacturer graph come from? Sources with release and retrieval time, curated inputs and generated intermediates (with their hashes).
 
-*5 rows, 0.6 s*
+*7 rows, 0.6 s*
 
 | input | release | retrieved | hash |
 |---|---|---|---|
 | GLEIF LEI records | 2026-10-14T16:00:00Z | 2026-10-15T02:14:42Z |  |
 | Wikidata (CC0), labels by identifier |  | 2026-10-15T02:35:08Z |  |
 | openFDA Drugs@FDA | 2026-10-14 | 2026-10-15T01:43:35Z |  |
+| scripts/labels_ja_zh.csv |  | 2026-10-20T13:19:38Z | sha256:a86536ba05ad7a3affa6a405a874446f31e161e2105f3616ea53858001c9b332 |
+| scripts/organizations.csv |  | 2026-10-20T13:19:38Z | sha256:7023e016eb19baaad983152ca881e9e8518d937f247b26494af396f71533601c |
 | vocab/src/organization_labels_ja_zh.csv |  |  | sha256:b4d1503e193d46a7279f4385ec4f27da1f8c65075d6d098f30b88a5aacbbd28d |
 | vocab/src/sponsor_lei.csv |  |  | sha256:6904aec612e442197a632126a3a555bd7b12cd4abf65ac9bb33f7bb3681df7c0 |
 
@@ -75,7 +77,7 @@
 
 [queries/sglt2-by-japanese-label.rq](../queries/sglt2-by-japanese-label.rq): Ask in Japanese: which specialties prescribe SGLT2阻害薬 (SGLT2 inhibitors) most? The class is found by its Japanese label (preferred or alternative), and specialties are shown with their Japanese label where one exists, otherwise in English.
 
-*10 rows, 1.1 s*
+*10 rows, 0.8 s*
 
 | 専門分野 | 処方件数 | 処方医数 |
 |---|---|---|
@@ -94,7 +96,7 @@
 
 [queries/sglt2-vs-glp1-by-specialty.rq](../queries/sglt2-vs-glp1-by-specialty.rq): SGLT2 vs GLP-1 claims by prescriber primary specialty (Connecticut, Medicare Part D 2024). Works with reasoning OFF: the class roll-up uses the skos:broader* property path, so tirzepatide (dual GIP/GLP-1) counts as GLP-1 and combination products count for every class they contain.
 
-*72 rows, 0.9 s*
+*72 rows, 0.8 s*
 
 | specialty | prescribers | sglt2Claims | glp1Claims |
 |---|---|---|---|
