@@ -2,7 +2,7 @@
 
 An RDF knowledge graph of 2024 Medicare Part D prescribing of type 2 diabetes drugs in Connecticut,
 built with SKOS, OWL and SHACL and served from Stardog. It is the code behind the Medium article
-in [docs/article.md](docs/article.md).
+[Building a Governed Diabetes Prescription Knowledge Graph in RDF](https://medium.com/@dgg32/building-a-governed-diabetes-prescription-knowledge-graph-in-rdf-75667d126ee2).
 
 - **Data:** 22,034 prescriber × drug records for 32 diabetes medicines (GLP-1, SGLT2, DPP-4,
   metformin, sulfonylureas, pioglitazone, long-acting insulins) from 3,896 prescribers, about a
