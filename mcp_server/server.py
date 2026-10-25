@@ -35,6 +35,12 @@ PREFIX dmsub: <https://dgg32.github.io/glp/vocab/substance/>
 PREFIX dmsp: <https://dgg32.github.io/glp/vocab/specialty/>
 PREFIX dmind: <https://dgg32.github.io/glp/vocab/indication/>
 PREFIX d:    <https://dgg32.github.io/glp/data/>
+PREFIX pref: <https://dgg32.github.io/glp/vocab/prefecture/>
+PREFIX sexage: <https://dgg32.github.io/glp/vocab/sex-age/>
+PREFIX setting: <https://dgg32.github.io/glp/vocab/care-setting/>
+PREFIX jpc:  <https://dgg32.github.io/glp/vocab/jp-drug-class/>
+PREFIX qb:   <http://purl.org/linked-data/cube#>
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:  <http://www.w3.org/2002/07/owl#>
@@ -46,35 +52,52 @@ KINDS = {
     "https://dgg32.github.io/glp/ontology#Specialty": "specialty",
     "https://dgg32.github.io/glp/ontology#Indication": "indication",
     "https://dgg32.github.io/glp/ontology#Organization": "company",
+    "https://dgg32.github.io/glp/ontology#Prefecture": "prefecture",
+    "https://dgg32.github.io/glp/ontology#JapaneseDrugClass": "jp_drug_class",
+    "https://dgg32.github.io/glp/ontology#CareSetting": "care_setting",
+    "https://dgg32.github.io/glp/ontology#SexAgeGroup": "sex_age",
 }
 HOW_TO_USE = {
     "drug_class": "?sub dm:inTherapeuticClass/skos:broader* <{iri}> . ?prod dm:hasActiveSubstance ?sub .",
     "substance": "?prod dm:hasActiveSubstance <{iri}> .",
-    "product": "?rx dm:forProduct <{iri}> .",
+    "product": "US: ?rx dm:forProduct <{iri}> .  Japan: ?slice dm:aboutProduct <{iri}> .",
     "specialty": "?doc dm:hasSpecialty/skos:broader* <{iri}> . (for shares by specialty, use "
                  "dm:hasPrimarySpecialty so that each prescriber counts once)",
     "indication": "?prod dm:hasIndication <{iri}> .",
-    "company": "?prod dm:manufacturedBy <{iri}> .",
+    "company": "?prod dm:manufacturedBy <{iri}> .  (corporate group of a Japanese holder: "
+               "?prod dm:manufacturedBy/dm:partOfCorporateGroup <{iri}> .)",
+    "prefecture": "?obs dm:prefecture <{iri}> ; dm:quantity ?q .",
+    "jp_drug_class": "?prod dm:inJapaneseDrugClass <{iri}> .",
+    "care_setting": "?slice dm:careSetting <{iri}> .  (setting:outpatient has the two outpatient settings as "
+                    "narrower: ?slice dm:careSetting/skos:broader* <{iri}> .)",
+    "sex_age": "?obs dm:sexAgeGroup/skos:broader* <{iri}> ; dm:quantity ?q .",
 }
 
 INSTRUCTIONS = """\
-Knowledge graph of US Medicare Part D prescribing of type 2 diabetes drugs in Connecticut, data year
-2024: 3,896 prescribers (pseudonymized), 22,034 prescriber x product claim aggregates, 51 products,
-21 substances in an ATC-based drug class tree, NUCC specialties, manufacturers, indications.
-Labels in English, Japanese and Chinese.
+Knowledge graph of the type 2 diabetes drug market in two countries, sharing one substance and drug
+class vocabulary (ATC-based tree, labels in English, Japanese and Chinese):
+- US: Medicare Part D prescribing in Connecticut, data year 2024: 3,896 prescribers (pseudonymized),
+  22,034 prescriber x product claim aggregates, 51 brand-level products, NUCC specialties, manufacturers.
+- Japan: NDB Open Data, FY2024 (April 2024 - March 2025), all of Japan: 510 strength-level products with
+  NHI prices, dispensed quantities by prefecture, month or sex-age band, in three care settings, as an
+  RDF Data Cube. No prescribers or specialties exist for Japan.
 
 How to answer a question:
 1. Call describe_model once to learn the classes, properties and example queries.
 2. Call resolve_term for every drug, drug class, specialty, company or condition the user mentions,
    in whatever language or spelling they used. Use the returned IRIs in SPARQL instead of guessing
    names. Drug classes roll up: query classes with dm:inTherapeuticClass/skos:broader*.
-3. Call run_sparql. Queries see all named graphs automatically. dm:SGLT2Prescriber and
-   dm:GLP1Prescriber exist only with reasoning=true.
+3. Call run_sparql. Queries see all named graphs automatically. dm:SGLT2Prescriber,
+   dm:GLP1Prescriber, dm:SGLT2Product and dm:GLP1Product exist only with reasoning=true.
 4. Answer in the user's language; prefer labels in that language (skos:prefLabel with lang tag).
 
 Caveats to mention when relevant: Medicare Part D only (mostly people 65+); counts are claims
 (fills and refills), not patients; CMS omits prescriber/drug rows with fewer than 11 claims;
 costs are gross, before rebates; the data cannot say why a drug was prescribed.
+Japan: quantities are tablets, pens or kits, not patients or prescriptions, and cannot be added across
+products; compare in yen (quantity x dm:nhiPrice, prices as of 2026-09-02). Cells below 1,000 (oral) or
+400 (injection) are masked, so prefecture and age figures are lower bounds; national totals are mostly
+unmasked. The prefecture is where the claim was issued. Country comparisons: use shares, not amounts.
 Privacy: prescribers are pseudonyms. Report aggregates; never try to identify an individual.
 """
 
@@ -186,12 +209,13 @@ def resolve_term(text: str, kind: str = "any") -> str:
     """Find the concepts in the graph that a user's word refers to, in any language or spelling.
 
     Matches English, Japanese and Chinese preferred, alternative and hidden labels (including the raw
-    CMS spellings), product brand names and company names. Case- and width-insensitive; falls back to
+    CMS and NDB spellings), product brand names, company names and Japanese prefectures. Case- and width-insensitive; falls back to
     a substring match when nothing matches exactly. Use the returned IRIs in run_sparql.
 
     Args:
         text: the term as the user wrote it, e.g. "Jardiance", "SGLT2阻害薬", "恩格列净", "cardiology"
-        kind: any | drug_class | substance | product | specialty | indication | company
+        kind: any | drug_class | substance | product | specialty | indication | company | prefecture |
+            jp_drug_class | care_setting | sex_age
     """
     term = unicodedata.normalize("NFKC", text).strip()
     if not term:
@@ -297,6 +321,18 @@ SELECT ?p ?kind ?domain ?range ?def ?comment WHERE {
             "- Combination products link to every substance they contain; avoid double counting cost across classes.",
             "- 13 prescribers have no NPI Registry record, hence no specialty. 130 have the primary specialty "
             "'Student in an Organized Health Care Education/Training Program'.",
+            "- Japan (NDB): ?slice a dm:QuantitySlice ; dm:aboutProduct ?prod ; dm:careSetting ?setting ; "
+            "qb:sliceStructure ?key ; dm:totalQuantity ?total ; qb:observation ?obs . ?obs dm:prefecture ?pref "
+            "(or dm:month \"2024-10\"^^xsd:gYearMonth, or dm:sexAgeGroup ?band) ; dm:quantity ?q . "
+            "?key is <https://dgg32.github.io/glp/data/ndb/key/prefecture>, .../month or .../sex-age (full IRIs). "
+            "Each product x setting has one slice per key, "
+            "so for national totals use the prefecture slices only (else every total counts three times).",
+            "- Japan: a masked cell or total has sdmx-attribute:confStatus instead of a value. Value in yen = "
+            "?q * ?price with ?prod dm:nhiPrice ?price. Products: dm:yjCode, dm:receiptCode, dm:isGeneric, "
+            "dm:isOriginator, dm:dispensingUnit, dm:routeOfAdministration, dm:inJapaneseDrugClass (薬効分類 249 "
+            "or 396; GLP-1 drugs are mostly 249). Holders: dm:manufacturedBy, then dm:partOfCorporateGroup for "
+            "the global group shared with the US data.",
+            "- Ages: ?band dm:minAge ?age ; skos:broader ?sex (sexage:M or sexage:F).",
             "", "## Named graphs (queried together automatically)"]
     out += [f"- {g['g']}: {int(g['n']):,} triples" for g in graphs]
     out += ["", "## Example queries"]
@@ -319,10 +355,10 @@ def run_sparql(query: str, reasoning: bool = False, limit: int = 200) -> str:
     """Run a read-only SPARQL query (SELECT, ASK, CONSTRUCT or DESCRIBE) over all named graphs.
 
     Args:
-        query: SPARQL query. No FROM clause needed. Prefixes dm:, dmtc:, dmsub:, dmsp:, dmind:, d:, skos:,
-            rdfs:, owl: must still be declared (copy them from describe_model).
+        query: SPARQL query. No FROM clause needed. Prefixes (dm:, dmtc:, qb:, ...) must still be
+            declared (copy them from describe_model).
         reasoning: true to apply the OWL ontology at query time (needed for dm:SGLT2Prescriber,
-            dm:GLP1Prescriber and dm:writes).
+            dm:GLP1Prescriber, dm:SGLT2Product, dm:GLP1Product and dm:writes).
         limit: maximum rows returned (1-1000).
     """
     try:

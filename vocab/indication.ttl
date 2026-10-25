@@ -115,7 +115,7 @@ dmind:T2DM a skos:Concept,
 <https://dgg32.github.io/glp/vocab/indication> a skos:ConceptScheme ;
     dcterms:creator "Sixing Huang" ;
     dcterms:description "Conditions the medicinal products in the dataset are authorized to treat, as MeSH descriptors."@en ;
-    dcterms:modified "2026-10-15"^^xsd:date ;
+    dcterms:modified "2026-10-25"^^xsd:date ;
     dcterms:title "Indications"@en,
         "適応症"@ja,
         "适应症"@zh ;

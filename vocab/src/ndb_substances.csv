@@ -1,0 +1,27 @@
+substance,search_term,fallback_class,note
+insulinHuman,insulin human,,"RxNorm calls it 'insulin, regular, human'; the id drops 'regular' because NDB's human insulin products include NPH and premixed formulations"
+insulinLispro,insulin lispro,,
+insulinAspart,insulin aspart,,
+insulinDetemir,insulin detemir,,
+insulinGlulisine,insulin glulisine,,
+insulinIcodec,insulin icodec,,once-weekly basal insulin; not marketed in the US
+acetohexamide,acetohexamide,,
+glyclopyramide,glyclopyramide,Sulfonylurea,"Japan only; not in RxNorm, no ATC code and only the general MeSH action 'hypoglycemic agents'. A sulfonylurea by structure and by its YJ code 3961 (sulfonylurea preparations)"
+tolbutamide,tolbutamide,,
+gliclazide,gliclazide,,not marketed in the US
+buformin,buformin,,Japan only; not in RxNorm
+acarbose,acarbose,,
+voglibose,voglibose,,Japan only; not in RxNorm
+nateglinide,nateglinide,,
+mitiglinide,mitiglinide,,Japan only; not in RxNorm
+miglitol,miglitol,,
+vildagliptin,vildagliptin,,not marketed in the US
+repaglinide,repaglinide,,
+teneligliptin,teneligliptin,,Japan only; not in RxNorm
+anagliptin,anagliptin,,Japan only; not in RxNorm
+ipragliflozin,ipragliflozin,,Japan only; not in RxNorm
+luseogliflozin,luseogliflozin,,Japan only; not in RxNorm (UMLS prefers a chemical name)
+tofogliflozin,tofogliflozin,SGLT2Inhibitor,"Japan only; not in RxNorm, no ATC code and no MeSH record. SGLT2 inhibitor by its mechanism of action as stated in the Japanese package insert"
+trelagliptin,trelagliptin,DPP4Inhibitor,"once-weekly DPP-4 inhibitor; Japan only. Not in RxNorm, no ATC code, and its MeSH record has no pharmacological action; DPP-4 inhibitor by the Japanese package insert"
+omarigliptin,omarigliptin,DPP4Inhibitor,"once-weekly DPP-4 inhibitor; Japan only. Not in RxNorm, no ATC code and no MeSH record; DPP-4 inhibitor by the Japanese package insert"
+imeglimin,imeglimin,,first of the glimin class; Japan only

@@ -170,3 +170,74 @@ below use common names.*
   side by the same doctors, not by separate camps.
 - Changing what "SGLT2 prescriber" means (for example, at least 50 claims) is an edit to one OWL
   definition, not to every query that uses it.
+
+## 6. Japan: where the diabetes drug money goes
+
+*All of Japan, NDB Open Data FY2024 (April 2024 - March 2025, 11th release), value = dispensed quantity x
+NHI price (price list of 2026-09-02). Computed 2026-10-25 with
+[queries/jp-class-share-yen.rq](../queries/jp-class-share-yen.rq) and
+[queries/jp-vs-connecticut-class-mix.rq](../queries/jp-vs-connecticut-class-mix.rq).*
+
+Single-ingredient products, share of each country's diabetes drug value:
+
+| Class | Japan | Connecticut |
+|---|---:|---:|
+| SGLT2 inhibitors | 39.3% | 34.1% |
+| DPP-4 inhibitors | **23.9%** | 11.2% |
+| GLP-1 receptor agonists (incl. GIP/GLP-1) | **20.7%** | 50.9% |
+| Insulins | 7.0% | 3.2% (glargine only in the CT subset) |
+| Biguanides | 4.4% | 0.5% |
+| α-glucosidase inhibitors, glimins, glinides | 3.5% | — (not used in the US) |
+| Sulfonylureas, thiazolidinediones | 1.2% | 0.1% |
+
+Japan spends 2.1x the US share on DPP-4 inhibitors and less than half on GLP-1 drugs. Three classes exist
+only in Japan's market. Combination products (not in the table) are 15.7% of Japan's value. Caveats:
+shares, not amounts (yen at list price vs gross USD); Part D is mostly people 65+, NDB all ages.
+
+## 7. Japan: Boehringer Ingelheim's position
+
+*[queries/jp-boehringer-share-by-class.rq](../queries/jp-boehringer-share-by-class.rq). Products in
+combination count in each of their classes (Tradiance in SGLT2 and DPP-4).*
+
+| Class | Boehringer group | Next |
+|---|---:|---|
+| SGLT2 inhibitors | **37.5%** (¥116.4bn) | AstraZeneca 32.2%, Tanabe 10.5% |
+| DPP-4 inhibitors | **27.0%** (¥67.3bn) | MSD 22.2%, Tanabe 16.1%, Novartis 12.1% |
+
+The Japanese holder 日本ベーリンガーインゲルハイム links to the same GLEIF group as the US application
+holder, so one IRI finds the company in both countries. Not visible in the data: the Lilly co-promotion.
+
+## 8. Japan: SGLT2 share by prefecture
+
+*[queries/jp-sglt2-share-by-prefecture.rq](../queries/jp-sglt2-share-by-prefecture.rq); masked cells
+left out.* SGLT2 share of diabetes drug value ranges from 39.3% (Kyoto) and 39.6% (Osaka) to 45.1% (Nara)
+and 44.4% (Okinawa); Tokyo 42.1%. A narrow band: the regional story is weak, the class story strong.
+
+## 9. Japan: age profile and GLP-1 uptake
+
+*[queries/jp-age-profile-by-class.rq](../queries/jp-age-profile-by-class.rq),
+[queries/jp-glp1-monthly-uptake.rq](../queries/jp-glp1-monthly-uptake.rq).*
+
+- Share of value dispensed to patients aged 75+: glinides 48%, α-GI 48%, DPP-4 46%, sulfonylureas 45%,
+  SGLT2 36%, metformin 33%, GLP-1 20%. The older the patient, the more likely a DPP-4 inhibitor.
+- Tirzepatide (Mounjaro) went from ¥1.1bn in April 2024 to ¥4.5bn in March 2025 per month (4x);
+  semaglutide (Ozempic, Wegovy, Rybelsus together) stayed at about ¥6.3bn.
+
+## 10. Japan: generic share before and after October 2024
+
+*[queries/jp-generic-share-by-month.rq](../queries/jp-generic-share-by-month.rq); tablets, outpatient
+(community pharmacy), single-ingredient products.* From October 2024 patients pay part of the price gap
+when they choose an off-patent brand that has a generic (長期収載品の選定療養). The generic share steps up
+that month in every class with established generics:
+
+| Class | Apr 2024 | Sep 2024 | Oct 2024 | Mar 2025 |
+|---|---:|---:|---:|---:|
+| α-glucosidase inhibitors | 90.4% | 91.3% | **94.0%** | 94.8% |
+| Glinides | 75.3% | 77.2% | **81.5%** | 87.5% |
+| Sulfonylureas | 86.7% | 87.4% | **90.6%** | 90.0% |
+| Thiazolidinediones | 91.0% | 92.0% | **94.4%** | 95.1% |
+| DPP-4 inhibitors | 0% | 0% | 0% | 12.8% (vildagliptin and saxagliptin generics, from December 2024) |
+
+Biguanides show 0.2%: NDB's generic flag is the reimbursement definition, which leaves out generics
+priced like their originator (the metformin "MT" generics, priced like Metgluco). A data-definition
+trap worth a paragraph in the article.

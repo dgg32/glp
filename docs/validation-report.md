@@ -1,6 +1,6 @@
 # SHACL validation report
 
-*Generated 2026-10-20 by `scripts/validate.py` against Stardog database `glp` with [shapes/diabetes-market-shapes.ttl](../shapes/diabetes-market-shapes.ttl). Full report: `data/validation/report-2026-10-20.ttl`.*
+*Generated 2026-10-25 by `scripts/validate.py` against Stardog database `glp` with [shapes/diabetes-market-shapes.ttl](../shapes/diabetes-market-shapes.ttl). Full report: `data/validation/report-2026-10-25.ttl`.*
 
 **0 violations, 17 warnings, 130 info.**
 

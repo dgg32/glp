@@ -1,0 +1,133 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dm: <https://dgg32.github.io/glp/ontology#> .
+@prefix dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/> .
+@prefix jpc: <https://dgg32.github.io/glp/vocab/jp-drug-class/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+jpc:249 a skos:Concept,
+        dm:JapaneseDrugClass ;
+    rdfs:label "Other hormone preparations (including antihormones)"@en,
+        "その他のホルモン剤（抗ホルモン剤を含む。）"@ja,
+        "其他激素类药物（含抗激素药）"@zh ;
+    skos:broader jpc:24 ;
+    skos:editorialNote "English and Chinese labels curated, pending native-speaker review."@en,
+        "narrowMatch FastActingInsulin: 3 of the 3 products containing a substance of FastActingInsulin are filed under 249."@en,
+        "narrowMatch GIPGLP1Agonist: 6 of the 6 products containing a substance of GIPGLP1Agonist are filed under 249."@en,
+        "relatedMatch GLP1ReceptorAgonist: 23 of the 25 products containing a substance of GLP1ReceptorAgonist are filed under 249."@en,
+        "relatedMatch LongActingInsulin: 14 of the 16 products containing a substance of LongActingInsulin are filed under 249."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/jp-drug-class> ;
+    skos:narrowMatch dmtc:FastActingInsulin,
+        dmtc:GIPGLP1Agonist ;
+    skos:notation "249" ;
+    skos:prefLabel "Other hormone preparations (including antihormones)"@en,
+        "その他のホルモン剤（抗ホルモン剤を含む。）"@ja,
+        "其他激素类药物（含抗激素药）"@zh ;
+    skos:relatedMatch dmtc:GLP1ReceptorAgonist,
+        dmtc:LongActingInsulin ;
+    skos:scopeNote "Only its diabetes drugs are in this graph: insulins (YJ 2492) and the GLP-1 / GIP-GLP-1 receptor agonists (YJ 2499), which ATC files under A10 but Japan under other hormone preparations."@en .
+
+jpc:396 a skos:Concept,
+        dm:JapaneseDrugClass ;
+    rdfs:label "Antidiabetic agents"@en,
+        "糖尿病用剤"@ja,
+        "糖尿病用药"@zh ;
+    skos:broadMatch dmtc:BloodGlucoseLowering ;
+    skos:broader jpc:39 ;
+    skos:editorialNote "broadMatch BloodGlucoseLowering: 427 of the 450 products containing a substance of BloodGlucoseLowering are filed under 396; 427 products in 396 in all."@en,
+        "narrowMatch AlphaGlucosidaseInhibitor: 92 of the 92 products containing a substance of AlphaGlucosidaseInhibitor are filed under 396."@en,
+        "narrowMatch Biguanide: 36 of the 36 products containing a substance of Biguanide are filed under 396."@en,
+        "narrowMatch DPP4Inhibitor: 47 of the 47 products containing a substance of DPP4Inhibitor are filed under 396."@en,
+        "narrowMatch Glimin: 1 of the 1 products containing a substance of Glimin are filed under 396."@en,
+        "narrowMatch Glinide: 37 of the 37 products containing a substance of Glinide are filed under 396."@en,
+        "narrowMatch SGLT2Inhibitor: 16 of the 16 products containing a substance of SGLT2Inhibitor are filed under 396."@en,
+        "narrowMatch Sulfonylurea: 131 of the 131 products containing a substance of Sulfonylurea are filed under 396."@en,
+        "narrowMatch Thiazolidinedione: 82 of the 82 products containing a substance of Thiazolidinedione are filed under 396."@en,
+        "relatedMatch GLP1ReceptorAgonist: 2 of the 25 products containing a substance of GLP1ReceptorAgonist are filed under 396."@en,
+        "relatedMatch LongActingInsulin: 2 of the 16 products containing a substance of LongActingInsulin are filed under 396."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/jp-drug-class> ;
+    skos:narrowMatch dmtc:AlphaGlucosidaseInhibitor,
+        dmtc:Biguanide,
+        dmtc:DPP4Inhibitor,
+        dmtc:Glimin,
+        dmtc:Glinide,
+        dmtc:SGLT2Inhibitor,
+        dmtc:Sulfonylurea,
+        dmtc:Thiazolidinedione ;
+    skos:notation "396" ;
+    skos:prefLabel "Antidiabetic agents"@en,
+        "糖尿病用剤"@ja,
+        "糖尿病用药"@zh ;
+    skos:relatedMatch dmtc:GLP1ReceptorAgonist,
+        dmtc:LongActingInsulin .
+
+jpc:2 a skos:Concept,
+        dm:JapaneseDrugClass ;
+    rdfs:label "Drugs for individual organ systems"@en,
+        "個々の器官系用医薬品"@ja,
+        "各器官系统用药"@zh ;
+    skos:editorialNote "Japanese label from the Japan Standard Commodity Classification; English and Chinese curated, pending native-speaker review."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/jp-drug-class> ;
+    skos:narrower jpc:24 ;
+    skos:notation "2" ;
+    skos:prefLabel "Drugs for individual organ systems"@en,
+        "個々の器官系用医薬品"@ja,
+        "各器官系统用药"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/jp-drug-class> .
+
+jpc:24 a skos:Concept,
+        dm:JapaneseDrugClass ;
+    rdfs:label "Hormone preparations (including antihormones)"@en,
+        "ホルモン剤（抗ホルモン剤を含む。）"@ja,
+        "激素类药物（含抗激素药）"@zh ;
+    skos:broader jpc:2 ;
+    skos:editorialNote "Japanese label from the Japan Standard Commodity Classification; English and Chinese curated, pending native-speaker review."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/jp-drug-class> ;
+    skos:narrower jpc:249 ;
+    skos:notation "24" ;
+    skos:prefLabel "Hormone preparations (including antihormones)"@en,
+        "ホルモン剤（抗ホルモン剤を含む。）"@ja,
+        "激素类药物（含抗激素药）"@zh .
+
+jpc:3 a skos:Concept,
+        dm:JapaneseDrugClass ;
+    rdfs:label "Metabolic drugs"@en,
+        "代謝性医薬品"@ja,
+        "代谢类药物"@zh ;
+    skos:editorialNote "Japanese label from the Japan Standard Commodity Classification; English and Chinese curated, pending native-speaker review."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/jp-drug-class> ;
+    skos:narrower jpc:39 ;
+    skos:notation "3" ;
+    skos:prefLabel "Metabolic drugs"@en,
+        "代謝性医薬品"@ja,
+        "代谢类药物"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/jp-drug-class> .
+
+jpc:39 a skos:Concept,
+        dm:JapaneseDrugClass ;
+    rdfs:label "Other metabolic drugs"@en,
+        "その他の代謝性医薬品"@ja,
+        "其他代谢类药物"@zh ;
+    skos:broader jpc:3 ;
+    skos:editorialNote "Japanese label from the Japan Standard Commodity Classification; English and Chinese curated, pending native-speaker review."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/jp-drug-class> ;
+    skos:narrower jpc:396 ;
+    skos:notation "39" ;
+    skos:prefLabel "Other metabolic drugs"@en,
+        "その他の代謝性医薬品"@ja,
+        "其他代谢类药物"@zh .
+
+<https://dgg32.github.io/glp/vocab/jp-drug-class> a skos:ConceptScheme ;
+    dcterms:creator "Sixing Huang" ;
+    dcterms:description "The therapeutic categories of the Japan Standard Commodity Classification that the diabetes drugs in NDB Open Data are filed under, with SKOS mapping links to the ATC-based therapeutic class scheme. The mappings are computed from the products (scripts/build_ndb.py), not asserted by hand."@en ;
+    dcterms:modified "2026-10-25"^^xsd:date ;
+    dcterms:title "Japanese therapeutic categories (薬効分類)"@en,
+        "薬効分類"@ja,
+        "日本药效分类"@zh ;
+    skos:hasTopConcept jpc:2,
+        jpc:3 ;
+    prov:wasDerivedFrom <https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177221_00017.html>,
+        <https://www.soumu.go.jp/toukei_toukatsu/index/seido/syouhin/2index.htm> .
+

@@ -73,6 +73,11 @@ SOURCES = {
     "wikidata": ("Wikidata (CC0), labels by identifier", "https://query.wikidata.org/sparql",
                  ["wikidata/*.json"], None),
     "idmp-o": ("IDMP-O (Pistoia Alliance)", "https://github.com/pistoiaalliance/idmp-o", [], lambda: "1.4.0"),
+    "ndb": ("NDB Open Data (MHLW), prescription drugs incl. public-expense claims",
+            "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177221_00017.html", ["ndb/ndb11_prescription.zip"],
+            lambda: "11th release, FY2024 claims (Apr 2024 - Mar 2025); NHI prices as of 2026-09-02"),
+    "nhi-price-list": ("NHI price list (薬価基準収載品目リスト, MHLW)", "https://www.mhlw.go.jp/topics/2026/04/tp20260401-01.html",
+                       ["ndb/yakka_*.xlsx"], lambda: "lists in force 2025-03-19 and 2026-10-14"),
 }
 
 # graph name (as in data/rdf/manifest.csv, relative to GRAPH; "schema" for Stardog's schema graph)
@@ -82,9 +87,19 @@ LINEAGE = {
                ["ontology/diabetes-market.ttl", "ontology/imports/idmp-o-1.4.0-extract.ttl"]),
     "vocab/therapeutic-class": ("scripts/resolve_vocab.py + scripts/build_skos.py",
                                 ["rxnorm", "umls", "mesh", "wikidata"], ["vocab/src/therapeutic_classes.csv"]),
-    "vocab/substance": ("scripts/resolve_drugs.py + scripts/build_skos.py", ["rxnorm", "mesh", "wikidata", "cms-partd"],
+    "vocab/substance": ("scripts/resolve_drugs.py + scripts/build_skos.py",
+                        ["rxnorm", "umls", "mesh", "wikidata", "cms-partd", "nhi-price-list"],
                         ["scripts/cms_generic_names.csv", "vocab/src/therapeutic_classes.csv",
-                         "vocab/src/substance_labels_ja_zh.csv"]),
+                         "vocab/src/substance_labels_ja_zh.csv", "vocab/src/ndb_substances.csv",
+                         "vocab/src/ndb_ingredients.csv"]),
+    "vocab/jp-prefecture": ("scripts/build_ndb.py", ["wikidata"], []),
+    "vocab/ndb-dimensions": ("scripts/build_ndb.py", ["ndb"], []),
+    "vocab/jp-drug-class": ("scripts/clean_ndb.py + scripts/build_ndb.py", ["ndb", "rxnorm", "umls"],
+                            ["vocab/src/ndb_ingredients.csv", "vocab/src/therapeutic_classes.csv"]),
+    "ndb-products": ("scripts/clean_ndb.py + scripts/build_ndb.py", ["ndb", "nhi-price-list"],
+                     ["vocab/src/ndb_ingredients.csv", "vocab/src/ndb_product_indications.csv",
+                      "vocab/src/jp_manufacturers.csv"]),
+    "ndb-2024": ("scripts/clean_ndb.py + scripts/build_ndb.py", ["ndb"], []),
     "vocab/indication": ("scripts/resolve_vocab.py + scripts/build_skos.py", ["mesh", "wikidata"],
                          ["vocab/src/indications.csv"]),
     "vocab/nucc-specialty": ("scripts/build_skos.py", ["nucc"], ["vocab/src/nucc_labels_ja_zh.csv"]),
@@ -105,6 +120,9 @@ GENERATED = {
     "cms-partd-2024": ["data/clean/partd_claims.csv"],
     "npi-registry": ["data/clean/npi_taxonomies.csv"],
     "drugsfda": ["scripts/organizations.csv", "scripts/labels_ja_zh.csv"],
+    "vocab/jp-drug-class": ["data/clean/ndb_products.csv", "scripts/substances.csv", "scripts/therapeutic_classes.csv"],
+    "ndb-products": ["data/clean/ndb_products.csv", "scripts/substances.csv"],
+    "ndb-2024": ["data/clean/ndb_slices.csv", "data/clean/ndb_cells.csv"],
 }
 DESCRIPTIONS = {
     "products": "CMS brand/generic names, linked to substances via RxNorm ingredients and to indications "
@@ -113,6 +131,12 @@ DESCRIPTIONS = {
                 "by their GLEIF ultimate parent.",
     "cms-partd-2024": "Pseudonymized: no prescriber names or NPIs.",
     "shapes": "The SHACL modelling contract; load_stardog.py commits only data with 0 violations.",
+    "ndb-products": "Strength-level products of NDB Open Data FY2024 (receipt code, YJ code, NHI price) with the "
+                    "marketing authorization holders of the NHI price list.",
+    "ndb-2024": "Dispensed quantities as an RDF Data Cube; masked cells and totals carry sdmx-attribute:confStatus. "
+                "Source: NDB Open Data (MHLW).",
+    "vocab/jp-drug-class": "Japanese therapeutic categories with SKOS mappings to the ATC-based classes, computed "
+                           "from the products.",
 }
 
 

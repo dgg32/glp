@@ -1,12 +1,18 @@
-id,atc,fda_epc,broader,mesh_id,alt_en,definition_en,scope_note_en,pref_ja,pref_zh,alt_ja,alt_zh
-DrugsUsedInDiabetes,A10,,,D007004,,,,糖尿病治療薬,糖尿病治疗药物,糖尿病薬|抗糖尿病薬,降糖药|抗糖尿病药
-Insulin,A10A,,,D007328,,,,インスリン製剤,胰岛素及其类似物,インスリン,胰岛素
-LongActingInsulin,A10AE,,,D049528,,,,持効型溶解インスリン,长效胰岛素,持効型インスリン|基礎インスリン,基础胰岛素
-BloodGlucoseLowering,A10B,,,,,,,血糖降下薬（インスリンを除く）,降血糖药（不含胰岛素）,非インスリン血糖降下薬,非胰岛素降糖药
-Biguanide,A10BA,,,,,,,ビグアナイド薬,双胍类药物,BG薬,双胍类
-Sulfonylurea,A10BB,,,,,,,スルホニルウレア薬,磺酰脲类药物,SU薬|スルホニル尿素薬,磺脲类
-Thiazolidinedione,A10BG,,,,,,,チアゾリジン薬,噻唑烷二酮类药物,チアゾリジンジオン系薬,格列酮类|TZD
-DPP4Inhibitor,A10BH,,,,,,,DPP-4阻害薬,DPP-4抑制剂,DPP-4阻害剤,二肽基肽酶-4抑制剂|格列汀类
-GLP1ReceptorAgonist,A10BJ,,,,,,,GLP-1受容体作動薬,GLP-1受体激动剂,GLP-1アナログ|GLP-1作動薬,胰高血糖素样肽-1受体激动剂|GLP-1类似物
-GIPGLP1Agonist,,N0000194015,GLP1ReceptorAgonist,,dual GIP/GLP-1 receptor agonists|twincretins|dual incretin agonists,Agonists of both the GIP and the GLP-1 receptor.,"Placed under GLP-1 receptor agonists by project decision (2026-10-14), as most market analyses do. ATC classifies tirzepatide under A10BX (other blood glucose lowering drugs), so there is no exactMatch to an ATC class.",持続性GIP/GLP-1受容体作動薬,GIP/GLP-1双受体激动剂,GIP/GLP-1受容体作動薬,GIP/GLP-1受体双重激动剂
-SGLT2Inhibitor,A10BK,,,,,,,SGLT2阻害薬,SGLT2抑制剂,SGLT2阻害剤,钠-葡萄糖协同转运蛋白2抑制剂|列净类
+id,atc,fda_epc,broader,mesh_id,alt_en,definition_en,scope_note_en,pref_ja,pref_zh,alt_ja,alt_zh,atc_members,pref_en
+DrugsUsedInDiabetes,A10,,,D007004,,,,糖尿病治療薬,糖尿病治疗药物,糖尿病薬|抗糖尿病薬,降糖药|抗糖尿病药,,
+Insulin,A10A,,,D007328,,,,インスリン製剤,胰岛素及其类似物,インスリン,胰岛素,,
+FastActingInsulin,A10AB,,,,,,,速効型・超速効型インスリン,速效胰岛素,超速効型インスリン|ボーラスインスリン,餐时胰岛素,,
+IntermediateActingInsulin,A10AC,,,,,,,中間型インスリン,中效胰岛素,NPHインスリン,NPH胰岛素,,
+PremixedInsulin,A10AD,,,,,,,混合型インスリン,预混胰岛素,混合型インスリン製剤,预混胰岛素制剂,,
+LongActingInsulin,A10AE,,,D049528,,,,持効型溶解インスリン,长效胰岛素,持効型インスリン|基礎インスリン,基础胰岛素,,
+BloodGlucoseLowering,A10B,,,,,,,血糖降下薬（インスリンを除く）,降血糖药（不含胰岛素）,非インスリン血糖降下薬,非胰岛素降糖药,,
+Biguanide,A10BA,,,,,,,ビグアナイド薬,双胍类药物,BG薬,双胍类,,
+Sulfonylurea,A10BB,,,,,,,スルホニルウレア薬,磺酰脲类药物,SU薬|スルホニル尿素薬,磺脲类,,
+Thiazolidinedione,A10BG,,,,,,,チアゾリジン薬,噻唑烷二酮类药物,チアゾリジンジオン系薬,格列酮类|TZD,,
+DPP4Inhibitor,A10BH,,,,,,,DPP-4阻害薬,DPP-4抑制剂,DPP-4阻害剤,二肽基肽酶-4抑制剂|格列汀类,,
+AlphaGlucosidaseInhibitor,A10BF,,,,,,,α-グルコシダーゼ阻害薬,α-葡萄糖苷酶抑制剂,α-GI,α-糖苷酶抑制剂,,
+Glinide,,N0000175428,BloodGlucoseLowering,,meglitinides|rapid-acting insulin secretagogues,"Short-acting insulin secretagogues that close pancreatic beta-cell ATP-sensitive potassium channels, taken with meals.","Project class (2026-10-25). ATC files repaglinide, nateglinide and mitiglinide under A10BX (other blood glucose lowering drugs) without a class of their own; Japan treats them as one class (速効型インスリン分泌促進薬). Members are defined by their ATC level-5 codes, the label by the FDA Established Pharmacologic Class.",速効型インスリン分泌促進薬,格列奈类药物,グリニド薬|グリニド系薬,格列奈类|餐时血糖调节剂,A10BX02|A10BX03|A10BX08,
+Glimin,,,BloodGlucoseLowering,,,"Oral blood glucose lowering drugs that act on mitochondria, improving both insulin secretion and insulin sensitivity. Imeglimin is the first member.","Project class (2026-10-25). ATC files imeglimin under A10BX (other blood glucose lowering drugs); Japan, where it was first approved, treats it as a class of its own (グリミン系). No FDA class exists, so the English label is curated.",グリミン系薬,格列明类药物,グリミン系,格列明类,A10BX15,Glimins
+GLP1ReceptorAgonist,A10BJ,,,,,,,GLP-1受容体作動薬,GLP-1受体激动剂,GLP-1アナログ|GLP-1作動薬,胰高血糖素样肽-1受体激动剂|GLP-1类似物,,
+GIPGLP1Agonist,,N0000194015,GLP1ReceptorAgonist,,dual GIP/GLP-1 receptor agonists|twincretins|dual incretin agonists,Agonists of both the GIP and the GLP-1 receptor.,"Placed under GLP-1 receptor agonists by project decision (2026-10-14), as most market analyses do. ATC classifies tirzepatide under A10BX (other blood glucose lowering drugs), so there is no exactMatch to an ATC class.",持続性GIP/GLP-1受容体作動薬,GIP/GLP-1双受体激动剂,GIP/GLP-1受容体作動薬,GIP/GLP-1受体双重激动剂,,
+SGLT2Inhibitor,A10BK,,,,,,,SGLT2阻害薬,SGLT2抑制剂,SGLT2阻害剤,钠-葡萄糖协同转运蛋白2抑制剂|列净类,,

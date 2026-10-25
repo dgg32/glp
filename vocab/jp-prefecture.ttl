@@ -1,0 +1,814 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dm: <https://dgg32.github.io/glp/ontology#> .
+@prefix pref: <https://dgg32.github.io/glp/vocab/prefecture/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+pref:01 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Hokkaido"@en,
+        "北海道"@ja,
+        "北海道"@zh ;
+    dcterms:identifier "JP-01" ;
+    skos:exactMatch wd:Q1037393 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "01" ;
+    skos:prefLabel "Hokkaido"@en,
+        "北海道"@ja,
+        "北海道"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:02 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Aomori"@en,
+        "青森県"@ja,
+        "青森县"@zh ;
+    dcterms:identifier "JP-02" ;
+    skos:altLabel "Aomori Prefecture"@en,
+        "青森"@ja ;
+    skos:exactMatch wd:Q71699 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "02" ;
+    skos:prefLabel "Aomori"@en,
+        "青森県"@ja,
+        "青森县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:03 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Iwate"@en,
+        "岩手県"@ja,
+        "岩手县"@zh ;
+    dcterms:identifier "JP-03" ;
+    skos:altLabel "Iwate Prefecture"@en,
+        "岩手"@ja ;
+    skos:exactMatch wd:Q48326 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "03" ;
+    skos:prefLabel "Iwate"@en,
+        "岩手県"@ja,
+        "岩手县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:04 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Miyagi"@en,
+        "宮城県"@ja,
+        "宫城县"@zh ;
+    dcterms:identifier "JP-04" ;
+    skos:altLabel "Miyagi Prefecture"@en,
+        "宮城"@ja ;
+    skos:exactMatch wd:Q47896 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "04" ;
+    skos:prefLabel "Miyagi"@en,
+        "宮城県"@ja,
+        "宫城县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:05 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Akita"@en,
+        "秋田県"@ja,
+        "秋田县"@zh ;
+    dcterms:identifier "JP-05" ;
+    skos:altLabel "Akita Prefecture"@en,
+        "秋田"@ja ;
+    skos:exactMatch wd:Q81863 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "05" ;
+    skos:prefLabel "Akita"@en,
+        "秋田県"@ja,
+        "秋田县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:06 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Yamagata"@en,
+        "山形県"@ja,
+        "山形县"@zh ;
+    dcterms:identifier "JP-06" ;
+    skos:altLabel "Yamagata Prefecture"@en,
+        "山形"@ja ;
+    skos:exactMatch wd:Q125863 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "06" ;
+    skos:prefLabel "Yamagata"@en,
+        "山形県"@ja,
+        "山形县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:07 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Fukushima"@en,
+        "福島県"@ja,
+        "福岛县"@zh ;
+    dcterms:identifier "JP-07" ;
+    skos:altLabel "Fukushima Prefecture"@en,
+        "福島"@ja ;
+    skos:exactMatch wd:Q71707 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "07" ;
+    skos:prefLabel "Fukushima"@en,
+        "福島県"@ja,
+        "福岛县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:08 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Ibaraki"@en,
+        "茨城県"@ja,
+        "茨城县"@zh ;
+    dcterms:identifier "JP-08" ;
+    skos:altLabel "Ibaraki Prefecture"@en,
+        "茨城"@ja ;
+    skos:exactMatch wd:Q83273 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "08" ;
+    skos:prefLabel "Ibaraki"@en,
+        "茨城県"@ja,
+        "茨城县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:09 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Tochigi"@en,
+        "栃木県"@ja,
+        "栃木县"@zh ;
+    dcterms:identifier "JP-09" ;
+    skos:altLabel "Tochigi Prefecture"@en,
+        "栃木"@ja ;
+    skos:exactMatch wd:Q44843 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "09" ;
+    skos:prefLabel "Tochigi"@en,
+        "栃木県"@ja,
+        "栃木县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:10 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Gunma"@en,
+        "群馬県"@ja,
+        "群马县"@zh ;
+    dcterms:identifier "JP-10" ;
+    skos:altLabel "Gunma Prefecture"@en,
+        "群馬"@ja ;
+    skos:exactMatch wd:Q129499 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "10" ;
+    skos:prefLabel "Gunma"@en,
+        "群馬県"@ja,
+        "群马县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:11 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Saitama"@en,
+        "埼玉県"@ja,
+        "埼玉县"@zh ;
+    dcterms:identifier "JP-11" ;
+    skos:altLabel "Saitama Prefecture"@en,
+        "埼玉"@ja ;
+    skos:exactMatch wd:Q128186 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "11" ;
+    skos:prefLabel "Saitama"@en,
+        "埼玉県"@ja,
+        "埼玉县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:12 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Chiba"@en,
+        "千葉県"@ja,
+        "千叶县"@zh ;
+    dcterms:identifier "JP-12" ;
+    skos:altLabel "Chiba Prefecture"@en,
+        "千葉"@ja ;
+    skos:exactMatch wd:Q80011 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "12" ;
+    skos:prefLabel "Chiba"@en,
+        "千葉県"@ja,
+        "千叶县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:13 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Tokyo"@en,
+        "東京都"@ja,
+        "东京都"@zh ;
+    dcterms:identifier "JP-13" ;
+    skos:altLabel "東京"@ja ;
+    skos:exactMatch wd:Q1490 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "13" ;
+    skos:prefLabel "Tokyo"@en,
+        "東京都"@ja,
+        "东京都"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:14 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Kanagawa"@en,
+        "神奈川県"@ja,
+        "神奈川县"@zh ;
+    dcterms:identifier "JP-14" ;
+    skos:altLabel "Kanagawa Prefecture"@en,
+        "神奈川"@ja ;
+    skos:exactMatch wd:Q127513 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "14" ;
+    skos:prefLabel "Kanagawa"@en,
+        "神奈川県"@ja,
+        "神奈川县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:15 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Niigata"@en,
+        "新潟県"@ja,
+        "新潟县"@zh ;
+    dcterms:identifier "JP-15" ;
+    skos:altLabel "Niigata Prefecture"@en,
+        "新潟"@ja ;
+    skos:exactMatch wd:Q132705 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "15" ;
+    skos:prefLabel "Niigata"@en,
+        "新潟県"@ja,
+        "新潟县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:16 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Toyama"@en,
+        "富山県"@ja,
+        "富山县"@zh ;
+    dcterms:identifier "JP-16" ;
+    skos:altLabel "Toyama Prefecture"@en,
+        "富山"@ja ;
+    skos:exactMatch wd:Q132929 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "16" ;
+    skos:prefLabel "Toyama"@en,
+        "富山県"@ja,
+        "富山县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:17 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Ishikawa"@en,
+        "石川県"@ja,
+        "石川县"@zh ;
+    dcterms:identifier "JP-17" ;
+    skos:altLabel "Ishikawa Prefecture"@en,
+        "石川"@ja ;
+    skos:exactMatch wd:Q131281 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "17" ;
+    skos:prefLabel "Ishikawa"@en,
+        "石川県"@ja,
+        "石川县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:18 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Fukui"@en,
+        "福井県"@ja,
+        "福井县"@zh ;
+    dcterms:identifier "JP-18" ;
+    skos:altLabel "Fukui Prefecture"@en,
+        "福井"@ja ;
+    skos:exactMatch wd:Q133879 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "18" ;
+    skos:prefLabel "Fukui"@en,
+        "福井県"@ja,
+        "福井县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:19 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Yamanashi"@en,
+        "山梨県"@ja,
+        "山梨县"@zh ;
+    dcterms:identifier "JP-19" ;
+    skos:altLabel "Yamanashi Prefecture"@en,
+        "山梨"@ja ;
+    skos:exactMatch wd:Q132720 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "19" ;
+    skos:prefLabel "Yamanashi"@en,
+        "山梨県"@ja,
+        "山梨县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:20 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Nagano"@en,
+        "長野県"@ja,
+        "长野县"@zh ;
+    dcterms:identifier "JP-20" ;
+    skos:altLabel "Nagano Prefecture"@en,
+        "長野"@ja ;
+    skos:exactMatch wd:Q127877 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "20" ;
+    skos:prefLabel "Nagano"@en,
+        "長野県"@ja,
+        "长野县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:21 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Gifu"@en,
+        "岐阜県"@ja,
+        "岐阜县"@zh ;
+    dcterms:identifier "JP-21" ;
+    skos:altLabel "Gifu Prefecture"@en,
+        "岐阜"@ja ;
+    skos:exactMatch wd:Q131277 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "21" ;
+    skos:prefLabel "Gifu"@en,
+        "岐阜県"@ja,
+        "岐阜县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:22 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Shizuoka"@en,
+        "静岡県"@ja,
+        "静冈县"@zh ;
+    dcterms:identifier "JP-22" ;
+    skos:altLabel "Shizuoka Prefecture"@en,
+        "静岡"@ja ;
+    skos:exactMatch wd:Q131320 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "22" ;
+    skos:prefLabel "Shizuoka"@en,
+        "静岡県"@ja,
+        "静冈县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:23 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Aichi"@en,
+        "愛知県"@ja,
+        "爱知县"@zh ;
+    dcterms:identifier "JP-23" ;
+    skos:altLabel "Aichi Prefecture"@en,
+        "愛知"@ja ;
+    skos:exactMatch wd:Q80434 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "23" ;
+    skos:prefLabel "Aichi"@en,
+        "愛知県"@ja,
+        "爱知县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:24 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Mie"@en,
+        "三重県"@ja,
+        "三重县"@zh ;
+    dcterms:identifier "JP-24" ;
+    skos:altLabel "Mie Prefecture"@en,
+        "三重"@ja ;
+    skos:exactMatch wd:Q128196 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "24" ;
+    skos:prefLabel "Mie"@en,
+        "三重県"@ja,
+        "三重县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:25 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Shiga"@en,
+        "滋賀県"@ja,
+        "滋贺县"@zh ;
+    dcterms:identifier "JP-25" ;
+    skos:altLabel "Shiga Prefecture"@en,
+        "滋賀"@ja ;
+    skos:exactMatch wd:Q131358 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "25" ;
+    skos:prefLabel "Shiga"@en,
+        "滋賀県"@ja,
+        "滋贺县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:26 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Kyoto"@en,
+        "京都府"@ja,
+        "京都府"@zh ;
+    dcterms:identifier "JP-26" ;
+    skos:altLabel "Kyoto Prefecture"@en,
+        "京"@ja ;
+    skos:exactMatch wd:Q120730 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "26" ;
+    skos:prefLabel "Kyoto"@en,
+        "京都府"@ja,
+        "京都府"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:27 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Osaka"@en,
+        "大阪府"@ja,
+        "大阪府"@zh ;
+    dcterms:identifier "JP-27" ;
+    skos:altLabel "Osaka Prefecture"@en,
+        "大阪"@ja ;
+    skos:exactMatch wd:Q122723 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "27" ;
+    skos:prefLabel "Osaka"@en,
+        "大阪府"@ja,
+        "大阪府"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:28 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Hyōgo"@en,
+        "兵庫県"@ja,
+        "兵库县"@zh ;
+    dcterms:identifier "JP-28" ;
+    skos:altLabel "Hyōgo Prefecture"@en,
+        "兵庫"@ja ;
+    skos:exactMatch wd:Q130290 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "28" ;
+    skos:prefLabel "Hyōgo"@en,
+        "兵庫県"@ja,
+        "兵库县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:29 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Nara"@en,
+        "奈良県"@ja,
+        "奈良县"@zh ;
+    dcterms:identifier "JP-29" ;
+    skos:altLabel "Nara Prefecture"@en,
+        "奈良"@ja ;
+    skos:exactMatch wd:Q131287 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "29" ;
+    skos:prefLabel "Nara"@en,
+        "奈良県"@ja,
+        "奈良县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:30 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Wakayama"@en,
+        "和歌山県"@ja,
+        "和歌山县"@zh ;
+    dcterms:identifier "JP-30" ;
+    skos:altLabel "Wakayama Prefecture"@en,
+        "和歌山"@ja ;
+    skos:exactMatch wd:Q131314 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "30" ;
+    skos:prefLabel "Wakayama"@en,
+        "和歌山県"@ja,
+        "和歌山县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:31 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Tottori"@en,
+        "鳥取県"@ja,
+        "鸟取县"@zh ;
+    dcterms:identifier "JP-31" ;
+    skos:altLabel "Tottori Prefecture"@en,
+        "鳥取"@ja ;
+    skos:exactMatch wd:Q133935 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "31" ;
+    skos:prefLabel "Tottori"@en,
+        "鳥取県"@ja,
+        "鸟取县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:32 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Shimane"@en,
+        "島根県"@ja,
+        "岛根县"@zh ;
+    dcterms:identifier "JP-32" ;
+    skos:altLabel "Shimane Prefecture"@en,
+        "島根"@ja ;
+    skos:exactMatch wd:Q132751 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "32" ;
+    skos:prefLabel "Shimane"@en,
+        "島根県"@ja,
+        "岛根县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:33 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Okayama"@en,
+        "岡山県"@ja,
+        "冈山县"@zh ;
+    dcterms:identifier "JP-33" ;
+    skos:altLabel "Okayama Prefecture"@en,
+        "岡山"@ja ;
+    skos:exactMatch wd:Q132936 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "33" ;
+    skos:prefLabel "Okayama"@en,
+        "岡山県"@ja,
+        "冈山县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:34 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Hiroshima"@en,
+        "広島県"@ja,
+        "广岛县"@zh ;
+    dcterms:identifier "JP-34" ;
+    skos:altLabel "Hiroshima Prefecture"@en,
+        "広島"@ja ;
+    skos:exactMatch wd:Q617375 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "34" ;
+    skos:prefLabel "Hiroshima"@en,
+        "広島県"@ja,
+        "广岛县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:35 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Yamaguchi"@en,
+        "山口県"@ja,
+        "山口县"@zh ;
+    dcterms:identifier "JP-35" ;
+    skos:altLabel "Yamaguchi Prefecture"@en,
+        "山口"@ja ;
+    skos:exactMatch wd:Q127264 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "35" ;
+    skos:prefLabel "Yamaguchi"@en,
+        "山口県"@ja,
+        "山口县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:36 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Tokushima"@en,
+        "徳島県"@ja,
+        "德岛县"@zh ;
+    dcterms:identifier "JP-36" ;
+    skos:altLabel "Tokushima Prefecture"@en,
+        "徳島"@ja ;
+    skos:exactMatch wd:Q160734 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "36" ;
+    skos:prefLabel "Tokushima"@en,
+        "徳島県"@ja,
+        "德岛县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:37 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Kagawa"@en,
+        "香川県"@ja,
+        "香川县"@zh ;
+    dcterms:identifier "JP-37" ;
+    skos:altLabel "Kagawa Prefecture"@en,
+        "香川"@ja ;
+    skos:exactMatch wd:Q161454 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "37" ;
+    skos:prefLabel "Kagawa"@en,
+        "香川県"@ja,
+        "香川县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:38 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Ehime"@en,
+        "愛媛県"@ja,
+        "爱媛县"@zh ;
+    dcterms:identifier "JP-38" ;
+    skos:altLabel "Ehime Prefecture"@en,
+        "愛媛"@ja ;
+    skos:exactMatch wd:Q123376 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "38" ;
+    skos:prefLabel "Ehime"@en,
+        "愛媛県"@ja,
+        "爱媛县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:39 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Kōchi"@en,
+        "高知県"@ja,
+        "高知县"@zh ;
+    dcterms:identifier "JP-39" ;
+    skos:altLabel "Kōchi Prefecture"@en,
+        "高知"@ja ;
+    skos:exactMatch wd:Q134093 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "39" ;
+    skos:prefLabel "Kōchi"@en,
+        "高知県"@ja,
+        "高知县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:40 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Fukuoka"@en,
+        "福岡県"@ja,
+        "福冈县"@zh ;
+    dcterms:identifier "JP-40" ;
+    skos:altLabel "Fukuoka Prefecture"@en,
+        "福岡"@ja ;
+    skos:exactMatch wd:Q123258 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "40" ;
+    skos:prefLabel "Fukuoka"@en,
+        "福岡県"@ja,
+        "福冈县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:41 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Saga"@en,
+        "佐賀県"@ja,
+        "佐贺县"@zh ;
+    dcterms:identifier "JP-41" ;
+    skos:altLabel "Saga Prefecture"@en,
+        "佐賀"@ja ;
+    skos:exactMatch wd:Q160420 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "41" ;
+    skos:prefLabel "Saga"@en,
+        "佐賀県"@ja,
+        "佐贺县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:42 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Nagasaki"@en,
+        "長崎県"@ja,
+        "长崎县"@zh ;
+    dcterms:identifier "JP-42" ;
+    skos:altLabel "Nagasaki Prefecture"@en,
+        "長崎"@ja ;
+    skos:exactMatch wd:Q169376 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "42" ;
+    skos:prefLabel "Nagasaki"@en,
+        "長崎県"@ja,
+        "长崎县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:43 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Kumamoto"@en,
+        "熊本県"@ja,
+        "熊本县"@zh ;
+    dcterms:identifier "JP-43" ;
+    skos:altLabel "Kumamoto Prefecture"@en,
+        "熊本"@ja ;
+    skos:exactMatch wd:Q130308 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "43" ;
+    skos:prefLabel "Kumamoto"@en,
+        "熊本県"@ja,
+        "熊本县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:44 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Ōita"@en,
+        "大分県"@ja,
+        "大分县"@zh ;
+    dcterms:identifier "JP-44" ;
+    skos:altLabel "Ōita Prefecture"@en,
+        "大分"@ja ;
+    skos:exactMatch wd:Q133924 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "44" ;
+    skos:prefLabel "Ōita"@en,
+        "大分県"@ja,
+        "大分县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:45 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Miyazaki"@en,
+        "宮崎県"@ja,
+        "宫崎县"@zh ;
+    dcterms:identifier "JP-45" ;
+    skos:altLabel "Miyazaki Prefecture"@en,
+        "宮崎"@ja ;
+    skos:exactMatch wd:Q130300 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "45" ;
+    skos:prefLabel "Miyazaki"@en,
+        "宮崎県"@ja,
+        "宫崎县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:46 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Kagoshima"@en,
+        "鹿児島県"@ja,
+        "鹿儿岛县"@zh ;
+    dcterms:identifier "JP-46" ;
+    skos:altLabel "Kagoshima Prefecture"@en,
+        "鹿児島"@ja ;
+    skos:exactMatch wd:Q15701 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "46" ;
+    skos:prefLabel "Kagoshima"@en,
+        "鹿児島県"@ja,
+        "鹿儿岛县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+pref:47 a skos:Concept,
+        dm:Prefecture ;
+    rdfs:label "Okinawa"@en,
+        "沖縄県"@ja,
+        "冲绳县"@zh ;
+    dcterms:identifier "JP-47" ;
+    skos:altLabel "Okinawa Prefecture"@en,
+        "沖縄"@ja ;
+    skos:exactMatch wd:Q766445 ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> ;
+    skos:notation "47" ;
+    skos:prefLabel "Okinawa"@en,
+        "沖縄県"@ja,
+        "冲绳县"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+
+<https://dgg32.github.io/glp/vocab/prefecture> a skos:ConceptScheme ;
+    dcterms:creator "Sixing Huang" ;
+    dcterms:description "The 47 prefectures with their JIS X 0401 codes, as NDB Open Data reports them. Labels from Wikidata (CC0), found by ISO 3166-2 code."@en ;
+    dcterms:modified "2026-10-25"^^xsd:date ;
+    dcterms:title "Prefectures of Japan"@en,
+        "都道府県"@ja,
+        "日本都道府县"@zh ;
+    skos:hasTopConcept pref:01,
+        pref:02,
+        pref:03,
+        pref:04,
+        pref:05,
+        pref:06,
+        pref:07,
+        pref:08,
+        pref:09,
+        pref:10,
+        pref:11,
+        pref:12,
+        pref:13,
+        pref:14,
+        pref:15,
+        pref:16,
+        pref:17,
+        pref:18,
+        pref:19,
+        pref:20,
+        pref:21,
+        pref:22,
+        pref:23,
+        pref:24,
+        pref:25,
+        pref:26,
+        pref:27,
+        pref:28,
+        pref:29,
+        pref:30,
+        pref:31,
+        pref:32,
+        pref:33,
+        pref:34,
+        pref:35,
+        pref:36,
+        pref:37,
+        pref:38,
+        pref:39,
+        pref:40,
+        pref:41,
+        pref:42,
+        pref:43,
+        pref:44,
+        pref:45,
+        pref:46,
+        pref:47 ;
+    prov:wasDerivedFrom <https://www.wikidata.org/wiki/Property:P300> .
+

@@ -1,0 +1,32 @@
+# Japan (NDB FY2024, yen at NHI prices) vs Connecticut (Medicare Part D 2024, gross USD): each class's share of
+# the country's diabetes drug value, through the shared ATC-based class tree. Single-ingredient products only.
+# Shares, not amounts: different currencies, payers (all ages vs mostly 65+) and price levels.
+# xsd:double: quantity x price overflows the fixed-point decimals of some engines (Oxigraph).
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX qb:   <http://purl.org/linked-data/cube#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+
+# COALESCE: in SPARQL, SUM over a variable that is unbound in some rows is an error, not a partial sum.
+SELECT ?class (ROUND(1000 * SUM(COALESCE(?jp, 0)) / MAX(?jpAll)) / 10 AS ?japanPct)
+       (ROUND(1000 * xsd:double(SUM(COALESCE(?us, 0))) / MAX(?usAll)) / 10 AS ?connecticutPct)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  VALUES ?cls { dmtc:Insulin dmtc:Biguanide dmtc:Sulfonylurea dmtc:Thiazolidinedione dmtc:DPP4Inhibitor
+                dmtc:AlphaGlucosidaseInhibitor dmtc:Glinide dmtc:Glimin dmtc:SGLT2Inhibitor dmtc:GLP1ReceptorAgonist }
+  { SELECT (SUM(xsd:double(?q0) * ?p0) AS ?jpAll) WHERE {
+      ?s0 qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> ; dm:totalQuantity ?q0 ;
+          dm:aboutProduct [ dm:nhiPrice ?p0 ; dm:isCombinationProduct false ] } }
+  { SELECT (SUM(?c0) AS ?usAll) WHERE { ?r0 dm:totalDrugCost ?c0 ; dm:forProduct/dm:isCombinationProduct false } }
+  ?cls skos:prefLabel ?class FILTER (lang(?class) = "en")
+  OPTIONAL {
+    { ?slice qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> ; dm:totalQuantity ?q ;
+             dm:aboutProduct ?prod . ?prod dm:nhiPrice ?price . BIND (xsd:double(?q) * ?price AS ?jp) }
+    UNION
+    { ?rx dm:forProduct ?prod ; dm:totalDrugCost ?us }
+    ?prod dm:isCombinationProduct false ; dm:hasActiveSubstance/dm:inTherapeuticClass/skos:broader* ?cls .
+  }
+}
+GROUP BY ?class
+ORDER BY DESC(?japanPct)

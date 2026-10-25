@@ -1,0 +1,32 @@
+# Japan, FY2024: Boehringer Ingelheim's value share (yen) in the classes where it has products, by corporate
+# group of the marketing authorization holder. Nippon Boehringer Ingelheim links to the same GLEIF group as
+# the US application holder (dm:partOfCorporateGroup), so one IRI finds the company in both countries.
+# Products in combination count in each of their classes (Tradiance: SGLT2 and DPP-4).
+# xsd:double: quantity x price overflows the fixed-point decimals of some engines (Oxigraph).
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX qb:   <http://purl.org/linked-data/cube#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+PREFIX d:    <https://dgg32.github.io/glp/data/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?class ?company (ROUND(SUM(?yen) / 1000000) AS ?yenMillion) (ROUND(1000 * SUM(?yen) / MAX(?classYen)) / 10 AS ?sharePct)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  VALUES ?cls { dmtc:SGLT2Inhibitor dmtc:DPP4Inhibitor }
+  { SELECT ?cls (SUM(xsd:double(?q0) * ?p0) AS ?classYen) WHERE {
+      ?s0 qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> ; dm:aboutProduct ?p ; dm:totalQuantity ?q0 .
+      ?p dm:nhiPrice ?p0 ; dm:hasActiveSubstance/dm:inTherapeuticClass ?cls } GROUP BY ?cls }
+  ?slice qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> ; dm:aboutProduct ?prod ; dm:totalQuantity ?q .
+  ?prod dm:nhiPrice ?price ; dm:hasActiveSubstance/dm:inTherapeuticClass ?cls .
+  BIND (xsd:double(?q) * ?price AS ?yen)
+  OPTIONAL { ?prod dm:manufacturedBy ?mah . OPTIONAL { ?mah dm:partOfCorporateGroup ?grp } }
+  BIND (COALESCE(?grp, ?mah) AS ?org)
+  OPTIONAL { ?org rdfs:label ?orgName FILTER (lang(?orgName) = "en") }
+  BIND (COALESCE(?orgName, "(no single holder: unified-name generic)") AS ?company)
+  ?cls skos:prefLabel ?class FILTER (lang(?class) = "en")
+}
+GROUP BY ?class ?company
+HAVING (SUM(?yen) > 1000000000)
+ORDER BY ?class DESC(?yenMillion)

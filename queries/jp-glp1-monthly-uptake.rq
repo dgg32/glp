@@ -1,0 +1,20 @@
+# Japan, FY2024: monthly value (yen) of GLP-1 and GIP/GLP-1 receptor agonists by substance, all care settings.
+# Quantities are in pens, tablets or kits, which cannot be added across products, so value is the common unit.
+# Masked month cells (small products) are left out. Products alone only (no insulin combinations).
+# xsd:double: quantity x price overflows the fixed-point decimals of some engines (Oxigraph).
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX qb:   <http://purl.org/linked-data/cube#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+
+SELECT ?month ?substance (ROUND(SUM(xsd:double(?q) * ?price) / 1000000) AS ?yenMillion)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  ?slice qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/month> ; dm:aboutProduct ?prod ; qb:observation ?o .
+  ?o dm:month ?month ; dm:quantity ?q .
+  ?prod dm:nhiPrice ?price ; dm:isCombinationProduct false ; dm:hasActiveSubstance ?sub .
+  ?sub dm:inTherapeuticClass/skos:broader* dmtc:GLP1ReceptorAgonist ; skos:prefLabel ?substance FILTER (lang(?substance) = "en")
+}
+GROUP BY ?month ?substance
+ORDER BY ?month DESC(?yenMillion)

@@ -1,22 +1,48 @@
-substance,rxcui,rxnorm_name,atc,therapeutic_class,class_evidence,alt_en,cms_names,mesh
-alogliptin,1368001,alogliptin,A10BH04,DPP4Inhibitor,ATC A10BH04,alogliptin benzoate,Alogliptin Benzoate,C520853
-canagliflozin,1373458,canagliflozin,A10BK02,SGLT2Inhibitor,ATC A10BK02,canagliflozin anhydrous,Canagliflozin,D000068896
-dapagliflozin,1488564,dapagliflozin,A10BK01,SGLT2Inhibitor,ATC A10BK01,"dapagliflozin 2,3-butanediol monohydrate|dapagliflozin propanediol",Dapagliflozin Propanediol,C529054
-dulaglutide,1551291,dulaglutide,A10BJ05,GLP1ReceptorAgonist,ATC A10BJ05,,Dulaglutide,C555680
-empagliflozin,1545653,empagliflozin,A10BK03,SGLT2Inhibitor,ATC A10BK03,,Empagliflozin,C570240
-ertugliflozin,1992672,ertugliflozin,A10BK04,SGLT2Inhibitor,ATC A10BK04,ertugliflozin pidolate,Ertugliflozin Pidolate,C570288
-exenatide,60548,exenatide,A10BJ01,GLP1ReceptorAgonist,ATC A10BJ01,,Exenatide Microspheres|Exenatide,D000077270
-glimepiride,25789,glimepiride,A10BB12,Sulfonylurea,ATC A10BB12,,Glimepiride,C057619
-glipizide,4821,glipizide,A10BB07,Sulfonylurea,ATC A10BB07,,Glipizide,D005913
-glyburide,4815,glyburide,A10BB01,Sulfonylurea,ATC A10BB01,"glibenclamide|glyburide, micronized",Glyburide,D005905
-insulinDegludec,1670007,insulin degludec,A10AE06,LongActingInsulin,ATC A10AE06,,,C571886
-insulinGlargine,274783,insulin glargine,A10AE04,LongActingInsulin,ATC A10AE04,insulin glargine-aglr|insulin glargine-aldy|insulin glargine-yfgn,"Insulin Glargine,hum.Rec.Anlog|Insulin Glargine-Yfgn",D000069036
-linagliptin,1100699,linagliptin,A10BH05,DPP4Inhibitor,ATC A10BH05,,Linagliptin,D000069476
-liraglutide,475968,liraglutide,A10BJ02,GLP1ReceptorAgonist,ATC A10BJ02,,Liraglutide,D000069450
-lixisenatide,1440051,lixisenatide,A10BJ03,GLP1ReceptorAgonist,ATC A10BJ03,,,C479460
-metformin,6809,metformin,A10BA02,Biguanide,ATC A10BA02,metformin hydrochloride,Metformin Hcl,D008687
-pioglitazone,33738,pioglitazone,A10BG03,Thiazolidinedione,ATC A10BG03,pioglitazone hydrochloride,Pioglitazone Hcl,D000077205
-saxagliptin,857974,saxagliptin,A10BH03,DPP4Inhibitor,ATC A10BH03,saxagliptin anhydrous|saxagliptin hydrochloride|saxagliptin hydrochloride dihydrate,Saxagliptin Hcl,C502994
-semaglutide,1991302,semaglutide,A10BJ06,GLP1ReceptorAgonist,ATC A10BJ06,,Semaglutide,D000099194
-sitagliptin,593411,sitagliptin,A10BH01,DPP4Inhibitor,ATC A10BH01,sitagliptin hydrochloride|sitagliptin phosphate,Sitagliptin Phosphate,D000068900
-tirzepatide,2601723,tirzepatide,A10BX16,GIPGLP1Agonist,FDA EPC N0000194015,,Tirzepatide,D000098860
+substance,rxcui,umls_cui,rxnorm_name,pref_en,atc,therapeutic_class,class_evidence,alt_en,cms_names,ndb_names,mesh
+acarbose,16681,,acarbose,acarbose,A10BF01,AlphaGlucosidaseInhibitor,ATC A10BF01,,,アカルボース,D020909
+acetohexamide,173,,acetohexamide,acetohexamide,A10BB31,Sulfonylurea,ATC A10BB31,,,アセトヘキサミド,D000092
+alogliptin,1368001,,alogliptin,alogliptin,A10BH04,DPP4Inhibitor,ATC A10BH04,alogliptin benzoate,Alogliptin Benzoate,アログリプチン安息香酸塩,C520853
+anagliptin,,C3272640,,anagliptin,,DPP4Inhibitor,MeSH pharmacological action D054873,,,アナグリプチン,C583175
+buformin,,C0006359,,buformin,A10BA03,Biguanide,ATC A10BA03,,,ブホルミン塩酸塩,D002026
+canagliflozin,1373458,,canagliflozin,canagliflozin,A10BK02,SGLT2Inhibitor,ATC A10BK02,canagliflozin anhydrous,Canagliflozin,カナグリフロジン水和物,D000068896
+dapagliflozin,1488564,,dapagliflozin,dapagliflozin,A10BK01,SGLT2Inhibitor,ATC A10BK01,"dapagliflozin 2,3-butanediol monohydrate|dapagliflozin propanediol",Dapagliflozin Propanediol,ダパグリフロジンプロピレングリコール水和物,C529054
+dulaglutide,1551291,,dulaglutide,dulaglutide,A10BJ05,GLP1ReceptorAgonist,ATC A10BJ05,,Dulaglutide,デュラグルチド（遺伝子組換え）,C555680
+empagliflozin,1545653,,empagliflozin,empagliflozin,A10BK03,SGLT2Inhibitor,ATC A10BK03,,Empagliflozin,エンパグリフロジン,C570240
+ertugliflozin,1992672,,ertugliflozin,ertugliflozin,A10BK04,SGLT2Inhibitor,ATC A10BK04,ertugliflozin pidolate,Ertugliflozin Pidolate,,C570288
+exenatide,60548,,exenatide,exenatide,A10BJ01,GLP1ReceptorAgonist,ATC A10BJ01,,Exenatide Microspheres|Exenatide,エキセナチド,D000077270
+gliclazide,4816,,gliclazide,gliclazide,A10BB09,Sulfonylurea,ATC A10BB09,,,グリクラジド,D005907
+glimepiride,25789,,glimepiride,glimepiride,A10BB12,Sulfonylurea,ATC A10BB12,,Glimepiride,グリメピリド,C057619
+glipizide,4821,,glipizide,glipizide,A10BB07,Sulfonylurea,ATC A10BB07,,Glipizide,,D005913
+glyburide,4815,,glyburide,glyburide,A10BB01,Sulfonylurea,ATC A10BB01,"glibenclamide|glyburide, micronized",Glyburide,グリベンクラミド,D005905
+glyclopyramide,,C0607456,,glyclopyramide,,Sulfonylurea,curated fallback (ndb_substances.csv),,,グリクロピラミド,C017346
+imeglimin,,C3501765,,imeglimin,A10BX15,Glimin,ATC A10BX15 (project class member),,,イメグリミン塩酸塩,C575881
+insulinAspart,51428,,"insulin aspart, human",insulin aspart,A10AB05|A10AD05,Insulin,"ATC A10AB05,A10AD05 (common broader class)","insulin aspart, human|insulin aspart-fsan|insulin aspart-szjj|insulin aspart-xjhz",,インスリンアスパルト（遺伝子組換え）|インスリンアスパルト（遺伝子組換え）［インスリンアスパルト後続１］,D061267
+insulinDegludec,1670007,,insulin degludec,insulin degludec,A10AE06,LongActingInsulin,ATC A10AE06,,,インスリンデグルデク（遺伝子組換え）,C571886
+insulinDetemir,139825,,insulin detemir,insulin detemir,A10AE05,LongActingInsulin,ATC A10AE05,,,インスリンデテミル（遺伝子組換え）,D000069057
+insulinGlargine,274783,,insulin glargine,insulin glargine,A10AE04,LongActingInsulin,ATC A10AE04,insulin glargine-aglr|insulin glargine-aldy|insulin glargine-yfgn,"Insulin Glargine,hum.Rec.Anlog|Insulin Glargine-Yfgn",インスリングラルギン（遺伝子組換え）|インスリングラルギン（遺伝子組換え）［インスリングラルギン後続１］|インスリングラルギン（遺伝子組換え）［インスリングラルギン後続２］,D000069036
+insulinGlulisine,400008,,"insulin glulisine, human",insulin glulisine,A10AB06,FastActingInsulin,ATC A10AB06,"insulin glulisine|insulin glulisine, human",,インスリングルリジン（遺伝子組換え）,C479079
+insulinHuman,253182,,"insulin, regular, human",insulin human,A10AB01|A10AC01|A10AD01|A10AE01|A10AF01,Insulin,"ATC A10AB01,A10AC01,A10AD01,A10AE01 (common broader class)","insulin, regular, human",,インスリン　ヒト（遺伝子組換え）,D061386
+insulinIcodec,2740394,,insulin icodec,insulin icodec,A10AE07,LongActingInsulin,ATC A10AE07,insulin icodec-abae,,インスリン　イコデク（遺伝子組換え）,C000712207
+insulinLispro,86009,,insulin lispro,insulin lispro,A10AB04|A10AC04|A10AD04,Insulin,"ATC A10AB04,A10AC04,A10AD04 (common broader class)",insulin lispro-aabc,,インスリンリスプロ（遺伝子組換え）|インスリンリスプロ（遺伝子組換え）［インスリンリスプロ後続１］,D061268
+ipragliflozin,,C3492889,,ipragliflozin,A10BK05,SGLT2Inhibitor,ATC A10BK05,,,イプラグリフロジン　Ｌ－プロリン,C572941
+linagliptin,1100699,,linagliptin,linagliptin,A10BH05,DPP4Inhibitor,ATC A10BH05,,Linagliptin,リナグリプチン,D000069476
+liraglutide,475968,,liraglutide,liraglutide,A10BJ02,GLP1ReceptorAgonist,ATC A10BJ02,,Liraglutide,リラグルチド（遺伝子組換え）,D000069450
+lixisenatide,1440051,,lixisenatide,lixisenatide,A10BJ03,GLP1ReceptorAgonist,ATC A10BJ03,,,リキシセナチド,C479460
+luseogliflozin,,C2933904,,luseogliflozin,A10BK07,SGLT2Inhibitor,ATC A10BK07,,,ルセオグリフロジン水和物,
+metformin,6809,,metformin,metformin,A10BA02,Biguanide,ATC A10BA02,metformin hydrochloride,Metformin Hcl,メトホルミン塩酸塩,D008687
+miglitol,30009,,miglitol,miglitol,A10BF02,AlphaGlucosidaseInhibitor,ATC A10BF02,,,ミグリトール,C045621
+mitiglinide,,C0906166,,mitiglinide,A10BX08,Glinide,ATC A10BX08 (project class member),,,ミチグリニドカルシウム水和物,C087255
+nateglinide,274332,,nateglinide,nateglinide,A10BX03,Glinide,ATC A10BX03 (project class member),,,ナテグリニド,D000077715
+omarigliptin,,C4279587,,omarigliptin,,DPP4Inhibitor,curated fallback (ndb_substances.csv),,,オマリグリプチン,
+pioglitazone,33738,,pioglitazone,pioglitazone,A10BG03,Thiazolidinedione,ATC A10BG03,pioglitazone hydrochloride,Pioglitazone Hcl,ピオグリタゾン塩酸塩,D000077205
+repaglinide,73044,,repaglinide,repaglinide,A10BX02,Glinide,ATC A10BX02 (project class member),,,レパグリニド,C072379
+saxagliptin,857974,,saxagliptin,saxagliptin,A10BH03,DPP4Inhibitor,ATC A10BH03,saxagliptin anhydrous|saxagliptin hydrochloride|saxagliptin hydrochloride dihydrate,Saxagliptin Hcl,サキサグリプチン水和物,C502994
+semaglutide,1991302,,semaglutide,semaglutide,A10BJ06,GLP1ReceptorAgonist,ATC A10BJ06,,Semaglutide,セマグルチド（遺伝子組換え）,D000099194
+sitagliptin,593411,,sitagliptin,sitagliptin,A10BH01,DPP4Inhibitor,ATC A10BH01,sitagliptin hydrochloride|sitagliptin phosphate,Sitagliptin Phosphate,シタグリプチンリン酸塩水和物,D000068900
+teneligliptin,,C2981308,,teneligliptin,A10BH08,DPP4Inhibitor,ATC A10BH08,,,テネリグリプチン臭化水素酸塩水和物,
+tirzepatide,2601723,,tirzepatide,tirzepatide,A10BX16,GIPGLP1Agonist,FDA EPC N0000194015,,Tirzepatide,チルゼパチド,D000098860
+tofogliflozin,,C3501434,,tofogliflozin,,SGLT2Inhibitor,curated fallback (ndb_substances.csv),,,トホグリフロジン水和物,
+tolbutamide,10635,,tolbutamide,tolbutamide,A10BB03|V04CA01,Sulfonylurea,ATC A10BB03,tolbutamide sodium,,トルブタミド,D014044
+trelagliptin,,C4045234,,trelagliptin,,DPP4Inhibitor,curated fallback (ndb_substances.csv),,,トレラグリプチンコハク酸塩,C000595449
+vildagliptin,596554,,vildagliptin,vildagliptin,A10BH02,DPP4Inhibitor,ATC A10BH02,,,ビルダグリプチン,D000077597
+voglibose,,C0532578,,voglibose,A10BF03,AlphaGlucosidaseInhibitor,ATC A10BF03,,,ボグリボース,C102817

@@ -341,3 +341,55 @@ Wikidata, for native-speaker review. The scheme-level review note now has a fixe
 - Not changed: `clean_data.py`'s rows-per-class report stays keyed by ATC class name (BUG.md L7).
   Combination products have composite class names ("Biguanides + DPP-4 inhibitors") with no single
   class id, and the report is an internal check, not a published table.
+
+## 2026-10-25: Japan extension (NDB Open Data)
+
+Plan and triple budget: `japan_extension.md`. Same database (`glp`), new named graphs, so both
+countries share the substance and class vocabularies.
+
+- **Scope**: all of 薬効分類 396, every insulin (YJ 2492) and the GLP-1 / GIP-GLP-1 ingredients of
+  249 by YJ ingredient prefix: 510 strength-level products, 286 generics. Glucagon (722) is out.
+  Every cell is kept (zeros and masked cells too): 150,288 observations.
+- **RDF Data Cube** for the NDB tables: one `dm:QuantitySlice` per product x care setting x dimension
+  (4,464) holds product, setting, slice key and national total, so a cell costs 3 triples. A flat
+  design (~6 per cell) would not fit the 1M-edge limit next to Connecticut. Observations are not typed;
+  `qb:observation`'s range types them under reasoning. Total load: 734,101 triples.
+- **Masking as SDMX confidentiality** (`sdmx-attribute:confStatus sdmx-code:confStatus-C`), the
+  generic code, because the files do not say whether a cell was masked as small (primary) or to
+  protect another (secondary). 429 national totals are masked too (small products, mostly inpatient).
+- **New property `dm:aboutProduct`** rather than reusing `dm:forProduct`, whose domain
+  `dm:Prescription` would make every slice a prescription under reasoning.
+- **Substances outside RxNorm**: RxNorm covers US drugs, so 12 of the 47 substances (teneligliptin,
+  ipragliflozin, imeglimin, ...) are looked up in UMLS (exact name, ATC from the UMLS ATC source) and
+  matched with `https://identifiers.org/umls:` IRIs; Wikidata labels are found by UMLS CUI (P2892).
+  The SHACL rule became "RxNorm, or UMLS when RxNorm does not have it".
+- **Classification fallbacks**, in order: several ATC classes -> their common broader class (human
+  insulin, lispro and aspart are "insulins and analogues": the formulation, not the substance, makes
+  them fast-acting or premixed); ATC level-5 member codes of a project class; FDA EPC; a MeSH
+  pharmacological action held by one class only (anagliptin); a curated fallback with a reason
+  (glyclopyramide, tofogliflozin, trelagliptin, omarigliptin have no ATC code and no usable MeSH action).
+- **Two project classes from A10BX** (other): glinides (repaglinide, nateglinide, mitiglinide; label
+  from the FDA EPC "Glinide") and glimins (imeglimin; curated label). Japan treats both as classes;
+  ATC does not. Four ATC classes added: A10AB, A10AC, A10AD, A10BF. US results do not change: no US
+  substance changed class (checked by diffing scripts/substances.csv).
+- **Crosswalk 薬効分類 <-> ATC computed, not curated** (`vocab/jp-drug-class.ttl`, rule in
+  `scripts/build_ndb.py`): 396 narrowMatch every oral class, relatedMatch GLP-1 and long-acting
+  insulin (the two insulin/GLP-1 combination pens are 396), broadMatch A10B; 249 narrowMatch
+  fast-acting insulin and GIP/GLP-1, relatedMatch GLP-1 and long-acting insulin. Nothing is claimed
+  about all of 249, which is only partly in scope.
+- **Products are strength-level** (one per receipt code), as NDB counts them; US products are
+  brand-level. Compare through substances and classes. Value = quantity x NHI price; the 11th
+  release carries the 2026-09-02 prices, so it is FY2024 volume at current prices.
+- **Marketing authorization holders** from the NHI price list (the 2026-10-14 list, the 2025-03-19
+  list for 92 products delisted since). 203 unified-name generics (統一名収載) have no holder.
+  Japanese subsidiaries of the seven groups already in the US graph link to them with
+  `dm:partOfCorporateGroup`; English names are curated (`vocab/src/jp_manufacturers.csv`).
+- **Indications** per YJ ingredient (`vocab/src/ndb_ingredients.csv`, diabetes indications only) with
+  a product-level override for Wegovy (obesity), which shares Ozempic's YJ ingredient code. Japan-only
+  indications (CHF and CKD for empagliflozin and dapagliflozin, type 1 add-on for some SGLT2
+  inhibitors) are not modelled yet.
+- **Checks proven on the data before writing the shapes**: every slice without masked cells sums
+  exactly to its national total (1,378 of 1,378), no sum exceeds its total, and every unmasked cell
+  is 0 or at least the masking threshold (1,000 oral, 400 injection).
+- Ontology 0.5.0, shapes 0.3.0 (both additive except the RxNorm rule and the CMS generic name rule,
+  which became "CMS generic name XOR YJ code").

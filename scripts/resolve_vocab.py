@@ -4,9 +4,10 @@ Run after resolve_drugs.py (it reads each substance's class and MeSH ID from scr
 and before resolve_products.py (which reads scripts/indications.csv).
 
 Drug classes. Curated (vocab/src/therapeutic_classes.csv): which classes exist (id = stable IRI
-name, plus its ATC code), the Japanese and Chinese labels, and the one project class (dual GIP/GLP-1
-agonists, defined by an FDA EPC code and placed under GLP-1 receptor agonists by decision; its
-English label, definition and scope note are curated too). Looked up:
+name, plus its ATC code), the Japanese and Chinese labels, and three project classes placed in the
+tree by decision: dual GIP/GLP-1 agonists (FDA EPC, under GLP-1 receptor agonists), glinides and
+glimins (ATC level-5 member codes from A10BX, added 2026-10-25 for the Japan data); their definitions
+and scope notes are curated. Looked up:
   - hierarchy and English prefLabel: the ATC tree in RxClass (levels 1-3 are written in capitals
     by WHO and are converted to sentence case)
   - MeSH link, in this order: (1) a MeSH descriptor that NLM's Metathesaurus editors relate to the
@@ -14,7 +15,7 @@ English label, definition and scope note are curated too). Looked up:
     member substances that have one and by no other substance; (3) the curated mesh_id (top class
     and the two insulin classes). The mesh_source column says which. English altLabels are the
     MeSH entry terms and the definition is the MeSH scope note
-  - the project class's label: the FDA EPC class name in RxClass
+  - a project class's label: the FDA EPC class name in RxClass, else the curated pref_en (glimins)
 Indications. Curated (vocab/src/indications.csv): which MeSH descriptors are in scope and their
 Japanese and Chinese fallback labels. Looked up in MeSH: English label, entry terms (altLabels and
 the terms resolve_products.py looks for in FDA labels), scope note, and the entry terms of broader
@@ -195,8 +196,8 @@ def class_names(curated):
             if c["broader"]:
                 raise SystemExit(f"{c['id']}: broader comes from the ATC tree; leave the column empty")
             out[c["id"]] = (sentence_case(name), id_of.get(parent, ""))
-        else:  # the project class: an FDA EPC class placed in the tree by decision
-            out[c["id"]] = (epc_name(c["fda_epc"]) + "s", c["broader"])
+        else:  # a project class placed in the tree by decision: named after its FDA EPC class, or curated
+            out[c["id"]] = (epc_name(c["fda_epc"]) + "s" if c["fda_epc"] else c["pref_en"], c["broader"])
     return out
 
 

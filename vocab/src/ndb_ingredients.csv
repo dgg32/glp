@@ -1,0 +1,65 @@
+yj7,ingredient_ja,substances,indications
+2492403,インスリン　ヒト（遺伝子組換え）,insulinHuman,T1DM|T2DM
+2492413,インスリン　ヒト（遺伝子組換え）,insulinHuman,T1DM|T2DM
+2492414,インスリンリスプロ（遺伝子組換え）,insulinLispro,T1DM|T2DM
+2492415,インスリンアスパルト（遺伝子組換え）,insulinAspart,T1DM|T2DM
+2492416,インスリングラルギン（遺伝子組換え）,insulinGlargine,T1DM|T2DM
+2492417,インスリンデテミル（遺伝子組換え）,insulinDetemir,T1DM|T2DM
+2492418,インスリングルリジン（遺伝子組換え）,insulinGlulisine,T1DM|T2DM
+2492419,インスリンデグルデク（遺伝子組換え）,insulinDegludec,T1DM|T2DM
+2492420,インスリングラルギン（遺伝子組換え）［インスリングラルギン後続１］,insulinGlargine,T1DM|T2DM
+2492421,インスリングラルギン（遺伝子組換え）［インスリングラルギン後続２］,insulinGlargine,T1DM|T2DM
+2492422,インスリンリスプロ（遺伝子組換え）［インスリンリスプロ後続１］,insulinLispro,T1DM|T2DM
+2492423,インスリンアスパルト（遺伝子組換え）［インスリンアスパルト後続１］,insulinAspart,T1DM|T2DM
+2492424,インスリン　イコデク（遺伝子組換え）,insulinIcodec,T1DM|T2DM
+2492500,インスリン　デグルデク（遺伝子組換え）・インスリン　アスパルト（遺伝子組換え）,insulinDegludec|insulinAspart,T1DM|T2DM
+2499014,セマグルチド（遺伝子組換え）,semaglutide,T2DM
+2499410,リラグルチド（遺伝子組換え）,liraglutide,T2DM
+2499411,エキセナチド,exenatide,T2DM
+2499415,リキシセナチド,lixisenatide,T2DM
+2499416,デュラグルチド（遺伝子組換え）,dulaglutide,T2DM
+2499418,セマグルチド（遺伝子組換え）,semaglutide,T2DM
+2499422,チルゼパチド,tirzepatide,T2DM
+3961001,アセトヘキサミド,acetohexamide,T2DM
+3961002,グリクロピラミド,glyclopyramide,T2DM
+3961003,グリベンクラミド,glyburide,T2DM
+3961006,トルブタミド,tolbutamide,T2DM
+3961007,グリクラジド,gliclazide,T2DM
+3961008,グリメピリド,glimepiride,T2DM
+3962001,ブホルミン塩酸塩,buformin,T2DM
+3962002,メトホルミン塩酸塩,metformin,T2DM
+3969003,アカルボース,acarbose,T2DM
+3969004,ボグリボース,voglibose,T2DM
+3969006,ナテグリニド,nateglinide,T2DM
+3969007,ピオグリタゾン塩酸塩,pioglitazone,T2DM
+3969008,ミチグリニドカルシウム水和物,mitiglinide,T2DM
+3969009,ミグリトール,miglitol,T2DM
+3969010,シタグリプチンリン酸塩水和物,sitagliptin,T2DM
+3969011,ビルダグリプチン,vildagliptin,T2DM
+3969012,アログリプチン安息香酸塩,alogliptin,T2DM
+3969013,レパグリニド,repaglinide,T2DM
+3969014,リナグリプチン,linagliptin,T2DM
+3969015,テネリグリプチン臭化水素酸塩水和物,teneligliptin,T2DM
+3969016,アナグリプチン,anagliptin,T2DM
+3969017,サキサグリプチン水和物,saxagliptin,T2DM
+3969018,イプラグリフロジン　Ｌ－プロリン,ipragliflozin,T2DM
+3969019,ダパグリフロジンプロピレングリコール水和物,dapagliflozin,T2DM
+3969020,ルセオグリフロジン水和物,luseogliflozin,T2DM
+3969021,トホグリフロジン水和物,tofogliflozin,T2DM
+3969022,カナグリフロジン水和物,canagliflozin,T2DM
+3969023,エンパグリフロジン,empagliflozin,T2DM
+3969024,トレラグリプチンコハク酸塩,trelagliptin,T2DM
+3969025,オマリグリプチン,omarigliptin,T2DM
+3969026,イメグリミン塩酸塩,imeglimin,T2DM
+3969100,ピオグリタゾン塩酸塩・メトホルミン塩酸塩,pioglitazone|metformin,T2DM
+3969101,ピオグリタゾン塩酸塩・グリメピリド,pioglitazone|glimepiride,T2DM
+3969102,ミチグリニドカルシウム水和物・ボグリボース,mitiglinide|voglibose,T2DM
+3969103,アログリプチン安息香酸塩・ピオグリタゾン塩酸塩,alogliptin|pioglitazone,T2DM
+3969104,ビルダグリプチン・メトホルミン塩酸塩,vildagliptin|metformin,T2DM
+3969105,アログリプチン安息香酸塩・メトホルミン塩酸塩,alogliptin|metformin,T2DM
+3969106,テネリグリプチン臭化水素酸塩水和物・カナグリフロジン水和物,teneligliptin|canagliflozin,T2DM
+3969107,シタグリプチンリン酸塩水和物・イプラグリフロジン　Ｌ－プロリン,sitagliptin|ipragliflozin,T2DM
+3969108,エンパグリフロジン・リナグリプチン,empagliflozin|linagliptin,T2DM
+3969109,アナグリプチン・メトホルミン塩酸塩,anagliptin|metformin,T2DM
+3969500,インスリン　デグルデク（遺伝子組換え）・リラグルチド（遺伝子組換え）,insulinDegludec|liraglutide,T2DM
+3969501,インスリングラルギン（遺伝子組換え）・リキシセナチド,insulinGlargine|lixisenatide,T2DM

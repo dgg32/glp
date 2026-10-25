@@ -1,0 +1,691 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dm: <https://dgg32.github.io/glp/ontology#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix setting: <https://dgg32.github.io/glp/vocab/care-setting/> .
+@prefix sexage: <https://dgg32.github.io/glp/vocab/sex-age/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+setting:inpatient a skos:Concept,
+        dm:CareSetting ;
+    rdfs:label "inpatient"@en,
+        "入院"@ja,
+        "住院"@zh ;
+    skos:definition "Drugs used during a hospital stay."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/care-setting> ;
+    skos:prefLabel "inpatient"@en,
+        "入院"@ja,
+        "住院"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/care-setting> .
+
+setting:outpatient-external a skos:Concept,
+        dm:CareSetting ;
+    rdfs:label "outpatient, community pharmacy"@en,
+        "外来（院外）"@ja,
+        "门诊（院外处方）"@zh ;
+    skos:broader setting:outpatient ;
+    skos:definition "Outpatient prescription filled at a community pharmacy (院外処方, the usual case in Japan)."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/care-setting> ;
+    skos:prefLabel "outpatient, community pharmacy"@en,
+        "外来（院外）"@ja,
+        "门诊（院外处方）"@zh .
+
+setting:outpatient-internal a skos:Concept,
+        dm:CareSetting ;
+    rdfs:label "outpatient, dispensed in-house"@en,
+        "外来（院内）"@ja,
+        "门诊（院内处方）"@zh ;
+    skos:broader setting:outpatient ;
+    skos:definition "Outpatient prescription dispensed by the clinic or hospital itself (院内処方)."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/care-setting> ;
+    skos:prefLabel "outpatient, dispensed in-house"@en,
+        "外来（院内）"@ja,
+        "门诊（院内处方）"@zh .
+
+sexage:F0 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 0-4 years"@en,
+        "女性 0～4歳"@ja,
+        "女性 0-4岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F0" ;
+    skos:prefLabel "female, 0-4 years"@en,
+        "女性 0～4歳"@ja,
+        "女性 0-4岁"@zh ;
+    dm:minAge 0 .
+
+sexage:F10 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 10-14 years"@en,
+        "女性 10～14歳"@ja,
+        "女性 10-14岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F10" ;
+    skos:prefLabel "female, 10-14 years"@en,
+        "女性 10～14歳"@ja,
+        "女性 10-14岁"@zh ;
+    dm:minAge 10 .
+
+sexage:F100 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 100 years and over"@en,
+        "女性 100歳以上"@ja,
+        "女性 100岁及以上"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F100" ;
+    skos:prefLabel "female, 100 years and over"@en,
+        "女性 100歳以上"@ja,
+        "女性 100岁及以上"@zh ;
+    dm:minAge 100 .
+
+sexage:F15 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 15-19 years"@en,
+        "女性 15～19歳"@ja,
+        "女性 15-19岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F15" ;
+    skos:prefLabel "female, 15-19 years"@en,
+        "女性 15～19歳"@ja,
+        "女性 15-19岁"@zh ;
+    dm:minAge 15 .
+
+sexage:F20 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 20-24 years"@en,
+        "女性 20～24歳"@ja,
+        "女性 20-24岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F20" ;
+    skos:prefLabel "female, 20-24 years"@en,
+        "女性 20～24歳"@ja,
+        "女性 20-24岁"@zh ;
+    dm:minAge 20 .
+
+sexage:F25 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 25-29 years"@en,
+        "女性 25～29歳"@ja,
+        "女性 25-29岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F25" ;
+    skos:prefLabel "female, 25-29 years"@en,
+        "女性 25～29歳"@ja,
+        "女性 25-29岁"@zh ;
+    dm:minAge 25 .
+
+sexage:F30 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 30-34 years"@en,
+        "女性 30～34歳"@ja,
+        "女性 30-34岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F30" ;
+    skos:prefLabel "female, 30-34 years"@en,
+        "女性 30～34歳"@ja,
+        "女性 30-34岁"@zh ;
+    dm:minAge 30 .
+
+sexage:F35 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 35-39 years"@en,
+        "女性 35～39歳"@ja,
+        "女性 35-39岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F35" ;
+    skos:prefLabel "female, 35-39 years"@en,
+        "女性 35～39歳"@ja,
+        "女性 35-39岁"@zh ;
+    dm:minAge 35 .
+
+sexage:F40 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 40-44 years"@en,
+        "女性 40～44歳"@ja,
+        "女性 40-44岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F40" ;
+    skos:prefLabel "female, 40-44 years"@en,
+        "女性 40～44歳"@ja,
+        "女性 40-44岁"@zh ;
+    dm:minAge 40 .
+
+sexage:F45 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 45-49 years"@en,
+        "女性 45～49歳"@ja,
+        "女性 45-49岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F45" ;
+    skos:prefLabel "female, 45-49 years"@en,
+        "女性 45～49歳"@ja,
+        "女性 45-49岁"@zh ;
+    dm:minAge 45 .
+
+sexage:F5 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 5-9 years"@en,
+        "女性 5～9歳"@ja,
+        "女性 5-9岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F5" ;
+    skos:prefLabel "female, 5-9 years"@en,
+        "女性 5～9歳"@ja,
+        "女性 5-9岁"@zh ;
+    dm:minAge 5 .
+
+sexage:F50 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 50-54 years"@en,
+        "女性 50～54歳"@ja,
+        "女性 50-54岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F50" ;
+    skos:prefLabel "female, 50-54 years"@en,
+        "女性 50～54歳"@ja,
+        "女性 50-54岁"@zh ;
+    dm:minAge 50 .
+
+sexage:F55 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 55-59 years"@en,
+        "女性 55～59歳"@ja,
+        "女性 55-59岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F55" ;
+    skos:prefLabel "female, 55-59 years"@en,
+        "女性 55～59歳"@ja,
+        "女性 55-59岁"@zh ;
+    dm:minAge 55 .
+
+sexage:F60 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 60-64 years"@en,
+        "女性 60～64歳"@ja,
+        "女性 60-64岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F60" ;
+    skos:prefLabel "female, 60-64 years"@en,
+        "女性 60～64歳"@ja,
+        "女性 60-64岁"@zh ;
+    dm:minAge 60 .
+
+sexage:F65 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 65-69 years"@en,
+        "女性 65～69歳"@ja,
+        "女性 65-69岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F65" ;
+    skos:prefLabel "female, 65-69 years"@en,
+        "女性 65～69歳"@ja,
+        "女性 65-69岁"@zh ;
+    dm:minAge 65 .
+
+sexage:F70 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 70-74 years"@en,
+        "女性 70～74歳"@ja,
+        "女性 70-74岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F70" ;
+    skos:prefLabel "female, 70-74 years"@en,
+        "女性 70～74歳"@ja,
+        "女性 70-74岁"@zh ;
+    dm:minAge 70 .
+
+sexage:F75 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 75-79 years"@en,
+        "女性 75～79歳"@ja,
+        "女性 75-79岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F75" ;
+    skos:prefLabel "female, 75-79 years"@en,
+        "女性 75～79歳"@ja,
+        "女性 75-79岁"@zh ;
+    dm:minAge 75 .
+
+sexage:F80 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 80-84 years"@en,
+        "女性 80～84歳"@ja,
+        "女性 80-84岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F80" ;
+    skos:prefLabel "female, 80-84 years"@en,
+        "女性 80～84歳"@ja,
+        "女性 80-84岁"@zh ;
+    dm:minAge 80 .
+
+sexage:F85 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 85-89 years"@en,
+        "女性 85～89歳"@ja,
+        "女性 85-89岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F85" ;
+    skos:prefLabel "female, 85-89 years"@en,
+        "女性 85～89歳"@ja,
+        "女性 85-89岁"@zh ;
+    dm:minAge 85 .
+
+sexage:F90 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 90-94 years"@en,
+        "女性 90～94歳"@ja,
+        "女性 90-94岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F90" ;
+    skos:prefLabel "female, 90-94 years"@en,
+        "女性 90～94歳"@ja,
+        "女性 90-94岁"@zh ;
+    dm:minAge 90 .
+
+sexage:F95 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female, 95-99 years"@en,
+        "女性 95～99歳"@ja,
+        "女性 95-99岁"@zh ;
+    skos:broader sexage:F ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "F95" ;
+    skos:prefLabel "female, 95-99 years"@en,
+        "女性 95～99歳"@ja,
+        "女性 95-99岁"@zh ;
+    dm:minAge 95 .
+
+sexage:M0 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 0-4 years"@en,
+        "男性 0～4歳"@ja,
+        "男性 0-4岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M0" ;
+    skos:prefLabel "male, 0-4 years"@en,
+        "男性 0～4歳"@ja,
+        "男性 0-4岁"@zh ;
+    dm:minAge 0 .
+
+sexage:M10 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 10-14 years"@en,
+        "男性 10～14歳"@ja,
+        "男性 10-14岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M10" ;
+    skos:prefLabel "male, 10-14 years"@en,
+        "男性 10～14歳"@ja,
+        "男性 10-14岁"@zh ;
+    dm:minAge 10 .
+
+sexage:M100 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 100 years and over"@en,
+        "男性 100歳以上"@ja,
+        "男性 100岁及以上"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M100" ;
+    skos:prefLabel "male, 100 years and over"@en,
+        "男性 100歳以上"@ja,
+        "男性 100岁及以上"@zh ;
+    dm:minAge 100 .
+
+sexage:M15 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 15-19 years"@en,
+        "男性 15～19歳"@ja,
+        "男性 15-19岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M15" ;
+    skos:prefLabel "male, 15-19 years"@en,
+        "男性 15～19歳"@ja,
+        "男性 15-19岁"@zh ;
+    dm:minAge 15 .
+
+sexage:M20 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 20-24 years"@en,
+        "男性 20～24歳"@ja,
+        "男性 20-24岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M20" ;
+    skos:prefLabel "male, 20-24 years"@en,
+        "男性 20～24歳"@ja,
+        "男性 20-24岁"@zh ;
+    dm:minAge 20 .
+
+sexage:M25 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 25-29 years"@en,
+        "男性 25～29歳"@ja,
+        "男性 25-29岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M25" ;
+    skos:prefLabel "male, 25-29 years"@en,
+        "男性 25～29歳"@ja,
+        "男性 25-29岁"@zh ;
+    dm:minAge 25 .
+
+sexage:M30 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 30-34 years"@en,
+        "男性 30～34歳"@ja,
+        "男性 30-34岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M30" ;
+    skos:prefLabel "male, 30-34 years"@en,
+        "男性 30～34歳"@ja,
+        "男性 30-34岁"@zh ;
+    dm:minAge 30 .
+
+sexage:M35 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 35-39 years"@en,
+        "男性 35～39歳"@ja,
+        "男性 35-39岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M35" ;
+    skos:prefLabel "male, 35-39 years"@en,
+        "男性 35～39歳"@ja,
+        "男性 35-39岁"@zh ;
+    dm:minAge 35 .
+
+sexage:M40 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 40-44 years"@en,
+        "男性 40～44歳"@ja,
+        "男性 40-44岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M40" ;
+    skos:prefLabel "male, 40-44 years"@en,
+        "男性 40～44歳"@ja,
+        "男性 40-44岁"@zh ;
+    dm:minAge 40 .
+
+sexage:M45 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 45-49 years"@en,
+        "男性 45～49歳"@ja,
+        "男性 45-49岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M45" ;
+    skos:prefLabel "male, 45-49 years"@en,
+        "男性 45～49歳"@ja,
+        "男性 45-49岁"@zh ;
+    dm:minAge 45 .
+
+sexage:M5 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 5-9 years"@en,
+        "男性 5～9歳"@ja,
+        "男性 5-9岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M5" ;
+    skos:prefLabel "male, 5-9 years"@en,
+        "男性 5～9歳"@ja,
+        "男性 5-9岁"@zh ;
+    dm:minAge 5 .
+
+sexage:M50 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 50-54 years"@en,
+        "男性 50～54歳"@ja,
+        "男性 50-54岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M50" ;
+    skos:prefLabel "male, 50-54 years"@en,
+        "男性 50～54歳"@ja,
+        "男性 50-54岁"@zh ;
+    dm:minAge 50 .
+
+sexage:M55 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 55-59 years"@en,
+        "男性 55～59歳"@ja,
+        "男性 55-59岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M55" ;
+    skos:prefLabel "male, 55-59 years"@en,
+        "男性 55～59歳"@ja,
+        "男性 55-59岁"@zh ;
+    dm:minAge 55 .
+
+sexage:M60 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 60-64 years"@en,
+        "男性 60～64歳"@ja,
+        "男性 60-64岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M60" ;
+    skos:prefLabel "male, 60-64 years"@en,
+        "男性 60～64歳"@ja,
+        "男性 60-64岁"@zh ;
+    dm:minAge 60 .
+
+sexage:M65 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 65-69 years"@en,
+        "男性 65～69歳"@ja,
+        "男性 65-69岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M65" ;
+    skos:prefLabel "male, 65-69 years"@en,
+        "男性 65～69歳"@ja,
+        "男性 65-69岁"@zh ;
+    dm:minAge 65 .
+
+sexage:M70 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 70-74 years"@en,
+        "男性 70～74歳"@ja,
+        "男性 70-74岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M70" ;
+    skos:prefLabel "male, 70-74 years"@en,
+        "男性 70～74歳"@ja,
+        "男性 70-74岁"@zh ;
+    dm:minAge 70 .
+
+sexage:M75 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 75-79 years"@en,
+        "男性 75～79歳"@ja,
+        "男性 75-79岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M75" ;
+    skos:prefLabel "male, 75-79 years"@en,
+        "男性 75～79歳"@ja,
+        "男性 75-79岁"@zh ;
+    dm:minAge 75 .
+
+sexage:M80 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 80-84 years"@en,
+        "男性 80～84歳"@ja,
+        "男性 80-84岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M80" ;
+    skos:prefLabel "male, 80-84 years"@en,
+        "男性 80～84歳"@ja,
+        "男性 80-84岁"@zh ;
+    dm:minAge 80 .
+
+sexage:M85 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 85-89 years"@en,
+        "男性 85～89歳"@ja,
+        "男性 85-89岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M85" ;
+    skos:prefLabel "male, 85-89 years"@en,
+        "男性 85～89歳"@ja,
+        "男性 85-89岁"@zh ;
+    dm:minAge 85 .
+
+sexage:M90 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 90-94 years"@en,
+        "男性 90～94歳"@ja,
+        "男性 90-94岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M90" ;
+    skos:prefLabel "male, 90-94 years"@en,
+        "男性 90～94歳"@ja,
+        "男性 90-94岁"@zh ;
+    dm:minAge 90 .
+
+sexage:M95 a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male, 95-99 years"@en,
+        "男性 95～99歳"@ja,
+        "男性 95-99岁"@zh ;
+    skos:broader sexage:M ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:notation "M95" ;
+    skos:prefLabel "male, 95-99 years"@en,
+        "男性 95～99歳"@ja,
+        "男性 95-99岁"@zh ;
+    dm:minAge 95 .
+
+setting:outpatient a skos:Concept,
+        dm:CareSetting ;
+    rdfs:label "outpatient"@en,
+        "外来"@ja,
+        "门诊"@zh ;
+    skos:definition "Outpatient care, both dispensing routes."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/care-setting> ;
+    skos:narrower setting:outpatient-external,
+        setting:outpatient-internal ;
+    skos:prefLabel "outpatient"@en,
+        "外来"@ja,
+        "门诊"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/care-setting> .
+
+<https://dgg32.github.io/glp/vocab/care-setting> a skos:ConceptScheme ;
+    dcterms:creator "Sixing Huang" ;
+    dcterms:description "Where a drug was prescribed and dispensed, as NDB Open Data splits its tables."@en ;
+    dcterms:modified "2026-10-25"^^xsd:date ;
+    dcterms:title "Care settings (NDB Open Data)"@en,
+        "診療区分（NDBオープンデータ）"@ja,
+        "诊疗类别（NDB开放数据）"@zh ;
+    skos:hasTopConcept setting:inpatient,
+        setting:outpatient ;
+    prov:wasDerivedFrom <https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177221_00017.html> .
+
+sexage:F a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "female"@en,
+        "女性"@ja,
+        "女性"@zh ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:narrower sexage:F0,
+        sexage:F10,
+        sexage:F100,
+        sexage:F15,
+        sexage:F20,
+        sexage:F25,
+        sexage:F30,
+        sexage:F35,
+        sexage:F40,
+        sexage:F45,
+        sexage:F5,
+        sexage:F50,
+        sexage:F55,
+        sexage:F60,
+        sexage:F65,
+        sexage:F70,
+        sexage:F75,
+        sexage:F80,
+        sexage:F85,
+        sexage:F90,
+        sexage:F95 ;
+    skos:prefLabel "female"@en,
+        "女性"@ja,
+        "女性"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/sex-age> .
+
+sexage:M a skos:Concept,
+        dm:SexAgeGroup ;
+    rdfs:label "male"@en,
+        "男性"@ja,
+        "男性"@zh ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> ;
+    skos:narrower sexage:M0,
+        sexage:M10,
+        sexage:M100,
+        sexage:M15,
+        sexage:M20,
+        sexage:M25,
+        sexage:M30,
+        sexage:M35,
+        sexage:M40,
+        sexage:M45,
+        sexage:M5,
+        sexage:M50,
+        sexage:M55,
+        sexage:M60,
+        sexage:M65,
+        sexage:M70,
+        sexage:M75,
+        sexage:M80,
+        sexage:M85,
+        sexage:M90,
+        sexage:M95 ;
+    skos:prefLabel "male"@en,
+        "男性"@ja,
+        "男性"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/sex-age> .
+
+<https://dgg32.github.io/glp/vocab/sex-age> a skos:ConceptScheme ;
+    dcterms:creator "Sixing Huang" ;
+    dcterms:description "Sex combined with the 21 five-year age bands of NDB Open Data (0-4 ... 95-99, 100+). Each band has its sex as broader concept, so queries can roll up by sex."@en ;
+    dcterms:modified "2026-10-25"^^xsd:date ;
+    dcterms:title "Sex and age bands (NDB Open Data)"@en,
+        "性・年齢階級（NDBオープンデータ）"@ja,
+        "性别与年龄组（NDB开放数据）"@zh ;
+    skos:hasTopConcept sexage:F,
+        sexage:M ;
+    prov:wasDerivedFrom <https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177221_00017.html> .
+

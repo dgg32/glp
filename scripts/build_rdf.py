@@ -6,6 +6,9 @@
   npi-registry.ttl    prescriber -> NUCC specialty links
   drugsfda.ttl        manufacturers: Drugs@FDA application holders, grouped into companies by their
                       GLEIF ultimate parent (scripts/resolve_organizations.py)
+  ndb-products.ttl,   Japan, NDB Open Data FY2024 (scripts/build_ndb.py): products and their marketing
+  ndb-2024.ttl        authorization holders; dispensed quantities as an RDF Data Cube. Also writes the
+                      Japan vocabularies vocab/jp-prefecture.ttl, vocab/ndb-dimensions.ttl, vocab/jp-drug-class.ttl
   provenance.ttl      PROV-O description of every loaded graph (scripts/provenance.py): source snapshots
                       with releases, curated inputs, content hashes, generating step
   manifest.csv        file -> named graph IRI, for loading into Stardog (includes ontology and vocab)
@@ -32,6 +35,7 @@ from pathlib import Path
 
 from rdflib import Graph, Literal, Namespace, URIRef
 
+import build_ndb
 import provenance
 from rdflib.namespace import DCTERMS, RDF, RDFS, SKOS, XSD
 
@@ -260,13 +264,18 @@ def main():
         path = OUT / f"{name}.ttl"
         g.serialize(path, format="turtle")
         written[name] = (path, len(g))
+    japan = build_ndb.build(report)  # {graph name: (file, Graph)}
+    for name, (file, g) in japan.items():
+        g.serialize(ROOT / file, format="turtle")
     # Loading manifest: data graphs plus ontology (schema graph, for reasoning) and vocabularies.
     manifest = [("ontology/diabetes-market.ttl", "tag:stardog:api:context:schema"),
                 ("ontology/imports/idmp-o-1.4.0-extract.ttl", "tag:stardog:api:context:schema")]
     for v in ("therapeutic-class", "substance", "indication", "nucc-specialty"):
         manifest.append((f"vocab/{v}.ttl", str(GRAPH[f"vocab/{v}"])))
+    manifest += [(file, str(GRAPH[name])) for name, (file, _) in japan.items() if name.startswith("vocab/")]
     for name, (path, _) in written.items():
         manifest.append((str(path.relative_to(ROOT)), str(GRAPH[name])))
+    manifest += [(file, str(GRAPH[name])) for name, (file, _) in japan.items() if not name.startswith("vocab/")]
     manifest.append(("shapes/diabetes-market-shapes.ttl", str(GRAPH["shapes"])))  # SHACL contract
     provenance.build(manifest, NOW).serialize(OUT / "provenance.ttl", format="turtle")  # describes all of the above
     manifest.append(("data/rdf/provenance.ttl", str(GRAPH["provenance"])))

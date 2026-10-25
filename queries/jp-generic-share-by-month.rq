@@ -1,0 +1,28 @@
+# Japan, FY2024: generic share of dispensed tablets per month, oral outpatient (community pharmacy) only,
+# by class, for the classes that have generics. From October 2024, patients pay part of the price gap when
+# they choose an off-patent brand that has a generic (長期収載品の選定療養); a rise from 2024-10 would show it.
+# Masked month cells are left out. Tablets are comparable within one class, not across classes.
+# "Generic" is NDB's reimbursement flag: generics priced like their originator (★ in the price list) are not
+# counted, which is why biguanides (metformin "MT" generics, priced like Metgluco) show almost no generics.
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX qb:   <http://purl.org/linked-data/cube#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+PREFIX setting: <https://dgg32.github.io/glp/vocab/care-setting/>
+
+# xsd:double: Oxigraph returns an error, not 0, for 0 divided by a decimal (months without generics).
+SELECT ?class ?month (ROUND(1000 * xsd:double(SUM(?gen)) / SUM(?q)) / 10 AS ?genericPct)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  VALUES ?cls { dmtc:Biguanide dmtc:Sulfonylurea dmtc:Thiazolidinedione dmtc:DPP4Inhibitor
+                dmtc:AlphaGlucosidaseInhibitor dmtc:Glinide }
+  ?slice qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/month> ; dm:careSetting setting:outpatient-external ;
+         dm:aboutProduct ?prod ; qb:observation ?o .
+  ?o dm:month ?month ; dm:quantity ?q .
+  ?prod dm:isCombinationProduct false ; dm:isGeneric ?generic ; dm:hasActiveSubstance/dm:inTherapeuticClass ?cls .
+  BIND (IF(?generic, ?q, 0) AS ?gen)
+  ?cls skos:prefLabel ?class FILTER (lang(?class) = "en")
+}
+GROUP BY ?class ?month
+ORDER BY ?class ?month

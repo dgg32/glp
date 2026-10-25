@@ -1,0 +1,19 @@
+# reasoning: true
+# Products the reasoner classifies as dm:GLP1Product (a defined OWL class: contains a substance in the
+# GLP-1 receptor agonist class or a narrower one), counted by country and Japanese therapeutic category.
+# Japan files most GLP-1 drugs under 249 (other hormones) but the insulin combinations under 396 (antidiabetics);
+# the defined class finds both without knowing either code. Without reasoning, no product has this type.
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?country ?category (COUNT(DISTINCT ?prod) AS ?products) (SAMPLE(?name) AS ?example)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  ?prod a dm:GLP1Product ; rdfs:label ?name .
+  OPTIONAL { ?prod dm:inJapaneseDrugClass ?jp . ?jp skos:prefLabel ?jpLabel FILTER (lang(?jpLabel) = "ja") }
+  BIND (IF(BOUND(?jp), "Japan", "US (Connecticut)") AS ?country)
+  BIND (COALESCE(?jpLabel, "-") AS ?category)
+}
+GROUP BY ?country ?category
+ORDER BY ?country ?category

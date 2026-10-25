@@ -1,0 +1,29 @@
+# Japan, FY2024: share of each class's value (yen) dispensed to patients aged 75 and over (後期高齢者),
+# from the sex-age tables, all care settings, products alone or in combination. Masked cells are left out.
+# xsd:double: quantity x price overflows the fixed-point decimals of some engines (Oxigraph).
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX qb:   <http://purl.org/linked-data/cube#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+
+SELECT ?class (ROUND(SUM(?yen) / 1000000) AS ?yenMillion) (ROUND(1000 * SUM(?old) / SUM(?yen)) / 10 AS ?age75plusPct)
+       (ROUND(1000 * SUM(?female) / SUM(?yen)) / 10 AS ?femalePct)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  VALUES ?cls { dmtc:Insulin dmtc:Biguanide dmtc:Sulfonylurea dmtc:Thiazolidinedione dmtc:DPP4Inhibitor
+                dmtc:AlphaGlucosidaseInhibitor dmtc:Glinide dmtc:Glimin dmtc:SGLT2Inhibitor dmtc:GLP1ReceptorAgonist }
+  ?slice qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/sex-age> ; dm:aboutProduct ?prod ; qb:observation ?o .
+  ?o dm:sexAgeGroup ?band ; dm:quantity ?q .
+  ?band dm:minAge ?age ; skos:broader ?sex .
+  ?prod dm:nhiPrice ?price .
+  # DISTINCT: a combination with two substances of one class (Ryzodeg: two insulins) counts once.
+  # (A FILTER EXISTS here does not see ?cls from VALUES in Stardog 12, so every class got the same total.)
+  { SELECT DISTINCT ?prod ?cls WHERE { ?prod dm:hasActiveSubstance/dm:inTherapeuticClass/skos:broader* ?cls } }
+  BIND (xsd:double(?q) * ?price AS ?yen)
+  BIND (IF(?age >= 75, ?yen, 0) AS ?old)
+  BIND (IF(?sex = <https://dgg32.github.io/glp/vocab/sex-age/F>, ?yen, 0) AS ?female)
+  ?cls skos:prefLabel ?class FILTER (lang(?class) = "en")
+}
+GROUP BY ?class
+ORDER BY DESC(?age75plusPct)

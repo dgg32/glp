@@ -8,6 +8,42 @@
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+dmtc:AlphaGlucosidaseInhibitor a skos:Concept,
+        dm:TherapeuticClass ;
+    rdfs:label "Alpha glucosidase inhibitors"@en,
+        "α-グルコシダーゼ阻害薬"@ja,
+        "α-葡萄糖苷酶抑制剂"@zh ;
+    skos:altLabel "Glycoside Hydrolase Inhibitors"@en,
+        "Hydrolase Inhibitors, Glycoside"@en,
+        "Inhibitor, alpha-Glucosidase"@en,
+        "Inhibitors, Glycoside Hydrolase"@en,
+        "Inhibitors, Intestinal alpha-Amylase"@en,
+        "Inhibitors, Pancreatic alpha-Amylase"@en,
+        "Inhibitors, alpha-Glucosidase"@en,
+        "Intestinal alpha Amylase Inhibitors"@en,
+        "Intestinal alpha-Amylase Inhibitors"@en,
+        "Pancreatic alpha Amylase Inhibitors"@en,
+        "Pancreatic alpha-Amylase Inhibitors"@en,
+        "alpha Amylase Inhibitors, Pancreatic"@en,
+        "alpha Glucosidase Inhibitor"@en,
+        "alpha Glucosidase Inhibitors"@en,
+        "alpha-Amylase Inhibitors, Intestinal"@en,
+        "alpha-Amylase Inhibitors, Pancreatic"@en,
+        "alpha-Glucosidase Inhibitor"@en,
+        "alpha-Glucosidase Inhibitors"@en,
+        "α-GI"@ja,
+        "α-糖苷酶抑制剂"@zh ;
+    skos:broader dmtc:BloodGlucoseLowering ;
+    skos:closeMatch mesh:D065089 ;
+    skos:definition "Compounds that inhibit or block the activity of GLYCOSIDE HYDROLASES such as ALPHA-AMYLASES and ALPHA-GLUCOSIDASES."@en ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch atc:A10BF ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> ;
+    skos:notation "A10BF" ;
+    skos:prefLabel "Alpha glucosidase inhibitors"@en,
+        "α-グルコシダーゼ阻害薬"@ja,
+        "α-葡萄糖苷酶抑制剂"@zh .
+
 dmtc:Biguanide a skos:Concept,
         dm:TherapeuticClass ;
     rdfs:label "Biguanides"@en,
@@ -71,6 +107,23 @@ dmtc:DPP4Inhibitor a skos:Concept,
         "DPP-4阻害薬"@ja,
         "DPP-4抑制剂"@zh .
 
+dmtc:FastActingInsulin a skos:Concept,
+        dm:TherapeuticClass ;
+    rdfs:label "Insulins and analogues for injection, fast-acting"@en,
+        "速効型・超速効型インスリン"@ja,
+        "速效胰岛素"@zh ;
+    skos:altLabel "ボーラスインスリン"@ja,
+        "超速効型インスリン"@ja,
+        "餐时胰岛素"@zh ;
+    skos:broader dmtc:Insulin ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch atc:A10AB ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> ;
+    skos:notation "A10AB" ;
+    skos:prefLabel "Insulins and analogues for injection, fast-acting"@en,
+        "速効型・超速効型インスリン"@ja,
+        "速效胰岛素"@zh .
+
 dmtc:GIPGLP1Agonist a skos:Concept,
         dm:TherapeuticClass ;
     rdfs:label "Glucose-dependent Insulinotropic Polypeptide Receptor Agonists"@en,
@@ -89,6 +142,58 @@ dmtc:GIPGLP1Agonist a skos:Concept,
         "持続性GIP/GLP-1受容体作動薬"@ja,
         "GIP/GLP-1双受体激动剂"@zh ;
     skos:scopeNote "Placed under GLP-1 receptor agonists by project decision (2026-10-14), as most market analyses do. ATC classifies tirzepatide under A10BX (other blood glucose lowering drugs), so there is no exactMatch to an ATC class."@en .
+
+dmtc:Glimin a skos:Concept,
+        dm:TherapeuticClass ;
+    rdfs:label "Glimins"@en,
+        "グリミン系薬"@ja,
+        "格列明类药物"@zh ;
+    skos:altLabel "グリミン系"@ja,
+        "格列明类"@zh ;
+    skos:broader dmtc:BloodGlucoseLowering ;
+    skos:definition "Oral blood glucose lowering drugs that act on mitochondria, improving both insulin secretion and insulin sensitivity. Imeglimin is the first member."@en ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> ;
+    skos:prefLabel "Glimins"@en,
+        "グリミン系薬"@ja,
+        "格列明类药物"@zh ;
+    skos:scopeNote "Project class (2026-10-25). ATC files imeglimin under A10BX (other blood glucose lowering drugs); Japan, where it was first approved, treats it as a class of its own (グリミン系). No FDA class exists, so the English label is curated."@en .
+
+dmtc:Glinide a skos:Concept,
+        dm:TherapeuticClass ;
+    rdfs:label "Glinides"@en,
+        "速効型インスリン分泌促進薬"@ja,
+        "格列奈类药物"@zh ;
+    skos:altLabel "meglitinides"@en,
+        "rapid-acting insulin secretagogues"@en,
+        "グリニド系薬"@ja,
+        "グリニド薬"@ja,
+        "格列奈类"@zh,
+        "餐时血糖调节剂"@zh ;
+    skos:broader dmtc:BloodGlucoseLowering ;
+    skos:definition "Short-acting insulin secretagogues that close pancreatic beta-cell ATP-sensitive potassium channels, taken with meals."@en ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> ;
+    skos:prefLabel "Glinides"@en,
+        "速効型インスリン分泌促進薬"@ja,
+        "格列奈类药物"@zh ;
+    skos:scopeNote "Project class (2026-10-25). ATC files repaglinide, nateglinide and mitiglinide under A10BX (other blood glucose lowering drugs) without a class of their own; Japan treats them as one class (速効型インスリン分泌促進薬). Members are defined by their ATC level-5 codes, the label by the FDA Established Pharmacologic Class."@en .
+
+dmtc:IntermediateActingInsulin a skos:Concept,
+        dm:TherapeuticClass ;
+    rdfs:label "Insulins and analogues for injection, intermediate-acting"@en,
+        "中間型インスリン"@ja,
+        "中效胰岛素"@zh ;
+    skos:altLabel "NPHインスリン"@ja,
+        "NPH胰岛素"@zh ;
+    skos:broader dmtc:Insulin ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch atc:A10AC ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> ;
+    skos:notation "A10AC" ;
+    skos:prefLabel "Insulins and analogues for injection, intermediate-acting"@en,
+        "中間型インスリン"@ja,
+        "中效胰岛素"@zh .
 
 dmtc:LongActingInsulin a skos:Concept,
         dm:TherapeuticClass ;
@@ -114,6 +219,22 @@ dmtc:LongActingInsulin a skos:Concept,
     skos:prefLabel "Insulins and analogues for injection, long-acting"@en,
         "持効型溶解インスリン"@ja,
         "长效胰岛素"@zh .
+
+dmtc:PremixedInsulin a skos:Concept,
+        dm:TherapeuticClass ;
+    rdfs:label "Insulins and analogues for injection, intermediate- or long-acting combined with fast-acting"@en,
+        "混合型インスリン"@ja,
+        "预混胰岛素"@zh ;
+    skos:altLabel "混合型インスリン製剤"@ja,
+        "预混胰岛素制剂"@zh ;
+    skos:broader dmtc:Insulin ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch atc:A10AD ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> ;
+    skos:notation "A10AD" ;
+    skos:prefLabel "Insulins and analogues for injection, intermediate- or long-acting combined with fast-acting"@en,
+        "混合型インスリン"@ja,
+        "预混胰岛素"@zh .
 
 dmtc:SGLT2Inhibitor a skos:Concept,
         dm:TherapeuticClass ;
@@ -227,37 +348,6 @@ dmtc:GLP1ReceptorAgonist a skos:Concept,
         "GLP-1受容体作動薬"@ja,
         "GLP-1受体激动剂"@zh .
 
-dmtc:Insulin a skos:Concept,
-        dm:TherapeuticClass ;
-    rdfs:label "Insulins and analogues"@en,
-        "インスリン製剤"@ja,
-        "胰岛素及其类似物"@zh ;
-    skos:altLabel "Chain, Insulin B"@en,
-        "Iletin"@en,
-        "Insulin"@en,
-        "Insulin A Chain"@en,
-        "Insulin B Chain"@en,
-        "Insulin, Regular"@en,
-        "Insulin, Sodium"@en,
-        "Insulin, Soluble"@en,
-        "Novolin"@en,
-        "Regular Insulin"@en,
-        "Sodium Insulin"@en,
-        "Soluble Insulin"@en,
-        "インスリン"@ja,
-        "胰岛素"@zh ;
-    skos:broader dmtc:DrugsUsedInDiabetes ;
-    skos:closeMatch mesh:D007328 ;
-    skos:definition "A 51-amino acid pancreatic hormone that plays a major role in the regulation of glucose metabolism, directly by suppressing endogenous glucose production (GLYCOGENOLYSIS; GLUCONEOGENESIS) and indirectly by suppressing GLUCAGON secretion and LIPOLYSIS. Native insulin is a globular protein comprised of a zinc-coordinated hexamer. Each insulin monomer containing two chains, A (21 residues) and B (30 residues), linked by two disulfide bonds. Insulin is used as a drug to control insulin-dependent diabetes mellitus (DIABETES MELLITUS, TYPE 1)."@en ;
-    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
-    skos:exactMatch atc:A10A ;
-    skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> ;
-    skos:narrower dmtc:LongActingInsulin ;
-    skos:notation "A10A" ;
-    skos:prefLabel "Insulins and analogues"@en,
-        "インスリン製剤"@ja,
-        "胰岛素及其类似物"@zh .
-
 dmtc:DrugsUsedInDiabetes a skos:Concept,
         dm:TherapeuticClass ;
     rdfs:label "Drugs used in diabetes"@en,
@@ -310,6 +400,40 @@ dmtc:DrugsUsedInDiabetes a skos:Concept,
         "糖尿病治疗药物"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/therapeutic-class> .
 
+dmtc:Insulin a skos:Concept,
+        dm:TherapeuticClass ;
+    rdfs:label "Insulins and analogues"@en,
+        "インスリン製剤"@ja,
+        "胰岛素及其类似物"@zh ;
+    skos:altLabel "Chain, Insulin B"@en,
+        "Iletin"@en,
+        "Insulin"@en,
+        "Insulin A Chain"@en,
+        "Insulin B Chain"@en,
+        "Insulin, Regular"@en,
+        "Insulin, Sodium"@en,
+        "Insulin, Soluble"@en,
+        "Novolin"@en,
+        "Regular Insulin"@en,
+        "Sodium Insulin"@en,
+        "Soluble Insulin"@en,
+        "インスリン"@ja,
+        "胰岛素"@zh ;
+    skos:broader dmtc:DrugsUsedInDiabetes ;
+    skos:closeMatch mesh:D007328 ;
+    skos:definition "A 51-amino acid pancreatic hormone that plays a major role in the regulation of glucose metabolism, directly by suppressing endogenous glucose production (GLYCOGENOLYSIS; GLUCONEOGENESIS) and indirectly by suppressing GLUCAGON secretion and LIPOLYSIS. Native insulin is a globular protein comprised of a zinc-coordinated hexamer. Each insulin monomer containing two chains, A (21 residues) and B (30 residues), linked by two disulfide bonds. Insulin is used as a drug to control insulin-dependent diabetes mellitus (DIABETES MELLITUS, TYPE 1)."@en ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch atc:A10A ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> ;
+    skos:narrower dmtc:FastActingInsulin,
+        dmtc:IntermediateActingInsulin,
+        dmtc:LongActingInsulin,
+        dmtc:PremixedInsulin ;
+    skos:notation "A10A" ;
+    skos:prefLabel "Insulins and analogues"@en,
+        "インスリン製剤"@ja,
+        "胰岛素及其类似物"@zh .
+
 dmtc:BloodGlucoseLowering a skos:Concept,
         dm:TherapeuticClass ;
     rdfs:label "Blood glucose lowering drugs, excl. insulins"@en,
@@ -321,9 +445,12 @@ dmtc:BloodGlucoseLowering a skos:Concept,
     skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
     skos:exactMatch atc:A10B ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> ;
-    skos:narrower dmtc:Biguanide,
+    skos:narrower dmtc:AlphaGlucosidaseInhibitor,
+        dmtc:Biguanide,
         dmtc:DPP4Inhibitor,
         dmtc:GLP1ReceptorAgonist,
+        dmtc:Glimin,
+        dmtc:Glinide,
         dmtc:SGLT2Inhibitor,
         dmtc:Sulfonylurea,
         dmtc:Thiazolidinedione ;
@@ -334,8 +461,8 @@ dmtc:BloodGlucoseLowering a skos:Concept,
 
 <https://dgg32.github.io/glp/vocab/therapeutic-class> a skos:ConceptScheme ;
     dcterms:creator "Sixing Huang" ;
-    dcterms:description "Drug classes for the type 2 diabetes market, following the WHO ATC A10 tree (as served by RxClass) with one project-specific refinement (dual GIP/GLP-1 agonists under GLP-1 receptor agonists)."@en ;
-    dcterms:modified "2026-10-15"^^xsd:date ;
+    dcterms:description "Drug classes for the type 2 diabetes market, following the WHO ATC A10 tree (as served by RxClass) with three project classes: dual GIP/GLP-1 agonists under GLP-1 receptor agonists, and glinides and glimins, which ATC files under A10BX (other) but Japan treats as classes of their own."@en ;
+    dcterms:modified "2026-10-25"^^xsd:date ;
     dcterms:title "Therapeutic classes of diabetes drugs"@en,
         "糖尿病治療薬の薬効分類"@ja,
         "糖尿病治疗药物分类"@zh ;

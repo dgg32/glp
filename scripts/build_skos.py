@@ -1,8 +1,8 @@
 """Build the SKOS vocabularies in vocab/ from curated CSVs plus codes looked up at the source.
 
   vocab/therapeutic-class.ttl  drug classes (A10 tree), en/ja/zh labels, exactMatch ATC, closeMatch MeSH
-  vocab/substance.ttl          active substances, en/ja/zh labels, CMS spellings as hiddenLabel,
-                               exactMatch RxNorm / ATC / MeSH, dm:inTherapeuticClass
+  vocab/substance.ttl          active substances, en/ja/zh labels, CMS and NDB spellings as hiddenLabel,
+                               exactMatch RxNorm (or UMLS) / ATC / MeSH, dm:inTherapeuticClass
   vocab/indication.ttl         indications (type 2 / type 1 diabetes, chronic weight management), MeSH links
   vocab/nucc-specialty.ttl     NUCC Health Care Provider Taxonomy as SKOS (format conversion only).
                                NOT committed: the AMA/NUCC permission forbids derivative works and is
@@ -11,7 +11,7 @@
 Codes are never typed by hand. Substances, their ATC codes and English synonyms (RxNorm), classes and
 English synonyms come from scripts/substances.csv, written by scripts/resolve_drugs.py; class ATC
 codes are checked against RxClass and MeSH IDs come from the NLM MeSH SPARQL endpoint. Curated:
-the class tree (an ATC A10 subset plus one project class) and indication concepts with their labels,
+the class tree (an ATC A10 subset plus three project classes) and indication concepts with their labels,
 and the Japanese and Chinese labels (vocab/src/). Every API response is cached in
 data/raw/{rxnav,mesh}/ so reruns are offline and auditable; delete the cache to refresh.
 
@@ -46,6 +46,7 @@ PROV = Namespace("http://www.w3.org/ns/prov#")
 ATC = Namespace("http://purl.bioontology.org/ontology/ATC/")
 RXNORM = Namespace("http://purl.bioontology.org/ontology/RXNORM/")
 MESH = Namespace("http://id.nlm.nih.gov/mesh/")
+UMLS = Namespace("https://identifiers.org/umls:")
 TODAY = date.today().isoformat()
 # Curated ja/zh labels were drafted on this date; the date must not move on rebuilds.
 REVIEW_NOTE = Literal("Japanese and Chinese labels not taken from Wikidata were drafted 2026-10-14 and are pending "
@@ -125,7 +126,7 @@ SELECT ?label ?rec FROM <http://id.nlm.nih.gov/mesh> WHERE {{
 def new_graph():
     g = Graph()
     for p, ns in [("dm", DM), ("dmtc", DMTC), ("dmsub", DMSUB), ("dmsp", DMSP), ("dmind", DMIND), ("skos", SKOS),
-                  ("dcterms", DCTERMS), ("prov", PROV), ("atc", ATC), ("rxnorm", RXNORM), ("mesh", MESH), ("wd", WD)]:
+                  ("dcterms", DCTERMS), ("prov", PROV), ("atc", ATC), ("rxnorm", RXNORM), ("mesh", MESH), ("umls", UMLS), ("wd", WD)]:
         g.bind(p, ns)
     return g
 
@@ -177,7 +178,8 @@ def build_therapeutic_classes(classes, ja_zh):
     scheme_header(g, scheme, {"en": "Therapeutic classes of diabetes drugs", "ja": "糖尿病治療薬の薬効分類",
                               "zh": "糖尿病治疗药物分类"},
                   "Drug classes for the type 2 diabetes market, following the WHO ATC A10 tree (as served by RxClass) "
-                  "with one project-specific refinement (dual GIP/GLP-1 agonists under GLP-1 receptor agonists).",
+                  "with three project classes: dual GIP/GLP-1 agonists under GLP-1 receptor agonists, and glinides and "
+                  "glimins, which ATC files under A10BX (other) but Japan treats as classes of their own.",
                   ["https://lhncbc.nlm.nih.gov/RxNav/applications/RxClassIntro.html",
                    "https://www.nlm.nih.gov/research/umls/", "https://id.nlm.nih.gov/mesh/"])
     g.add((scheme, SKOS.editorialNote, REVIEW_NOTE))
@@ -215,11 +217,14 @@ def build_substances(substances, ja_zh, report):
     scheme = URIRef(BASE + "vocab/substance")
     scheme_header(g, scheme, {"en": "Active substances of diabetes drugs", "ja": "糖尿病治療薬の有効成分",
                               "zh": "糖尿病治疗药物活性成分"},
-                  "Active substances (moieties) found in the Part D diabetes subset, with CMS spellings as hidden labels "
-                  "for term normalization.",
+                  "Active substances (moieties) found in the Part D diabetes subset (Connecticut) and in NDB Open Data "
+                  "(Japan), with CMS and NDB (成分名) spellings as hidden labels for term normalization. Substances not "
+                  "in RxNorm (marketed in Japan only) are identified by their UMLS CUI.",
                   ["https://www.nlm.nih.gov/research/umls/rxnorm/",
+                   "https://www.nlm.nih.gov/research/umls/",
                    "https://id.nlm.nih.gov/mesh/",
-                   "https://data.cms.gov/provider-summary-by-type-of-service/medicare-part-d-prescribers"])
+                   "https://data.cms.gov/provider-summary-by-type-of-service/medicare-part-d-prescribers",
+                   "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177182.html"])
     g.add((scheme, SKOS.editorialNote, REVIEW_NOTE))
     for s in substances:
         l = ja_zh[("substance", s["substance"])]
@@ -229,14 +234,22 @@ def build_substances(substances, ja_zh, report):
         g.add((node, SKOS.inScheme, scheme))
         g.add((node, SKOS.topConceptOf, scheme))
         g.add((scheme, SKOS.hasTopConcept, node))
-        labels(g, node, s["rxnorm_name"], l["pref_ja"], l["pref_zh"], split(s["alt_en"]))
+        labels(g, node, s["pref_en"], l["pref_ja"], l["pref_zh"], split(s["alt_en"]))
         label_note(g, node, l)
         if l["wikidata"]:
             g.add((node, SKOS.exactMatch, WD[l["wikidata"]]))
         for cms in split(s["cms_names"]):
             g.add((node, SKOS.hiddenLabel, Literal(cms, lang="en")))
+        for ndb in split(s["ndb_names"]):  # 成分名 as in the NHI price list, e.g. メトホルミン塩酸塩
+            g.add((node, SKOS.hiddenLabel, Literal(ndb, lang="ja")))
         g.add((node, DM.inTherapeuticClass, DMTC[s["therapeutic_class"]]))
-        g.add((node, SKOS.exactMatch, RXNORM[s["rxcui"]]))
+        if s["rxcui"]:
+            g.add((node, SKOS.exactMatch, RXNORM[s["rxcui"]]))
+        else:  # not in RxNorm (Japan only)
+            g.add((node, SKOS.exactMatch, UMLS[s["umls_cui"]]))
+            report.append(f"{s['substance']}: not in RxNorm, identified by UMLS {s['umls_cui']}")
+        if s["class_evidence"].startswith("curated"):
+            report.append(f"{s['substance']}: class {s['therapeutic_class']} is a curated fallback")
         for code in split(s["atc"]):
             g.add((node, SKOS.exactMatch, ATC[code]))
         if s["class_evidence"].startswith("FDA EPC"):
@@ -245,7 +258,7 @@ def build_substances(substances, ja_zh, report):
         if s["mesh"]:  # looked up by resolve_drugs.py
             g.add((node, SKOS.exactMatch, MESH[s["mesh"]]))
         else:
-            report.append(f"{s['substance']}: no MeSH record for {s['rxnorm_name']!r} or its synonyms")
+            report.append(f"{s['substance']}: no MeSH record for {s['pref_en']!r} or its synonyms")
     return g
 
 

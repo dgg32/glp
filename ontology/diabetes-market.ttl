@@ -7,6 +7,9 @@
 @prefix dcterms:    <http://purl.org/dc/terms/> .
 @prefix owl:        <http://www.w3.org/2002/07/owl#> .
 @prefix prov:       <http://www.w3.org/ns/prov#> .
+@prefix qb:         <http://purl.org/linked-data/cube#> .
+@prefix sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> .
+@prefix sdmx-code:  <http://purl.org/linked-data/sdmx/2009/code#> .
 @prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos:       <http://www.w3.org/2004/02/skos/core#> .
@@ -18,13 +21,14 @@
 
 <https://dgg32.github.io/glp/ontology> a owl:Ontology ;
     dcterms:title "Diabetes Drug Market Ontology"@en , "糖尿病治療薬市場オントロジー"@ja , "糖尿病药物市场本体"@zh ;
-    dcterms:description "A small OWL ontology for US Medicare Part D prescribing of type 2 diabetes drugs: who prescribes which product, containing which substance, in which therapeutic class. Product and substance classes are aligned to IDMP-O 1.4.0; commercial concepts (prescriber, prescription aggregate) are not covered by IDMP-O and are defined here."@en ;
+    dcterms:description "A small OWL ontology for the type 2 diabetes drug market in two claims datasets: US Medicare Part D prescribing (who prescribes which product) and Japan's NDB Open Data (how much of each product is dispensed, by prefecture, month and sex-age band). Product and substance classes are aligned to IDMP-O 1.4.0; NDB tables are modelled with the W3C RDF Data Cube vocabulary; commercial concepts (prescriber, prescription aggregate) are not covered by IDMP-O and are defined here."@en ;
     dcterms:creator "Sixing Huang" ;
     dcterms:created "2026-10-14"^^xsd:date ;
     dcterms:license <https://opensource.org/licenses/MIT> ;
-    owl:versionIRI <https://dgg32.github.io/glp/ontology/0.4.0> ;
-    owl:versionInfo "0.4.0" ;
-    owl:priorVersion <https://dgg32.github.io/glp/ontology/0.3.0> ;
+    owl:versionIRI <https://dgg32.github.io/glp/ontology/0.5.0> ;
+    owl:versionInfo "0.5.0" ;
+    owl:priorVersion <https://dgg32.github.io/glp/ontology/0.4.0> ;
+    skos:changeNote "0.5.0 (2026-10-25): Japan (NDB Open Data). Added dm:QuantitySlice (an RDF Data Cube slice) with dm:aboutProduct, dm:careSetting and dm:totalQuantity, the observation dimensions dm:prefecture, dm:month and dm:sexAgeGroup, the measure dm:quantity and the SDMX confidentiality attribute for masked cells; Japanese product attributes (dm:yjCode, dm:receiptCode, dm:nhiPrice, dm:dispensingUnit, dm:isGeneric, dm:isOriginator, dm:routeOfAdministration, dm:inJapaneseDrugClass); dm:partOfCorporateGroup; concept classes dm:Prefecture, dm:SexAgeGroup, dm:CareSetting, dm:JapaneseDrugClass; defined classes dm:SGLT2Product and dm:GLP1Product. dm:MedicinalProduct and dm:Organization now cover Japanese products and marketing authorization holders. No change to existing axioms."@en ;
     skos:changeNote "0.4.0 (2026-10-15): definitions only, no axiom changes. dm:Indication: indications are MeSH descriptors stated in FDA labels (example 'obesity' replaces 'chronic weight management'). dm:Organization: a company is the corporate group of a Drugs@FDA application holder, identified by the LEI of its GLEIF ultimate parent."@en ;
     skos:changeNote "0.3.0 (2026-10-14): added dm:pseudonymousId (prescribers are identified by a keyed hash, never by NPI or name, in loaded data) and dm:cmsGenericName."@en ;
     skos:changeNote "0.2.0 (2026-10-14): removed the age 65+ datatype properties to stay well inside the Stardog Cloud Free 1M-edge limit; dm:writes is now inferred only; IDMP-O definitions moved to imports/idmp-o-1.4.0-extract.ttl."@en ;
@@ -49,7 +53,8 @@ dm:Prescription a owl:Class ;
 dm:MedicinalProduct a owl:Class ;
     rdfs:subClassOf idmp-mprd:MedicinalProduct ;
     rdfs:label "medicinal product"@en , "医薬品"@ja , "药品"@zh ;
-    skos:definition "A drug product as named in Part D claims (CMS Brnd_Name), e.g. Jardiance. Unbranded generics appear under their generic name."@en .
+    skos:definition "A drug product as named in claims data: in Part D (CMS Brnd_Name, e.g. Jardiance; unbranded generics appear under their generic name), or in NDB Open Data, where each strength is its own product with a receipt code and a YJ code (e.g. ジャディアンス錠10mg)."@en ;
+    rdfs:comment "US products are brand-level (all strengths together), Japanese products strength-level, because that is how each source counts. Compare them through their substances and classes, not one to one."@en .
 
 dm:Substance a owl:Class ;
     rdfs:subClassOf idmp-sub:Substance ;
@@ -75,8 +80,35 @@ dm:Indication a owl:Class ;
 dm:Organization a owl:Class ;
     rdfs:subClassOf cmns-org:Organization ;
     rdfs:label "organization"@en , "組織"@ja , "组织"@zh ;
-    skos:definition "A company that holds the US marketing application for a medicinal product, taken as its corporate group, e.g. Boehringer Ingelheim."@en ;
-    rdfs:comment "Drugs@FDA application holders are grouped by their GLEIF ultimate parent; the LEI of that parent is the dcterms:identifier and the last segment of the IRI."@en .
+    skos:definition "A company that holds the marketing authorization for a medicinal product: in the US the corporate group of the Drugs@FDA application holder (e.g. Boehringer Ingelheim), in Japan the holder named in the NHI price list (e.g. 日本ベーリンガーインゲルハイム)."@en ;
+    rdfs:comment "Drugs@FDA application holders are grouped by their GLEIF ultimate parent; the LEI of that parent is the dcterms:identifier and the last segment of the IRI. A Japanese subsidiary of such a group links to it with dm:partOfCorporateGroup."@en .
+
+dm:QuantitySlice a owl:Class ;
+    rdfs:subClassOf qb:Slice ;
+    rdfs:label "quantity slice"@en , "数量スライス"@ja , "数量切片"@zh ;
+    skos:definition "The quantity of one medicinal product dispensed in one care setting in one NDB Open Data release, broken down by one dimension (prefecture, month or sex-age band). One row of one NDB table; its cells are the qb:observation values."@en ;
+    rdfs:comment "An RDF Data Cube slice fixes product, care setting and dimension once, so each cell needs only three triples: the link from the slice, the dimension value, and the quantity or the confidentiality flag."@en .
+
+dm:Prefecture a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "prefecture"@en , "都道府県"@ja , "都道府县"@zh ;
+    skos:definition "One of Japan's 47 prefectures, identified by its JIS X 0401 code (01-47)."@en .
+
+dm:SexAgeGroup a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "sex and age band"@en , "性・年齢階級"@ja , "性别年龄组"@zh ;
+    skos:definition "A sex combined with a five-year age band (0-4 ... 95-99, 100+), as NDB Open Data reports them."@en .
+
+dm:CareSetting a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "care setting"@en , "診療区分"@ja , "诊疗类别"@zh ;
+    skos:definition "Where a drug was prescribed and dispensed: outpatient with a prescription filled at a community pharmacy (院外), outpatient dispensed in the clinic or hospital (院内), or inpatient (入院)."@en .
+
+dm:JapaneseDrugClass a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Japanese therapeutic category"@en , "薬効分類"@ja , "日本药效分类"@zh ;
+    skos:definition "A three-digit therapeutic category of the Japan Standard Commodity Classification (薬効分類), as used by the NHI price list and NDB Open Data, e.g. 396 糖尿病用剤."@en ;
+    rdfs:comment "Not the same tree as ATC: GLP-1 receptor agonists are filed under 249 (other hormone preparations). The SKOS mapping properties in vocab/jp-drug-class.ttl relate the two."@en .
 
 # --- Defined classes: membership is inferred by the reasoner, never asserted ---
 
@@ -115,6 +147,36 @@ dm:GLP1Prescriber a owl:Class ;
                       owl:someValuesFrom [ a owl:Restriction ;
                           owl:onProperty dm:inTherapeuticClass ;
                           owl:hasValue dmtc:GLP1ReceptorAgonist ] ] ] ]
+        )
+    ] .
+
+dm:SGLT2Product a owl:Class ;
+    rdfs:label "SGLT2 inhibitor product"@en , "SGLT2阻害薬製剤"@ja , "SGLT2抑制剂产品"@zh ;
+    skos:definition "A medicinal product containing a substance in the SGLT2 inhibitor class, alone or in combination."@en ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            dm:MedicinalProduct
+            [ a owl:Restriction ;
+              owl:onProperty dm:hasActiveSubstance ;
+              owl:someValuesFrom [ a owl:Restriction ;
+                  owl:onProperty dm:inTherapeuticClass ;
+                  owl:hasValue dmtc:SGLT2Inhibitor ] ]
+        )
+    ] .
+
+dm:GLP1Product a owl:Class ;
+    rdfs:label "GLP-1 receptor agonist product"@en , "GLP-1受容体作動薬製剤"@ja , "GLP-1受体激动剂产品"@zh ;
+    skos:definition "A medicinal product containing a substance in the GLP-1 receptor agonist class (including dual GIP/GLP-1 agonists), alone or in combination, whatever its Japanese therapeutic category (249 or 396)."@en ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            dm:MedicinalProduct
+            [ a owl:Restriction ;
+              owl:onProperty dm:hasActiveSubstance ;
+              owl:someValuesFrom [ a owl:Restriction ;
+                  owl:onProperty dm:inTherapeuticClass ;
+                  owl:hasValue dmtc:GLP1ReceptorAgonist ] ]
         )
     ] .
 
@@ -175,6 +237,38 @@ dm:manufacturedBy a owl:ObjectProperty ;
     rdfs:label "manufactured by"@en ;
     rdfs:domain dm:MedicinalProduct ;
     rdfs:range dm:Organization .
+
+dm:partOfCorporateGroup a owl:ObjectProperty ;
+    rdfs:label "part of corporate group"@en ;
+    rdfs:domain dm:Organization ;
+    rdfs:range dm:Organization ;
+    skos:definition "Links a national company (e.g. the Japanese marketing authorization holder 日本ベーリンガーインゲルハイム) to its corporate group as identified by GLEIF."@en .
+
+dm:inJapaneseDrugClass a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "in Japanese therapeutic category"@en ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range dm:JapaneseDrugClass .
+
+# --- NDB Open Data (RDF Data Cube) ---
+dm:aboutProduct a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "about product"@en ;
+    rdfs:domain dm:QuantitySlice ;
+    rdfs:range dm:MedicinalProduct ;
+    rdfs:comment "Not dm:forProduct, whose domain is dm:Prescription: with reasoning, every slice would become a prescription."@en .
+
+dm:careSetting a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "care setting"@en ;
+    rdfs:domain dm:QuantitySlice ;
+    rdfs:range dm:CareSetting .
+
+dm:prefecture a owl:ObjectProperty , qb:DimensionProperty ;
+    rdfs:label "prefecture"@en ;
+    rdfs:range dm:Prefecture ;
+    skos:definition "The prefecture of the medical institution that issued the claim (not where the patient lives)."@en .
+
+dm:sexAgeGroup a owl:ObjectProperty , qb:DimensionProperty ;
+    rdfs:label "sex and age band"@en ;
+    rdfs:range dm:SexAgeGroup .
 
 #################################################################
 #  Datatype properties (attributes)
@@ -264,6 +358,73 @@ dm:isCombinationProduct a owl:DatatypeProperty , owl:FunctionalProperty ;
     rdfs:domain dm:MedicinalProduct ;
     rdfs:range xsd:boolean .
 
+# --- MedicinalProduct (Japan) ---
+dm:yjCode a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "YJ code"@en , "薬価基準収載医薬品コード"@ja ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range xsd:string ;
+    skos:definition "The 12-character NHI price list code (薬価基準収載医薬品コード). Characters 1-4 are the therapeutic category, 1-7 the ingredient, 8 the dosage form."@en .
+
+dm:receiptCode a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "receipt code"@en , "レセプト電算処理システム用コード"@ja ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range xsd:string ;
+    skos:definition "The 9-digit drug code of the claims (receipt) processing system (医薬品コード), the key of NDB Open Data."@en .
+
+dm:nhiPrice a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "NHI price (JPY per unit)"@en , "薬価"@ja ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range xsd:decimal ;
+    skos:definition "Reimbursement price in yen per dispensing unit (tablet, pen, ...), as printed in NDB Open Data."@en ;
+    rdfs:comment "MHLW updated the prices in the 11th release to the price list of 2026-09-02, so quantity x price is the FY2024 volume at current prices, not FY2024 spending."@en .
+
+dm:dispensingUnit a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "dispensing unit"@en , "単位"@ja ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range xsd:string ;
+    skos:definition "The unit in which quantities are counted (錠 tablet, キット kit, 筒 cartridge ...). Quantities in different units cannot be added."@en .
+
+dm:isGeneric a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "is generic"@en , "後発品"@ja ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range xsd:boolean ;
+    skos:definition "Generic (後発医薬品) according to NDB Open Data's 後発品区分; biosimilars count as generics."@en ;
+    rdfs:comment "The reimbursement definition, not the pharmaceutical one: generics priced at the originator's level (marked ★ in the NHI price list) are not flagged. Most metformin generics (the 'MT' products, priced like Metgluco) are such a case, so metformin's generic share looks near zero."@en .
+
+dm:isOriginator a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "is originator"@en , "先発品"@ja ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range xsd:boolean ;
+    skos:definition "Flagged 先発品 (originator) in the NHI price list. Neither generic nor originator: older products that predate the distinction and unified-name listings."@en .
+
+dm:routeOfAdministration a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "route of administration"@en , "投与経路"@ja ;
+    rdfs:domain dm:MedicinalProduct ;
+    rdfs:range xsd:string ;
+    skos:definition "\"oral\" or \"injection\": the NDB table family (内服 / 注射) the product is reported in. Masking thresholds differ: 1,000 for oral, 400 for injection tables."@en .
+
+# --- QuantitySlice and its observations ---
+dm:totalQuantity a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "total quantity"@en , "総計（処方数量）"@ja ;
+    rdfs:domain dm:QuantitySlice ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The national total of the row (総計). Unmasked unless the whole product is below the masking threshold in that care setting; then the slice carries sdmx-attribute:confStatus instead."@en .
+
+dm:month a owl:DatatypeProperty , qb:DimensionProperty ;
+    rdfs:label "month of care"@en , "診療月"@ja ;
+    rdfs:range xsd:gYearMonth .
+
+dm:quantity a owl:DatatypeProperty , qb:MeasureProperty ;
+    rdfs:label "quantity"@en , "処方数量"@ja ;
+    rdfs:range xsd:decimal ;
+    skos:definition "Dispensed quantity in the product's dispensing unit. Absent when NDB masked the cell; the observation then carries sdmx-attribute:confStatus sdmx-code:confStatus-C."@en .
+
+dm:minAge a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "minimum age"@en ;
+    rdfs:domain dm:SexAgeGroup ;
+    rdfs:range xsd:integer ;
+    skos:definition "Lower bound of the age band in years (65 for 65-69)."@en .
+
 #################################################################
 #  External terms (MIREOT-style declarations, not imports)
 #################################################################
@@ -312,6 +473,62 @@ skos:broader a owl:ObjectProperty ;
     rdfs:subPropertyOf skos:broaderTransitive ;
     rdfs:label "has broader"@en ;
     rdfs:isDefinedBy <http://www.w3.org/2004/02/skos/core> .
+
+qb:DataSet a owl:Class ;
+    rdfs:label "data set"@en ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+qb:Slice a owl:Class ;
+    rdfs:label "slice"@en ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+qb:SliceKey a owl:Class ;
+    rdfs:label "slice key"@en ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+qb:Observation a owl:Class ;
+    rdfs:label "observation"@en ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+qb:DimensionProperty a owl:Class ;
+    rdfs:label "dimension property"@en ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+qb:MeasureProperty a owl:Class ;
+    rdfs:label "measure property"@en ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+qb:observation a owl:ObjectProperty ;
+    rdfs:label "observation"@en ;
+    rdfs:domain qb:Slice ;
+    rdfs:range qb:Observation ;
+    rdfs:comment "Observations are not typed in the data (one triple each saved); the range types them under reasoning."@en ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+qb:slice a owl:ObjectProperty ;
+    rdfs:label "slice"@en ;
+    rdfs:domain qb:DataSet ;
+    rdfs:range qb:Slice ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+qb:sliceStructure a owl:ObjectProperty ;
+    rdfs:label "slice structure"@en ;
+    rdfs:domain qb:Slice ;
+    rdfs:range qb:SliceKey ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+qb:componentProperty a owl:ObjectProperty ;
+    rdfs:label "component"@en ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/cube> .
+
+sdmx-attribute:confStatus a owl:ObjectProperty ;
+    rdfs:label "confidentiality status"@en ;
+    rdfs:comment "Set to sdmx-code:confStatus-C (confidential) on NDB cells and totals that MHLW masked. NDB does not say whether a cell was masked for being small (primary) or to protect another cell (secondary), so the generic code is used."@en ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/sdmx/2009/attribute> .
+
+sdmx-code:confStatus-C a owl:NamedIndividual ;
+    rdfs:label "confidential"@en , "秘匿"@ja ;
+    rdfs:isDefinedBy <http://purl.org/linked-data/sdmx/2009/code> .
 
 # Therapeutic class concepts referenced by the defined classes; the SKOS scheme defines them fully.
 dmtc:SGLT2Inhibitor a owl:NamedIndividual , dm:TherapeuticClass .

@@ -8,8 +8,45 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rxnorm: <http://purl.bioontology.org/ontology/RXNORM/> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix umls: <https://identifiers.org/umls:> .
 @prefix wd: <http://www.wikidata.org/entity/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+dmsub:acarbose a skos:Concept,
+        dm:Substance ;
+    rdfs:label "acarbose"@en,
+        "アカルボース"@ja,
+        "阿卡波糖"@zh ;
+    skos:editorialNote "Japanese label from Wikidata Q338005 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D020909,
+        atc:A10BF01,
+        rxnorm:16681,
+        wd:Q338005 ;
+    skos:hiddenLabel "アカルボース"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "acarbose"@en,
+        "アカルボース"@ja,
+        "阿卡波糖"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:AlphaGlucosidaseInhibitor .
+
+dmsub:acetohexamide a skos:Concept,
+        dm:Substance ;
+    rdfs:label "acetohexamide"@en,
+        "アセトヘキサミド"@ja,
+        "醋磺己脲"@zh ;
+    skos:editorialNote "Japanese label from Wikidata Q4673274 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D000092,
+        atc:A10BB31,
+        rxnorm:173,
+        wd:Q4673274 ;
+    skos:hiddenLabel "アセトヘキサミド"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "acetohexamide"@en,
+        "アセトヘキサミド"@ja,
+        "醋磺己脲"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Sulfonylurea .
 
 dmsub:alogliptin a skos:Concept,
         dm:Substance ;
@@ -22,13 +59,47 @@ dmsub:alogliptin a skos:Concept,
         atc:A10BH04,
         rxnorm:1368001,
         wd:Q4734170 ;
-    skos:hiddenLabel "Alogliptin Benzoate"@en ;
+    skos:hiddenLabel "Alogliptin Benzoate"@en,
+        "アログリプチン安息香酸塩"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "alogliptin"@en,
         "アログリプチン"@ja,
         "阿格列汀"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:DPP4Inhibitor .
+
+dmsub:anagliptin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "anagliptin"@en,
+        "アナグリプチン"@ja,
+        "阿拉格列汀"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C583175,
+        umls:C3272640 ;
+    skos:hiddenLabel "アナグリプチン"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "anagliptin"@en,
+        "アナグリプチン"@ja,
+        "阿拉格列汀"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:DPP4Inhibitor .
+
+dmsub:buformin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "buformin"@en,
+        "ブホルミン"@ja,
+        "丁双胍"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D002026,
+        atc:A10BA03,
+        umls:C0006359 ;
+    skos:hiddenLabel "ブホルミン塩酸塩"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "buformin"@en,
+        "ブホルミン"@ja,
+        "丁双胍"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Biguanide .
 
 dmsub:canagliflozin a skos:Concept,
         dm:Substance ;
@@ -41,7 +112,8 @@ dmsub:canagliflozin a skos:Concept,
         atc:A10BK02,
         rxnorm:1373458,
         wd:Q47495780 ;
-    skos:hiddenLabel "Canagliflozin"@en ;
+    skos:hiddenLabel "Canagliflozin"@en,
+        "カナグリフロジン水和物"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "canagliflozin"@en,
         "カナグリフロジン"@ja,
@@ -61,7 +133,8 @@ dmsub:dapagliflozin a skos:Concept,
         atc:A10BK01,
         rxnorm:1488564,
         wd:Q409898 ;
-    skos:hiddenLabel "Dapagliflozin Propanediol"@en ;
+    skos:hiddenLabel "Dapagliflozin Propanediol"@en,
+        "ダパグリフロジンプロピレングリコール水和物"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "dapagliflozin"@en,
         "ダパグリフロジン"@ja,
@@ -79,7 +152,8 @@ dmsub:dulaglutide a skos:Concept,
         atc:A10BJ05,
         rxnorm:1551291,
         wd:Q21011228 ;
-    skos:hiddenLabel "Dulaglutide"@en ;
+    skos:hiddenLabel "Dulaglutide"@en,
+        "デュラグルチド（遺伝子組換え）"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "dulaglutide"@en,
         "デュラグルチド"@ja,
@@ -97,7 +171,8 @@ dmsub:empagliflozin a skos:Concept,
         atc:A10BK03,
         rxnorm:1545653,
         wd:Q5373824 ;
-    skos:hiddenLabel "Empagliflozin"@en ;
+    skos:hiddenLabel "Empagliflozin"@en,
+        "エンパグリフロジン"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "empagliflozin"@en,
         "エンパグリフロジン"@ja,
@@ -135,13 +210,32 @@ dmsub:exenatide a skos:Concept,
         rxnorm:60548,
         wd:Q417762 ;
     skos:hiddenLabel "Exenatide"@en,
-        "Exenatide Microspheres"@en ;
+        "Exenatide Microspheres"@en,
+        "エキセナチド"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "exenatide"@en,
         "エキセナチド"@ja,
         "艾塞那肽"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:GLP1ReceptorAgonist .
+
+dmsub:gliclazide a skos:Concept,
+        dm:Substance ;
+    rdfs:label "gliclazide"@en,
+        "グリクラジド"@ja,
+        "格列齐特"@zh ;
+    skos:editorialNote "Japanese label from Wikidata Q290001 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D005907,
+        atc:A10BB09,
+        rxnorm:4816,
+        wd:Q290001 ;
+    skos:hiddenLabel "グリクラジド"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "gliclazide"@en,
+        "グリクラジド"@ja,
+        "格列齐特"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Sulfonylurea .
 
 dmsub:glimepiride a skos:Concept,
         dm:Substance ;
@@ -153,7 +247,8 @@ dmsub:glimepiride a skos:Concept,
         atc:A10BB12,
         rxnorm:25789,
         wd:Q106029845 ;
-    skos:hiddenLabel "Glimepiride"@en ;
+    skos:hiddenLabel "Glimepiride"@en,
+        "グリメピリド"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "glimepiride"@en,
         "グリメピリド"@ja,
@@ -191,13 +286,71 @@ dmsub:glyburide a skos:Concept,
         atc:A10BB01,
         rxnorm:4815,
         wd:Q420626 ;
-    skos:hiddenLabel "Glyburide"@en ;
+    skos:hiddenLabel "Glyburide"@en,
+        "グリベンクラミド"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "glyburide"@en,
         "グリベンクラミド"@ja,
         "格列本脲"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:Sulfonylurea .
+
+dmsub:glyclopyramide a skos:Concept,
+        dm:Substance ;
+    rdfs:label "glyclopyramide"@en,
+        "グリクロピラミド"@ja,
+        "格列吡脲"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C017346,
+        umls:C0607456 ;
+    skos:hiddenLabel "グリクロピラミド"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "glyclopyramide"@en,
+        "グリクロピラミド"@ja,
+        "格列吡脲"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Sulfonylurea .
+
+dmsub:imeglimin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "imeglimin"@en,
+        "イメグリミン"@ja,
+        "伊美格列明"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C575881,
+        atc:A10BX15,
+        umls:C3501765 ;
+    skos:hiddenLabel "イメグリミン塩酸塩"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "imeglimin"@en,
+        "イメグリミン"@ja,
+        "伊美格列明"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Glimin .
+
+dmsub:insulinAspart a skos:Concept,
+        dm:Substance ;
+    rdfs:label "insulin aspart"@en,
+        "インスリンアスパルト"@ja,
+        "门冬胰岛素"@zh ;
+    skos:altLabel "insulin aspart, human"@en,
+        "insulin aspart-fsan"@en,
+        "insulin aspart-szjj"@en,
+        "insulin aspart-xjhz"@en ;
+    skos:editorialNote "Japanese label from Wikidata Q2754775 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D061267,
+        atc:A10AB05,
+        atc:A10AD05,
+        rxnorm:51428,
+        wd:Q2754775 ;
+    skos:hiddenLabel "インスリンアスパルト（遺伝子組換え）"@ja,
+        "インスリンアスパルト（遺伝子組換え）［インスリンアスパルト後続１］"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "insulin aspart"@en,
+        "インスリンアスパルト"@ja,
+        "门冬胰岛素"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Insulin .
 
 dmsub:insulinDegludec a skos:Concept,
         dm:Substance ;
@@ -209,10 +362,29 @@ dmsub:insulinDegludec a skos:Concept,
         atc:A10AE06,
         rxnorm:1670007,
         wd:Q16252338 ;
+    skos:hiddenLabel "インスリンデグルデク（遺伝子組換え）"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "insulin degludec"@en,
         "インスリン デグルデク"@ja,
         "德谷胰岛素"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:LongActingInsulin .
+
+dmsub:insulinDetemir a skos:Concept,
+        dm:Substance ;
+    rdfs:label "insulin detemir"@en,
+        "インスリンデテミル"@ja,
+        "地特胰岛素"@zh ;
+    skos:editorialNote "Japanese label from Wikidata Q410965 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D000069057,
+        atc:A10AE05,
+        rxnorm:139825,
+        wd:Q410965 ;
+    skos:hiddenLabel "インスリンデテミル（遺伝子組換え）"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "insulin detemir"@en,
+        "インスリンデテミル"@ja,
+        "地特胰岛素"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:LongActingInsulin .
 
@@ -230,13 +402,116 @@ dmsub:insulinGlargine a skos:Concept,
         rxnorm:274783,
         wd:Q417317 ;
     skos:hiddenLabel "Insulin Glargine,hum.Rec.Anlog"@en,
-        "Insulin Glargine-Yfgn"@en ;
+        "Insulin Glargine-Yfgn"@en,
+        "インスリングラルギン（遺伝子組換え）"@ja,
+        "インスリングラルギン（遺伝子組換え）［インスリングラルギン後続１］"@ja,
+        "インスリングラルギン（遺伝子組換え）［インスリングラルギン後続２］"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "insulin glargine"@en,
         "インスリングラルギン"@ja,
         "甘精胰岛素"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:LongActingInsulin .
+
+dmsub:insulinGlulisine a skos:Concept,
+        dm:Substance ;
+    rdfs:label "insulin glulisine"@en,
+        "インスリン グルリジン"@ja,
+        "谷赖胰岛素"@zh ;
+    skos:altLabel "insulin glulisine"@en,
+        "insulin glulisine, human"@en ;
+    skos:editorialNote "Japanese label from Wikidata Q6042242 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C479079,
+        atc:A10AB06,
+        rxnorm:400008,
+        wd:Q6042242 ;
+    skos:hiddenLabel "インスリングルリジン（遺伝子組換え）"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "insulin glulisine"@en,
+        "インスリン グルリジン"@ja,
+        "谷赖胰岛素"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:FastActingInsulin .
+
+dmsub:insulinHuman a skos:Concept,
+        dm:Substance ;
+    rdfs:label "insulin human"@en,
+        "インスリン ヒト"@ja,
+        "人胰岛素"@zh ;
+    skos:altLabel "insulin, regular, human"@en ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D061386,
+        atc:A10AB01,
+        atc:A10AC01,
+        atc:A10AD01,
+        atc:A10AE01,
+        atc:A10AF01,
+        rxnorm:253182,
+        wd:Q50265665 ;
+    skos:hiddenLabel "インスリン　ヒト（遺伝子組換え）"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "insulin human"@en,
+        "インスリン ヒト"@ja,
+        "人胰岛素"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Insulin .
+
+dmsub:insulinIcodec a skos:Concept,
+        dm:Substance ;
+    rdfs:label "insulin icodec"@en,
+        "インスリン イコデク"@ja,
+        "依柯胰岛素"@zh ;
+    skos:altLabel "insulin icodec-abae"@en ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C000712207,
+        atc:A10AE07,
+        rxnorm:2740394 ;
+    skos:hiddenLabel "インスリン　イコデク（遺伝子組換え）"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "insulin icodec"@en,
+        "インスリン イコデク"@ja,
+        "依柯胰岛素"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:LongActingInsulin .
+
+dmsub:insulinLispro a skos:Concept,
+        dm:Substance ;
+    rdfs:label "insulin lispro"@en,
+        "インスリンリスプロ"@ja,
+        "赖脯胰岛素"@zh ;
+    skos:altLabel "insulin lispro-aabc"@en ;
+    skos:editorialNote "Japanese label from Wikidata Q3492616 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D061268,
+        atc:A10AB04,
+        atc:A10AC04,
+        atc:A10AD04,
+        rxnorm:86009,
+        wd:Q3492616 ;
+    skos:hiddenLabel "インスリンリスプロ（遺伝子組換え）"@ja,
+        "インスリンリスプロ（遺伝子組換え）［インスリンリスプロ後続１］"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "insulin lispro"@en,
+        "インスリンリスプロ"@ja,
+        "赖脯胰岛素"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Insulin .
+
+dmsub:ipragliflozin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "ipragliflozin"@en,
+        "イプラグリフロジン"@ja,
+        "伊格列净"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C572941,
+        atc:A10BK05,
+        umls:C3492889 ;
+    skos:hiddenLabel "イプラグリフロジン　Ｌ－プロリン"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "ipragliflozin"@en,
+        "イプラグリフロジン"@ja,
+        "伊格列净"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:SGLT2Inhibitor .
 
 dmsub:linagliptin a skos:Concept,
         dm:Substance ;
@@ -248,7 +523,8 @@ dmsub:linagliptin a skos:Concept,
         atc:A10BH05,
         rxnorm:1100699,
         wd:Q909745 ;
-    skos:hiddenLabel "Linagliptin"@en ;
+    skos:hiddenLabel "Linagliptin"@en,
+        "リナグリプチン"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "linagliptin"@en,
         "リナグリプチン"@ja,
@@ -266,7 +542,8 @@ dmsub:liraglutide a skos:Concept,
         atc:A10BJ02,
         rxnorm:475968,
         wd:Q2526479 ;
-    skos:hiddenLabel "Liraglutide"@en ;
+    skos:hiddenLabel "Liraglutide"@en,
+        "リラグルチド（遺伝子組換え）"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "liraglutide"@en,
         "リラグルチド"@ja,
@@ -284,12 +561,29 @@ dmsub:lixisenatide a skos:Concept,
         atc:A10BJ03,
         rxnorm:1440051,
         wd:Q6659956 ;
+    skos:hiddenLabel "リキシセナチド"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "lixisenatide"@en,
         "リキシセナチド"@ja,
         "利司那肽"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:GLP1ReceptorAgonist .
+
+dmsub:luseogliflozin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "luseogliflozin"@en,
+        "ルセオグリフロジン"@ja,
+        "鲁格列净"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch atc:A10BK07,
+        umls:C2933904 ;
+    skos:hiddenLabel "ルセオグリフロジン水和物"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "luseogliflozin"@en,
+        "ルセオグリフロジン"@ja,
+        "鲁格列净"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:SGLT2Inhibitor .
 
 dmsub:metformin a skos:Concept,
         dm:Substance ;
@@ -302,13 +596,82 @@ dmsub:metformin a skos:Concept,
         atc:A10BA02,
         rxnorm:6809,
         wd:Q19484 ;
-    skos:hiddenLabel "Metformin Hcl"@en ;
+    skos:hiddenLabel "Metformin Hcl"@en,
+        "メトホルミン塩酸塩"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "metformin"@en,
         "メトホルミン"@ja,
         "二甲双胍"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:Biguanide .
+
+dmsub:miglitol a skos:Concept,
+        dm:Substance ;
+    rdfs:label "miglitol"@en,
+        "ミグリトール"@ja,
+        "米格列醇"@zh ;
+    skos:editorialNote "Japanese label from Wikidata Q772735 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C045621,
+        atc:A10BF02,
+        rxnorm:30009,
+        wd:Q772735 ;
+    skos:hiddenLabel "ミグリトール"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "miglitol"@en,
+        "ミグリトール"@ja,
+        "米格列醇"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:AlphaGlucosidaseInhibitor .
+
+dmsub:mitiglinide a skos:Concept,
+        dm:Substance ;
+    rdfs:label "mitiglinide"@en,
+        "ミチグリニド"@ja,
+        "米格列奈"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C087255,
+        atc:A10BX08,
+        umls:C0906166 ;
+    skos:hiddenLabel "ミチグリニドカルシウム水和物"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "mitiglinide"@en,
+        "ミチグリニド"@ja,
+        "米格列奈"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Glinide .
+
+dmsub:nateglinide a skos:Concept,
+        dm:Substance ;
+    rdfs:label "nateglinide"@en,
+        "ナテグリニド"@ja,
+        "那格列奈"@zh ;
+    skos:editorialNote "Japanese label from Wikidata Q2254797 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D000077715,
+        atc:A10BX03,
+        rxnorm:274332,
+        wd:Q2254797 ;
+    skos:hiddenLabel "ナテグリニド"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "nateglinide"@en,
+        "ナテグリニド"@ja,
+        "那格列奈"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Glinide .
+
+dmsub:omarigliptin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "omarigliptin"@en,
+        "オマリグリプチン"@ja,
+        "奥格列汀"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch umls:C4279587 ;
+    skos:hiddenLabel "オマリグリプチン"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "omarigliptin"@en,
+        "オマリグリプチン"@ja,
+        "奥格列汀"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:DPP4Inhibitor .
 
 dmsub:pioglitazone a skos:Concept,
         dm:Substance ;
@@ -321,13 +684,32 @@ dmsub:pioglitazone a skos:Concept,
         atc:A10BG03,
         rxnorm:33738,
         wd:Q417765 ;
-    skos:hiddenLabel "Pioglitazone Hcl"@en ;
+    skos:hiddenLabel "Pioglitazone Hcl"@en,
+        "ピオグリタゾン塩酸塩"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "pioglitazone"@en,
         "ピオグリタゾン"@ja,
         "吡格列酮"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:Thiazolidinedione .
+
+dmsub:repaglinide a skos:Concept,
+        dm:Substance ;
+    rdfs:label "repaglinide"@en,
+        "レパグリニド"@ja,
+        "瑞格列奈"@zh ;
+    skos:editorialNote "Japanese label from Wikidata Q2195995 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C072379,
+        atc:A10BX02,
+        rxnorm:73044,
+        wd:Q2195995 ;
+    skos:hiddenLabel "レパグリニド"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "repaglinide"@en,
+        "レパグリニド"@ja,
+        "瑞格列奈"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Glinide .
 
 dmsub:saxagliptin a skos:Concept,
         dm:Substance ;
@@ -342,7 +724,8 @@ dmsub:saxagliptin a skos:Concept,
         atc:A10BH03,
         rxnorm:857974,
         wd:Q3121121 ;
-    skos:hiddenLabel "Saxagliptin Hcl"@en ;
+    skos:hiddenLabel "Saxagliptin Hcl"@en,
+        "サキサグリプチン水和物"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "saxagliptin"@en,
         "サキサグリプチン"@ja,
@@ -360,7 +743,8 @@ dmsub:semaglutide a skos:Concept,
         atc:A10BJ06,
         rxnorm:1991302,
         wd:Q27261089 ;
-    skos:hiddenLabel "Semaglutide"@en ;
+    skos:hiddenLabel "Semaglutide"@en,
+        "セマグルチド（遺伝子組換え）"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "semaglutide"@en,
         "セマグルチド"@ja,
@@ -380,11 +764,28 @@ dmsub:sitagliptin a skos:Concept,
         atc:A10BH01,
         rxnorm:593411,
         wd:Q419832 ;
-    skos:hiddenLabel "Sitagliptin Phosphate"@en ;
+    skos:hiddenLabel "Sitagliptin Phosphate"@en,
+        "シタグリプチンリン酸塩水和物"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "sitagliptin"@en,
         "シタグリプチン"@ja,
         "西格列汀"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:DPP4Inhibitor .
+
+dmsub:teneligliptin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "teneligliptin"@en,
+        "テネリグリプチン"@ja,
+        "替格列汀"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch atc:A10BH08,
+        umls:C2981308 ;
+    skos:hiddenLabel "テネリグリプチン臭化水素酸塩水和物"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "teneligliptin"@en,
+        "テネリグリプチン"@ja,
+        "替格列汀"@zh ;
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:DPP4Inhibitor .
 
@@ -397,7 +798,8 @@ dmsub:tirzepatide a skos:Concept,
     skos:exactMatch mesh:D000098860,
         atc:A10BX16,
         rxnorm:2601723 ;
-    skos:hiddenLabel "Tirzepatide"@en ;
+    skos:hiddenLabel "Tirzepatide"@en,
+        "チルゼパチド"@ja ;
     skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
     skos:prefLabel "tirzepatide"@en,
         "チルゼパチド"@ja,
@@ -405,36 +807,150 @@ dmsub:tirzepatide a skos:Concept,
     skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
     dm:inTherapeuticClass dmtc:GIPGLP1Agonist .
 
+dmsub:tofogliflozin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "tofogliflozin"@en,
+        "トホグリフロジン"@ja,
+        "托格列净"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch umls:C3501434 ;
+    skos:hiddenLabel "トホグリフロジン水和物"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "tofogliflozin"@en,
+        "トホグリフロジン"@ja,
+        "托格列净"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:SGLT2Inhibitor .
+
+dmsub:tolbutamide a skos:Concept,
+        dm:Substance ;
+    rdfs:label "tolbutamide"@en,
+        "トルブタミド"@ja,
+        "甲苯磺丁脲"@zh ;
+    skos:altLabel "tolbutamide sodium"@en ;
+    skos:editorialNote "Japanese label from Wikidata Q414275 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D014044,
+        atc:A10BB03,
+        atc:V04CA01,
+        rxnorm:10635,
+        wd:Q414275 ;
+    skos:hiddenLabel "トルブタミド"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "tolbutamide"@en,
+        "トルブタミド"@ja,
+        "甲苯磺丁脲"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:Sulfonylurea .
+
+dmsub:trelagliptin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "trelagliptin"@en,
+        "トレラグリプチン"@ja,
+        "曲格列汀"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C000595449,
+        umls:C4045234 ;
+    skos:hiddenLabel "トレラグリプチンコハク酸塩"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "trelagliptin"@en,
+        "トレラグリプチン"@ja,
+        "曲格列汀"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:DPP4Inhibitor .
+
+dmsub:vildagliptin a skos:Concept,
+        dm:Substance ;
+    rdfs:label "vildagliptin"@en,
+        "ビルダグリプチン"@ja,
+        "维格列汀"@zh ;
+    skos:editorialNote "Japanese label from Wikidata Q421042 (CC0); Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:D000077597,
+        atc:A10BH02,
+        rxnorm:596554,
+        wd:Q421042 ;
+    skos:hiddenLabel "ビルダグリプチン"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "vildagliptin"@en,
+        "ビルダグリプチン"@ja,
+        "维格列汀"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:DPP4Inhibitor .
+
+dmsub:voglibose a skos:Concept,
+        dm:Substance ;
+    rdfs:label "voglibose"@en,
+        "ボグリボース"@ja,
+        "伏格列波糖"@zh ;
+    skos:editorialNote "Japanese label curated, pending native-speaker review; Chinese label curated, pending native-speaker review."@en ;
+    skos:exactMatch mesh:C102817,
+        atc:A10BF03,
+        umls:C0532578 ;
+    skos:hiddenLabel "ボグリボース"@ja ;
+    skos:inScheme <https://dgg32.github.io/glp/vocab/substance> ;
+    skos:prefLabel "voglibose"@en,
+        "ボグリボース"@ja,
+        "伏格列波糖"@zh ;
+    skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> ;
+    dm:inTherapeuticClass dmtc:AlphaGlucosidaseInhibitor .
+
 <https://dgg32.github.io/glp/vocab/substance> a skos:ConceptScheme ;
     dcterms:creator "Sixing Huang" ;
-    dcterms:description "Active substances (moieties) found in the Part D diabetes subset, with CMS spellings as hidden labels for term normalization."@en ;
-    dcterms:modified "2026-10-15"^^xsd:date ;
+    dcterms:description "Active substances (moieties) found in the Part D diabetes subset (Connecticut) and in NDB Open Data (Japan), with CMS and NDB (成分名) spellings as hidden labels for term normalization. Substances not in RxNorm (marketed in Japan only) are identified by their UMLS CUI."@en ;
+    dcterms:modified "2026-10-25"^^xsd:date ;
     dcterms:title "Active substances of diabetes drugs"@en,
         "糖尿病治療薬の有効成分"@ja,
         "糖尿病治疗药物活性成分"@zh ;
     skos:editorialNote "Japanese and Chinese labels not taken from Wikidata were drafted 2026-10-14 and are pending native-speaker review (docs/label-review.md)."@en ;
-    skos:hasTopConcept dmsub:alogliptin,
+    skos:hasTopConcept dmsub:acarbose,
+        dmsub:acetohexamide,
+        dmsub:alogliptin,
+        dmsub:anagliptin,
+        dmsub:buformin,
         dmsub:canagliflozin,
         dmsub:dapagliflozin,
         dmsub:dulaglutide,
         dmsub:empagliflozin,
         dmsub:ertugliflozin,
         dmsub:exenatide,
+        dmsub:gliclazide,
         dmsub:glimepiride,
         dmsub:glipizide,
         dmsub:glyburide,
+        dmsub:glyclopyramide,
+        dmsub:imeglimin,
+        dmsub:insulinAspart,
         dmsub:insulinDegludec,
+        dmsub:insulinDetemir,
         dmsub:insulinGlargine,
+        dmsub:insulinGlulisine,
+        dmsub:insulinHuman,
+        dmsub:insulinIcodec,
+        dmsub:insulinLispro,
+        dmsub:ipragliflozin,
         dmsub:linagliptin,
         dmsub:liraglutide,
         dmsub:lixisenatide,
+        dmsub:luseogliflozin,
         dmsub:metformin,
+        dmsub:miglitol,
+        dmsub:mitiglinide,
+        dmsub:nateglinide,
+        dmsub:omarigliptin,
         dmsub:pioglitazone,
+        dmsub:repaglinide,
         dmsub:saxagliptin,
         dmsub:semaglutide,
         dmsub:sitagliptin,
-        dmsub:tirzepatide ;
+        dmsub:teneligliptin,
+        dmsub:tirzepatide,
+        dmsub:tofogliflozin,
+        dmsub:tolbutamide,
+        dmsub:trelagliptin,
+        dmsub:vildagliptin,
+        dmsub:voglibose ;
     prov:wasDerivedFrom <https://data.cms.gov/provider-summary-by-type-of-service/medicare-part-d-prescribers>,
         <https://id.nlm.nih.gov/mesh/>,
+        <https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177182.html>,
+        <https://www.nlm.nih.gov/research/umls/>,
         <https://www.nlm.nih.gov/research/umls/rxnorm/> .
 

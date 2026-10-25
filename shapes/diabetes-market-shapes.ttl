@@ -7,6 +7,9 @@
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix qb:   <http://purl.org/linked-data/cube#> .
+@prefix sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> .
+@prefix sdmx-code: <http://purl.org/linked-data/sdmx/2009/code#> .
 
 # The modeling contract for the Diabetes Drug Market knowledge graph.
 # OWL says what the data means and lets the reasoner add facts (open world);
@@ -15,13 +18,16 @@
 
 <https://dgg32.github.io/glp/shapes> a owl:Ontology ;
     dcterms:title "SHACL shapes for the Diabetes Drug Market knowledge graph"@en ;
-    owl:versionIRI <https://dgg32.github.io/glp/shapes/0.2.0> ;
-    owl:versionInfo "0.2.0" ;
-    owl:priorVersion <https://dgg32.github.io/glp/shapes/0.1.0> ;
+    owl:versionIRI <https://dgg32.github.io/glp/shapes/0.3.0> ;
+    owl:versionInfo "0.3.0" ;
+    owl:priorVersion <https://dgg32.github.io/glp/shapes/0.2.0> ;
+    skos:changeNote "0.3.0 (2026-10-25): Japan (NDB Open Data). A substance needs RxNorm or, where RxNorm does not have it, UMLS. A product needs exactly one of a CMS generic name (US) and a YJ code (Japan). New shapes for Japanese products, quantity slices and their observations: masked XOR value for cells and totals, the masking threshold, completeness (47 prefectures, 12 months, 42 sex-age bands per slice) and the sum of the cells against the national total."@en ;
     skos:changeNote "0.2.0 (2026-10-20): the substance class rule no longer uses sh:maxCount 1, which the ontology's property chain broke under reasoning. It is split into 'A substance needs a therapeutic class.' (sh:minCount 1) and a SPARQL constraint that counts only the most specific classes, so the shapes give the same result with reasoning off and on. 38 rules (was 37)."@en ;
     owl:imports <https://dgg32.github.io/glp/ontology> ;
     sh:declare [ sh:prefix "dm" ; sh:namespace "https://dgg32.github.io/glp/ontology#"^^xsd:anyURI ] ,
-               [ sh:prefix "skos" ; sh:namespace "http://www.w3.org/2004/02/skos/core#"^^xsd:anyURI ] .
+               [ sh:prefix "skos" ; sh:namespace "http://www.w3.org/2004/02/skos/core#"^^xsd:anyURI ] ,
+               [ sh:prefix "qb" ; sh:namespace "http://purl.org/linked-data/cube#"^^xsd:anyURI ] ,
+               [ sh:prefix "sdmx-attribute" ; sh:namespace "http://purl.org/linked-data/sdmx/2009/attribute#"^^xsd:anyURI ] .
 
 #################################################################
 #  Vocabularies (SKOS)
@@ -79,14 +85,16 @@ dms:SubstanceShape a sh:NodeShape ;
               FILTER (?n > 1)
             }""" ] ;
     # SPARQL rather than sh:qualifiedValueShape + sh:pattern: Stardog 12 does not apply sh:pattern to IRIs there.
+    # RxNorm covers US drugs only; for substances marketed only in Japan, UMLS is the identifier of record.
     sh:sparql [
-        sh:message "A substance needs an exactMatch to RxNorm." ;
+        sh:message "A substance needs an exactMatch to RxNorm, or to UMLS when RxNorm does not have it." ;
         sh:prefixes <https://dgg32.github.io/glp/shapes> ;
         sh:select """
             SELECT $this WHERE {
               FILTER NOT EXISTS {
                 $this skos:exactMatch ?m .
-                FILTER STRSTARTS(STR(?m), "http://purl.bioontology.org/ontology/RXNORM/")
+                FILTER (STRSTARTS(STR(?m), "http://purl.bioontology.org/ontology/RXNORM/")
+                        || STRSTARTS(STR(?m), "https://identifiers.org/umls:"))
               }
             }""" ] .
 
@@ -108,8 +116,8 @@ dms:ProductShape a sh:NodeShape ;
         sh:message "A product needs one name per language." ] ;
     sh:property [
         sh:path dm:cmsGenericName ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:message "A product needs exactly one CMS generic name." ] ;
+        sh:maxCount 1 ;
+        sh:message "A product has at most one CMS generic name." ] ;
     sh:property [
         sh:path dm:hasIndication ;
         sh:minCount 1 ;
@@ -129,6 +137,166 @@ dms:ProductShape a sh:NodeShape ;
               { SELECT $this (COUNT(?s) AS ?n) WHERE { $this dm:hasActiveSubstance ?s } GROUP BY $this }
               FILTER ((?value && ?n < 2) || (!?value && ?n > 1))
             }""" ] .
+
+# Own node shape: a node-level sh:message would replace the messages of ProductShape's other constraints.
+dms:ProductSourceShape a sh:NodeShape ;
+    sh:name "product source" ;
+    sh:targetClass dm:MedicinalProduct ;
+    # A product comes from exactly one source: Part D (CMS generic name) or NDB Open Data (YJ code).
+    sh:xone (
+        [ sh:path dm:cmsGenericName ; sh:minCount 1 ]
+        [ sh:path dm:yjCode ; sh:minCount 1 ]
+    ) ;
+    sh:message "A product needs either a CMS generic name (US) or a YJ code (Japan), not both." .
+
+dms:JapaneseProductShape a sh:NodeShape ;
+    sh:name "medicinal product (Japan)" ;
+    sh:targetSubjectsOf dm:yjCode ;
+    sh:property [
+        sh:path dm:yjCode ;
+        sh:maxCount 1 ;
+        sh:pattern "^[0-9]{7}[A-Z][0-9A-Z]{4}$" ;
+        sh:message "A YJ code is 12 characters: 7 digits, a dosage form letter, 4 characters." ] ;
+    sh:property [
+        sh:path dm:receiptCode ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:pattern "^[0-9]{9}$" ;
+        sh:message "A Japanese product needs exactly one receipt code of 9 digits." ] ;
+    sh:property [
+        sh:path dm:nhiPrice ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:message "A Japanese product needs exactly one positive NHI price." ] ;
+    sh:property [
+        sh:path dm:dispensingUnit ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "A Japanese product needs exactly one dispensing unit." ] ;
+    sh:property [
+        sh:path dm:isGeneric ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "A Japanese product needs exactly one generic flag." ] ;
+    sh:property [
+        sh:path dm:routeOfAdministration ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:in ( "oral" "injection" ) ;
+        sh:message "The route of administration is 'oral' or 'injection' (the NDB table family)." ] ;
+    sh:property [
+        sh:path dm:inJapaneseDrugClass ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class dm:JapaneseDrugClass ;
+        sh:message "A Japanese product is in exactly one Japanese therapeutic category." ] ;
+    sh:sparql [
+        sh:message "The first three digits of the YJ code must be the product's therapeutic category." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this ?value WHERE {
+              $this dm:yjCode ?value ; dm:inJapaneseDrugClass/skos:notation ?code .
+              FILTER (SUBSTR(?value, 1, 3) != STR(?code))
+            }""" ] ;
+    sh:sparql [
+        sh:severity sh:Info ;
+        sh:message "Product flagged both generic (NDB) and originator (price list)." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this WHERE { $this dm:isGeneric true ; dm:isOriginator true }""" ] .
+
+#################################################################
+#  NDB Open Data: quantity slices and observations (RDF Data Cube)
+#################################################################
+
+dms:QuantitySliceShape a sh:NodeShape ;
+    sh:name "quantity slice (one NDB table row)" ;
+    sh:targetClass dm:QuantitySlice ;
+    sh:property [
+        sh:path dm:aboutProduct ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class dm:MedicinalProduct ;
+        sh:message "A slice is about exactly one medicinal product." ] ;
+    sh:property [
+        sh:path dm:careSetting ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class dm:CareSetting ;
+        sh:message "A slice has exactly one care setting." ] ;
+    sh:property [
+        sh:path qb:sliceStructure ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:in ( <https://dgg32.github.io/glp/data/ndb/key/prefecture> <https://dgg32.github.io/glp/data/ndb/key/month> <https://dgg32.github.io/glp/data/ndb/key/sex-age> ) ;
+        sh:message "A slice is broken down by exactly one of prefecture, month or sex-age band." ] ;
+    sh:property [
+        sh:path dm:totalQuantity ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "The national total is one non-negative decimal." ] ;
+    sh:sparql [
+        sh:message "A slice needs one observation per prefecture (47), month (12) or sex-age band (42)." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this (?n AS ?value) WHERE {
+              { SELECT $this ?key (COUNT(?o) AS ?n) WHERE {
+                  $this qb:sliceStructure ?key . OPTIONAL { $this qb:observation ?o } } GROUP BY $this ?key }
+              # Stardog does not allow VALUES in SPARQL constraints, hence IF
+              BIND (IF(?key = <https://dgg32.github.io/glp/data/ndb/key/prefecture>, 47,
+                    IF(?key = <https://dgg32.github.io/glp/data/ndb/key/month>, 12, 42)) AS ?expected)
+              FILTER (?n != ?expected)
+            }""" ] ;
+    sh:sparql [
+        sh:message "The cells add up to more than the national total, or, with no cell masked, not to the total." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this (?sum AS ?value) WHERE {
+              { SELECT $this (SUM(?q) AS ?sum) (COUNT(?m) AS ?masked) WHERE {
+                  $this qb:observation ?o .
+                  OPTIONAL { ?o dm:quantity ?q } OPTIONAL { ?o sdmx-attribute:confStatus ?m }
+                } GROUP BY $this }
+              $this dm:totalQuantity ?total .
+              FILTER (?sum > ?total + 0.01 || (?masked = 0 && ABS(?sum - ?total) > 0.01))
+            }""" ] ;
+    sh:sparql [
+        sh:message "An unmasked cell is 0 or at least the masking threshold (1,000 in oral tables, 400 in injection tables)." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this ?value WHERE {
+              $this dm:aboutProduct/dm:routeOfAdministration ?route ; qb:observation/dm:quantity ?value .
+              FILTER (?value > 0 && ?value < IF(?route = "oral", 1000, 400))
+            }""" ] .
+
+dms:SliceTotalShape a sh:NodeShape ;
+    sh:name "quantity slice total" ;
+    sh:targetClass dm:QuantitySlice ;
+    sh:xone (
+        [ sh:path dm:totalQuantity ; sh:minCount 1 ]
+        [ sh:path sdmx-attribute:confStatus ; sh:hasValue sdmx-code:confStatus-C ]
+    ) ;
+    sh:message "Either the national total is present or it is flagged as masked (exactly one of the two)." .
+
+dms:ObservationShape a sh:NodeShape ;
+    sh:name "observation (one NDB table cell)" ;
+    sh:targetObjectsOf qb:observation ;
+    sh:property [
+        sh:path dm:quantity ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "A quantity is one non-negative decimal." ] ;
+    # Like the CMS beneficiary count: a value is present OR it is flagged masked, never both, never neither.
+    sh:xone (
+        [ sh:path dm:quantity ; sh:minCount 1 ]
+        [ sh:path sdmx-attribute:confStatus ; sh:hasValue sdmx-code:confStatus-C ]
+    ) ;
+    sh:message "Either the quantity is present or the cell is flagged as masked (exactly one of the two)." .
+
+dms:ObservationDimensionShape a sh:NodeShape ;
+    sh:name "observation dimension" ;
+    sh:targetObjectsOf qb:observation ;
+    sh:xone (
+        [ sh:path dm:prefecture ; sh:minCount 1 ; sh:maxCount 1 ; sh:class dm:Prefecture ]
+        [ sh:path dm:month ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:gYearMonth ]
+        [ sh:path dm:sexAgeGroup ; sh:minCount 1 ; sh:maxCount 1 ; sh:class dm:SexAgeGroup ]
+    ) ;
+    sh:message "A cell has exactly one dimension value: a prefecture, a month or a sex-age band." .
 
 #################################################################
 #  Prescribers

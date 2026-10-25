@@ -2,7 +2,8 @@
 
 Run after resolve_vocab.py, resolve_drugs.py and resolve_organizations.py (it reads their outputs).
 
-Wikidata (CC0) items are found by identifier, never by name: substances by RxNorm CUI (P3345),
+Wikidata (CC0) items are found by identifier, never by name: substances by RxNorm CUI (P3345) or, for
+substances not in RxNorm (Japan only), by UMLS CUI (P2892),
 companies by LEI (P1278), indications by MeSH descriptor ID (P486), drug classes by ATC code (P267).
 Policy, from comparing Wikidata with the curated drafts (docs/decisions.md, 2026-10-15):
   Japanese    from Wikidata for substances, companies and indications
@@ -84,7 +85,10 @@ def concepts(keep):
     subs = {r["id"]: r for r in read_csv("substance_labels_ja_zh.csv")}
     for s in csv.DictReader(open(ROOT / "scripts" / "substances.csv", newline="", encoding="utf-8")):
         c = subs.get(s["substance"], {})
-        out.append(("substance", s["substance"], "P3345", s["rxcui"], c.get("pref_ja", ""), c.get("pref_zh", "")))
+        # Japan-only substances have no RxCUI; they are found by UMLS CUI (P2892) instead
+        prop, key = ("P3345", s["rxcui"]) if s["rxcui"] else ("P2892", s["umls_cui"])
+        out.append(("substance", s["substance"], prop, key, c.get("pref_ja", ""), c.get("pref_zh", "")))
+        keep.update((s["substance"], lang) for lang in c.get("keep_curated", "").split("|") if lang)
     orgs = {r["organization"]: r for r in read_csv("organization_labels_ja_zh.csv")}
     seen = set()
     for o in csv.DictReader(open(ROOT / "scripts" / "organizations.csv", newline="", encoding="utf-8")):

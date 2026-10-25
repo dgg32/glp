@@ -1,0 +1,26 @@
+# Japan, FY2024: SGLT2 inhibitors' share of diabetes drug value (yen) by prefecture, outpatient and
+# inpatient together, products alone or in combination. Masked prefecture cells are left out, so small
+# products in small prefectures are missing on both sides of the ratio. Top 10 and, by ORDER BY ASC, bottom.
+# The prefecture is where the claim was issued, not where the patient lives.
+# xsd:double: quantity x price overflows the fixed-point decimals of some engines (Oxigraph).
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX qb:   <http://purl.org/linked-data/cube#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+
+SELECT ?prefecture ?en (ROUND(SUM(?sglt2) / 1000000) AS ?sglt2YenMillion) (ROUND(SUM(?yen) / 1000000) AS ?allYenMillion)
+       (ROUND(1000 * SUM(?sglt2) / SUM(?yen)) / 10 AS ?sglt2SharePct)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  ?slice qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> ;
+         dm:aboutProduct ?prod ; qb:observation ?o .
+  ?o dm:prefecture ?pref ; dm:quantity ?q .
+  ?prod dm:nhiPrice ?price .
+  BIND (xsd:double(?q) * ?price AS ?yen)
+  OPTIONAL { ?prod dm:hasActiveSubstance/dm:inTherapeuticClass dmtc:SGLT2Inhibitor . BIND (true AS ?isSglt2) }
+  BIND (IF(BOUND(?isSglt2), ?yen, 0) AS ?sglt2)
+  ?pref skos:prefLabel ?prefecture , ?en FILTER (lang(?prefecture) = "ja" && lang(?en) = "en")
+}
+GROUP BY ?prefecture ?en
+ORDER BY DESC(?sglt2SharePct)

@@ -1,22 +1,48 @@
-id,pref_ja,pref_zh
-empagliflozin,エンパグリフロジン,恩格列净
-dapagliflozin,ダパグリフロジン,达格列净
-canagliflozin,カナグリフロジン,卡格列净
-ertugliflozin,エルツグリフロジン,艾托格列净
-semaglutide,セマグルチド,司美格鲁肽
-tirzepatide,チルゼパチド,替尔泊肽
-dulaglutide,デュラグルチド,度拉糖肽
-exenatide,エキセナチド,艾塞那肽
-liraglutide,リラグルチド,利拉鲁肽
-lixisenatide,リキシセナチド,利司那肽
-sitagliptin,シタグリプチン,西格列汀
-linagliptin,リナグリプチン,利格列汀
-alogliptin,アログリプチン,阿格列汀
-saxagliptin,サキサグリプチン,沙格列汀
-metformin,メトホルミン,二甲双胍
-glipizide,グリピジド,格列吡嗪
-glimepiride,グリメピリド,格列美脲
-glyburide,グリベンクラミド,格列本脲
-pioglitazone,ピオグリタゾン,吡格列酮
-insulinGlargine,インスリン グラルギン,甘精胰岛素
-insulinDegludec,インスリン デグルデク,德谷胰岛素
+id,pref_ja,pref_zh,keep_curated,note
+empagliflozin,エンパグリフロジン,恩格列净,,
+dapagliflozin,ダパグリフロジン,达格列净,,
+canagliflozin,カナグリフロジン,卡格列净,,
+ertugliflozin,エルツグリフロジン,艾托格列净,,
+semaglutide,セマグルチド,司美格鲁肽,,
+tirzepatide,チルゼパチド,替尔泊肽,,
+dulaglutide,デュラグルチド,度拉糖肽,,
+exenatide,エキセナチド,艾塞那肽,,
+liraglutide,リラグルチド,利拉鲁肽,,
+lixisenatide,リキシセナチド,利司那肽,,
+sitagliptin,シタグリプチン,西格列汀,,
+linagliptin,リナグリプチン,利格列汀,,
+alogliptin,アログリプチン,阿格列汀,,
+saxagliptin,サキサグリプチン,沙格列汀,,
+metformin,メトホルミン,二甲双胍,,
+glipizide,グリピジド,格列吡嗪,,
+glimepiride,グリメピリド,格列美脲,,
+glyburide,グリベンクラミド,格列本脲,,
+pioglitazone,ピオグリタゾン,吡格列酮,,
+insulinGlargine,インスリン グラルギン,甘精胰岛素,,
+insulinDegludec,インスリン デグルデク,德谷胰岛素,,
+insulinHuman,インスリン ヒト,人胰岛素,ja,"Wikidata's ja label is plain インスリン, the name of the whole class; the JAN name is インスリン ヒト"
+insulinLispro,インスリン リスプロ,赖脯胰岛素,,
+insulinAspart,インスリン アスパルト,门冬胰岛素,,
+insulinDetemir,インスリン デテミル,地特胰岛素,,
+insulinGlulisine,インスリン グルリジン,谷赖胰岛素,,
+insulinIcodec,インスリン イコデク,依柯胰岛素,,
+acetohexamide,アセトヘキサミド,醋磺己脲,,
+glyclopyramide,グリクロピラミド,格列吡脲,,
+tolbutamide,トルブタミド,甲苯磺丁脲,,
+gliclazide,グリクラジド,格列齐特,,
+buformin,ブホルミン,丁双胍,,
+acarbose,アカルボース,阿卡波糖,,
+voglibose,ボグリボース,伏格列波糖,,
+nateglinide,ナテグリニド,那格列奈,,
+mitiglinide,ミチグリニド,米格列奈,,
+miglitol,ミグリトール,米格列醇,,
+vildagliptin,ビルダグリプチン,维格列汀,,
+repaglinide,レパグリニド,瑞格列奈,,
+teneligliptin,テネリグリプチン,替格列汀,,
+anagliptin,アナグリプチン,阿拉格列汀,,
+ipragliflozin,イプラグリフロジン,伊格列净,,
+luseogliflozin,ルセオグリフロジン,鲁格列净,,
+tofogliflozin,トホグリフロジン,托格列净,,
+trelagliptin,トレラグリプチン,曲格列汀,,
+omarigliptin,オマリグリプチン,奥格列汀,,
+imeglimin,イメグリミン,伊美格列明,,

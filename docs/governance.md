@@ -105,12 +105,21 @@ the pipeline and everyone who queries the graph: a product has at least one subs
 digits, every concept has exactly one English prefLabel, counts are non-negative, a beneficiary count
 is present or flagged as suppressed, and more.
 
+**Check locally, publish once** (since 2026-10-25, after repeated full reloads and reasoning-on
+validations filled Stardog Cloud Free's disk and corrupted the database):
+[check_local.py](../scripts/check_local.py) runs the triple budget, the full SHACL contract (pyshacl),
+the rule-coverage test, SHACL after an OWL 2 RL closure, and every query (on pyoxigraph) on this
+machine. [load_stardog.py](../scripts/load_stardog.py) refuses files that have not passed it, and
+rewrites only the graphs whose content hash differs from the one in Stardog's provenance graph.
+The Stardog tests below are for after a release, not for iterating.
+
 | Guarantee | Enforced by |
 |---|---|
+| Only checked files are published | `check_local.py` writes the hash of the build's provenance graph to `data/validation/local-check.json`; `load_stardog.py` stops if the files changed since |
 | Live data has no violations | [load_stardog.py](../scripts/load_stardog.py) runs `VALIDATE` on the uncommitted state inside the load transaction and rolls back on any `sh:Violation` |
 | The gate really blocks | [tests/test_load_gate.py](../tests/test_load_gate.py) adds an invalid prescription in a transaction; the gate reports 7 violations and the rollback leaves nothing behind |
-| Every rule can fire | [tests/test_shapes_stardog.py](../tests/test_shapes_stardog.py): planted errors trigger 38 of 38 rules |
-| OWL and SHACL agree | [tests/test_shapes_reasoning.py](../tests/test_shapes_reasoning.py) validates the live data with reasoning off and on; both give 0 violations, so no shape relies on facts the reasoner would contradict |
+| Every rule can fire | `check_local.py` (locally) and [tests/test_shapes_stardog.py](../tests/test_shapes_stardog.py) (in Stardog): planted errors trigger 59 of 59 rules |
+| OWL and SHACL agree | `check_local.py` validates after an OWL 2 RL closure of everything except the NDB observations (whose shapes no inference touches); 0 violations, so no shape relies on facts the reasoner would contradict. [tests/test_shapes_reasoning.py](../tests/test_shapes_reasoning.py) does the same in Stardog, but too heavy for Cloud Free with the NDB data |
 | Warnings are visible | [validate.py](../scripts/validate.py) writes [validation-report.md](validation-report.md): currently 0 violations, 17 warnings (13 prescribers missing from the NPI Registry, 3 zero-cost rows, Byetta's two application holders), 130 info |
 | What was loaded is what was built | the loader compares the triple count of every graph in Stardog with the local files |
 

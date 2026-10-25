@@ -4,6 +4,9 @@
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix qb:   <http://purl.org/linked-data/cube#> .
+@prefix sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> .
+@prefix sdmx-code: <http://purl.org/linked-data/sdmx/2009/code#> .
 
 # --- vocabulary ---
 t:scheme a skos:ConceptScheme .
@@ -68,3 +71,59 @@ t:typeRx a dm:Prescription ; dm:prescribedBy t:okDoctor ; dm:forProduct t:okProd
     dm:totalBeneficiaries "y" .                                      # not integer
 t:noCountRx a dm:Prescription ; dm:prescribedBy t:okDoctor ; dm:forProduct t:okProduct ; dm:dataYear "2024"^^xsd:gYear ;
     dm:totalDaySupply 900 .                                          # no claims, no cost; neither count nor flag (xone)
+
+# --- products: US or Japan (shapes 0.3.0) ---
+t:twoGenericNames a dm:MedicinalProduct ; rdfs:label "Two generic names"@en ; dm:cmsGenericName "a" , "b" ;
+    dm:hasIndication t:indication ; dm:hasActiveSubstance t:okSubstance ;
+    dm:isCombinationProduct false .                                  # two CMS generic names
+t:jpClass a skos:Concept , dm:JapaneseDrugClass ; skos:inScheme t:scheme ;
+    skos:prefLabel "antidiabetics"@en ; skos:notation "396" .
+t:okJpProduct a dm:MedicinalProduct ; rdfs:label "テスト錠"@ja ;
+    dm:hasIndication t:indication ; dm:hasActiveSubstance t:okSubstance ; dm:isCombinationProduct false ;
+    dm:yjCode "3969023F1023" ; dm:receiptCode "622431601" ; dm:nhiPrice 166.0 ; dm:dispensingUnit "錠" ;
+    dm:isGeneric false ; dm:isOriginator true ; dm:routeOfAdministration "oral" ; dm:inJapaneseDrugClass t:jpClass .
+t:badJpProduct a dm:MedicinalProduct ; rdfs:label "壊れた錠"@ja ; dm:cmsGenericName "z" ;   # both US and Japan keys
+    dm:hasIndication t:indication ; dm:hasActiveSubstance t:okSubstance ; dm:isCombinationProduct false ;
+    dm:yjCode "2499418-G1" ;                                         # malformed, and 249 != category 396
+    dm:receiptCode "12345" ;                                         # not 9 digits
+    dm:nhiPrice 0.0 ;                                                # not positive
+    dm:isGeneric true ; dm:isOriginator true ;                       # both flags (info); no dispensing unit
+    dm:routeOfAdministration "nasal" ;                               # not oral or injection
+    dm:inJapaneseDrugClass t:jpClass .
+t:classlessJpProduct a dm:MedicinalProduct ; rdfs:label "分類なし錠"@ja ;
+    dm:hasIndication t:indication ; dm:hasActiveSubstance t:okSubstance ; dm:isCombinationProduct false ;
+    dm:yjCode "3969023F2020" ; dm:receiptCode "622431701" ; dm:nhiPrice 283.4 ; dm:dispensingUnit "錠" ;
+    dm:routeOfAdministration "oral" .                                # no Japanese category, no generic flag
+
+# --- NDB quantity slices and observations ---
+t:setting a dm:CareSetting .
+t:pref a dm:Prefecture .
+t:okSlice a dm:QuantitySlice ; dm:aboutProduct t:okJpProduct ; dm:careSetting t:setting ;
+    qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/month> ;
+    dm:totalQuantity 2500.0 ;                                        # 12 cells, but they sum to 3000 (> total)
+    qb:observation t:m01 , t:m02 , t:m03 , t:m04 , t:m05 , t:m06 , t:m07 , t:m08 , t:m09 , t:m10 , t:m11 , t:m12 .
+t:m01 dm:month "2024-04"^^xsd:gYearMonth ; dm:quantity 3000.0 .
+t:m02 dm:month "2024-05"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m03 dm:month "2024-06"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m04 dm:month "2024-07"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m05 dm:month "2024-08"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m06 dm:month "2024-09"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m07 dm:month "2024-10"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m08 dm:month "2024-11"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m09 dm:month "2024-12"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m10 dm:month "2025-01"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m11 dm:month "2025-02"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:m12 dm:month "2025-03"^^xsd:gYearMonth ; dm:quantity 0.0 .
+t:badSlice a dm:QuantitySlice ;                                      # no product, no setting
+    qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> , t:otherKey ;  # two keys, one unknown
+    dm:totalQuantity -5.0 ;                                          # negative, and also flagged masked
+    sdmx-attribute:confStatus sdmx-code:confStatus-C ;
+    qb:observation t:smallCell , t:bothCell , t:noDimensionCell , t:neitherCell .  # 4 cells, not 47
+t:smallSlice a dm:QuantitySlice ; dm:aboutProduct t:okJpProduct ; dm:careSetting t:setting ;
+    qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> ;
+    sdmx-attribute:confStatus sdmx-code:confStatus-C ; qb:observation t:smallCell .
+t:smallCell dm:prefecture t:pref ; dm:quantity 250.0 .                # oral cell below 1,000 but not masked
+t:bothCell dm:prefecture t:pref ; dm:quantity -1.0 ;                 # negative, and also flagged masked
+    sdmx-attribute:confStatus sdmx-code:confStatus-C .
+t:noDimensionCell dm:quantity 1500.0 .                                # no prefecture, month or sex-age band
+t:neitherCell dm:prefecture t:pref ; dm:month "2024-04"^^xsd:gYearMonth .  # no value, not masked, two dimensions

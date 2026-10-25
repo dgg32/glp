@@ -1,0 +1,33 @@
+# Japan, FY2024 (NDB Open Data): value share by therapeutic class, all care settings, in yen
+# (dispensed quantity x NHI price, at the price list of 2026-09-02). Single-ingredient products only,
+# like cost-per-claim-by-class.rq; combination products are shown as their own row.
+# National totals come from the prefecture slices (each product x setting once); masked totals are left out.
+# xsd:double: quantity x price overflows the fixed-point decimals of some engines (Oxigraph).
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX qb:   <http://purl.org/linked-data/cube#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+
+SELECT ?class (ROUND(SUM(?yen) / 1000000) AS ?yenMillion) (ROUND(1000 * SUM(?yen) / MAX(?all)) / 10 AS ?sharePct)
+FROM <tag:stardog:api:context:all>
+WHERE {
+  { SELECT (SUM(xsd:double(?q0) * ?p0) AS ?all) WHERE {
+      ?s0 qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> ;
+          dm:aboutProduct/dm:nhiPrice ?p0 ; dm:totalQuantity ?q0 } }
+  ?slice qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> ;
+         dm:aboutProduct ?prod ; dm:totalQuantity ?q .
+  ?prod dm:nhiPrice ?price .
+  BIND (xsd:double(?q) * ?price AS ?yen)
+  {
+    ?prod dm:isCombinationProduct false .
+    VALUES ?cls { dmtc:Insulin dmtc:Biguanide dmtc:Sulfonylurea dmtc:Thiazolidinedione dmtc:DPP4Inhibitor
+                  dmtc:AlphaGlucosidaseInhibitor dmtc:Glinide dmtc:Glimin dmtc:SGLT2Inhibitor dmtc:GLP1ReceptorAgonist }
+    ?prod dm:hasActiveSubstance/dm:inTherapeuticClass/skos:broader* ?cls .
+    ?cls skos:prefLabel ?class FILTER (lang(?class) = "en")
+  } UNION {
+    ?prod dm:isCombinationProduct true . BIND ("(combination products)" AS ?class)
+  }
+}
+GROUP BY ?class
+ORDER BY DESC(?yenMillion)
