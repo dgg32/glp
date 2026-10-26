@@ -7,7 +7,7 @@ PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?country ?category (COUNT(DISTINCT ?prod) AS ?products) (SAMPLE(?name) AS ?example)
+SELECT ?country ?category (COUNT(DISTINCT ?prod) AS ?products) (MIN(?name) AS ?example)
 FROM <tag:stardog:api:context:all>
 WHERE {
   ?prod a dm:GLP1Product ; rdfs:label ?name .

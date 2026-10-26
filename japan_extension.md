@@ -53,7 +53,7 @@ Filenames are Shift-JIS: unzip with Python `zipfile.ZipFile(path, metadata_encod
 - **Size:** see "Scope and triple budget" below.
 
 ## Scope and triple budget (decided 2026-10-25, measured on the 11th release)
-Headroom: 1,000,000 edges − 276,677 (Connecticut) = ~723k. Japan goes into the same `glp` database as named graph `graph:ndb-2024`, so both countries share the ATC concepts.
+Headroom: 1,000,000 edges − 247,211 (Connecticut, shared vocabularies, shapes and provenance; measured per graph on 2026-10-26, the 276,677 used while planning was not reproducible) = ~753k. Japan goes into the same `glp` database as named graph `graph:ndb-2024`, so both countries share the ATC concepts.
 
 **Product filter** (510 products, 286 of them generics): all of 薬効分類 396 (incl. the combination pens Xultophy and Soliqua), every insulin (YJ prefix 2492), and the GLP-1 ingredients in 2499 by YJ prefix: 2499410 liraglutide, 2499411 exenatide, 2499415 lixisenatide, 2499416 dulaglutide, 2499418 semaglutide injection (Ozempic and Wegovy), 2499014 oral semaglutide (Rybelsus), 2499422 tirzepatide. Glucagon (722) and the rest of 249 are out. The 医科/歯科 files (top 10 only) are out.
 
@@ -63,9 +63,9 @@ Headroom: 1,000,000 edges − 276,677 (Connecticut) = ~723k. Japan goes into the
 
 | Design | Japan triples | Total | Fits? |
 |---|---|---|---|
-| Flat observations (~6 triples each), all cells | ~900k | ~1.18M | no |
-| Slices, all cells (**chosen**) | ~480k | ~755k | yes, ~245k left |
-| Slices, zeros dropped (fallback) | ~355k | ~630k | yes, ~370k left |
+| Flat observations (~6 triples each), all cells | ~900k | ~1.15M | no |
+| Slices, all cells (**chosen**) | 486,900 (measured) | 734,106 | yes, ~266k left |
+| Slices, zeros dropped (fallback) | ~364k | ~611k | yes, ~389k left |
 
 Zeros are kept because the graph is then lossless: a SHACL rule can check that every prefecture slice has exactly 47 observations, and a round-trip test can rebuild the Excel totals. If headroom is needed later, drop zeros first (−123k), then 入院 (heavily masked, −~90k). The 12th release (monthly) will not fit next to this; it needs its own database or only its month table.
 
@@ -84,7 +84,7 @@ rules proven to fire on `tests/shacl/broken-examples.ttl`, every graph count ver
 `queries/jp-*.rq` ran against that load; results in `docs/query-results.md`, interpretation in
 `docs/findings.md` §6–10, design decisions in `docs/decisions.md` (2026-10-25).
 
-**Incident, open:** after five full reloads and several reasoning-on `VALIDATE` attempts, Stardog Cloud
+**Incident (resolved 2026-10-26):** a new Stardog Cloud instance was created; `glp` loaded once from the locally checked files (734,106 triples, SHACL gate 0 violations, 2.5 min), and all 14 queries give the same results as locally. History: after five full reloads and several reasoning-on `VALIDATE` attempts, Stardog Cloud
 answered 503/502, then a sixth reload failed with "No space left on device", and since then every query
 returns `CorruptionException: Error reading from txn store` for database `glp`. Cloud Free has no backups,
 but every graph is rebuilt from local files. The Free instance is being recreated; then run

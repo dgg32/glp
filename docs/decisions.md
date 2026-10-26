@@ -393,3 +393,26 @@ countries share the substance and class vocabularies.
   is 0 or at least the masking threshold (1,000 oral, 400 injection).
 - Ontology 0.5.0, shapes 0.3.0 (both additive except the RxNorm rule and the CMS generic name rule,
   which became "CMS generic name XOR YJ code").
+
+## 2026-10-25: Local checks first; AllegroGraph Cloud as second target
+
+- **Check locally, publish once.** The Stardog Cloud Free database was corrupted after its disk filled
+  (repeated full reloads, reasoning-on validations). `scripts/check_local.py` now runs budget, SHACL
+  (pyshacl), rule coverage, OWL 2 RL closure + SHACL and all queries (pyoxigraph) locally;
+  `load_stardog.py` and `load_allegrograph.py` refuse files it has not passed and rewrite only graphs
+  whose content hash differs from the server's provenance graph.
+- **AllegroGraph Cloud 9.1.0** while Stardog Cloud is recreated: repository `glp` in the root catalog,
+  user `glp_loader` (read + write on `glp` only), `glp_reader` (read only); `scripts/setup_allegrograph.py`.
+  Same named graphs and IRIs (including the schema graph `tag:stardog:api:context:schema`, kept for
+  query portability). Loaded in one session (autoCommit off): 734,106 triples in 1 min 50 s.
+- **Portable SPARQL, three engine quirks found by running the same 14 queries on three engines:**
+  Oxigraph's fixed-point xsd:decimal overflows on quantity x price (cast to xsd:double) and errors on
+  0 / decimal; AllegroGraph 9.1 fails on ROUND over aggregates of IF() values (three share queries now
+  return unrounded percentages, rounded for display) and rejects non-ASCII variable names such as
+  `?専門分野` (the runner substitutes ASCII names and maps the columns back). After that, all 14 give
+  identical results locally and on AllegroGraph, and the same as Stardog up to rounding.
+- Not done yet on AllegroGraph: reasoning (RDFS++ only at query time; the defined classes need OWL
+  restrictions and property chains) and the MCP server's backend.
+- **2026-10-26: AllegroGraph dropped.** The server was removed; `setup_allegrograph.py`,
+  `load_allegrograph.py` and `run_queries.py --ag` are deleted, and the three share queries have their
+  `ROUND` back (Stardog and Oxigraph handle it). The Oxigraph `xsd:double` casts stay.

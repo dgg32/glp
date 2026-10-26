@@ -187,11 +187,11 @@ Single-ingredient products, share of each country's diabetes drug value:
 | GLP-1 receptor agonists (incl. GIP/GLP-1) | **20.7%** | 50.9% |
 | Insulins | 7.0% | 3.2% (glargine only in the CT subset) |
 | Biguanides | 4.4% | 0.5% |
-| α-glucosidase inhibitors, glimins, glinides | 3.5% | — (not used in the US) |
+| α-glucosidase inhibitors, glimins, glinides | 3.5% | — (outside the 32-drug Connecticut subset) |
 | Sulfonylureas, thiazolidinediones | 1.2% | 0.1% |
 
-Japan spends 2.1x the US share on DPP-4 inhibitors and less than half on GLP-1 drugs. Three classes exist
-only in Japan's market. Combination products (not in the table) are 15.7% of Japan's value. Caveats:
+Japan spends 2.1x the US share on DPP-4 inhibitors and less than half on GLP-1 drugs. Three classes are
+missing from the Connecticut subset; α-GIs and glinides are US-approved, only the glimins (imeglimin) are Japan-only. Combination products (not in the table) are 15.7% of Japan's value. Caveats:
 shares, not amounts (yen at list price vs gross USD); Part D is mostly people 65+, NDB all ages.
 
 ## 7. Japan: Boehringer Ingelheim's position

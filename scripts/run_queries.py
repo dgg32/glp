@@ -92,10 +92,9 @@ def table(variables, rows):
 def main():
     args = sys.argv[1:]
     local = "--local" in args
-    name_filter = next((a for a in args if a != "--local"), "")
+    name_filter = next((a for a in args if not a.startswith("--")), "")
     sd = Local() if local else Stardog(settings())
-    target = f"the generated files (local, no reasoning)" if local else \
-        f"Stardog database `{settings()['STARDOG_DATABASE']}`"
+    target = "the generated files (local, no reasoning)" if local else f"Stardog database `{settings()['STARDOG_DATABASE']}`"
     lines = ["# Query results", "",
              f"*Generated {date.today().isoformat()} by `scripts/run_queries.py` against {target}. "
              "Interpretation: [findings.md](findings.md).*", ""]

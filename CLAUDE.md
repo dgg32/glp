@@ -36,7 +36,7 @@ US type 2 diabetes drugs (GLP-1, SGLT2, DPP-4, metformin, sulfonylureas, insulin
 ## Constraints
 - **Public data only.** Never use or mention data from the user's client work for Taiwan's national drug evaluation center or drug regulator, which is under NDA.
 - **Privacy-by-design**: the data includes real doctor names. Hash or pseudonymize NPIs and names in anything published, and say so in the article.
-- **Stardog Cloud Free** (verified 2026-10-14, Stardog 12.1.4): 1M edges, 3 databases, 3 Voicebox databases, no backups. Reasoning (SL), SHACL (`VALIDATE`) and SHACL-SPARQL work (no `VALUES` inside SHACL-SPARQL constraints). The dataset is ~734k triples since the Japan extension (Connecticut ~277k, NDB ~485k). Queries are capped at 5 minutes, and heavy reasoning queries can make the instance answer 503 for a few minutes. Data lives in named graphs, so queries need `FROM <tag:stardog:api:context:all>` (or `default-graph-uri`).
+- **Stardog Cloud Free** (verified 2026-10-14, Stardog 12.1.4): 1M edges, 3 databases, 3 Voicebox databases, no backups. Reasoning (SL), SHACL (`VALIDATE`) and SHACL-SPARQL work (no `VALUES` inside SHACL-SPARQL constraints). The dataset is ~734k triples since the Japan extension (Connecticut with shared vocabularies ~247k, Japan ~487k). Queries are capped at 5 minutes, and heavy reasoning queries can make the instance answer 503 for a few minutes. Data lives in named graphs, so queries need `FROM <tag:stardog:api:context:all>` (or `default-graph-uri`).
 - Keep raw downloads in `data/raw/` and generated RDF in `data/rdf/`. Make all scripts rerunnable. Code will be published on GitHub, so put no credentials in the repo (use `.env`).
 
 ## Status (2026-10-14)

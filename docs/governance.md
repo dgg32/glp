@@ -7,7 +7,8 @@ to the code or file that enforces it.
 The short version:
 
 1. **Facts are looked up, not typed.** Drug, product, company, class and indication facts come from
-   public APIs (RxNorm, MeSH, UMLS, openFDA, GLEIF, Wikidata). What cannot be looked up is kept in
+   public APIs and files (RxNorm, MeSH, UMLS, openFDA, GLEIF, Wikidata; for Japan, NDB Open Data and the
+   NHI price list of MHLW). What cannot be looked up is kept in
    a few small curated tables, each with the reason and, where possible, evidence the build re-checks.
 2. **Every graph says where it came from.** A PROV-O record per named graph lists its source
    snapshots (with release), its curated and generated inputs (each hashed) and a content hash.
@@ -33,7 +34,12 @@ The short version:
 | Product → indications | openFDA drug labels, MeSH | MeSH entry terms in the label's indications, majority vote over labels | which MeSH descriptors are in scope (3) |
 | Product → manufacturer | Drugs@FDA | application holder | none |
 | Application holder → company | GLEIF | ultimate parent of the holder's LEI | sponsor name → LEI (13 rows, evidence re-checked) |
-| Japanese and Chinese labels | Wikidata (CC0), by identifier | RxNorm CUI, LEI, MeSH ID | labels Wikidata lacks or gets wrong; class and specialty labels |
+| Japanese and Chinese labels | Wikidata (CC0), by identifier | RxNorm CUI, UMLS CUI, LEI, MeSH ID | labels Wikidata lacks or gets wrong; class and specialty labels |
+| Japan: dispensed quantities by prefecture, month, sex-age band | NDB Open Data, 11th release (FY2024), MHLW | ZIP download, one RDF Data Cube slice per product × setting × dimension | none |
+| Japan: product, YJ code, NHI price, generic flag, 薬効分類 | NDB Open Data workbooks | per receipt code | none |
+| Japan: product → ingredient (成分名), marketing authorization holder, originator | NHI price list (薬価基準収載品目リスト), MHLW | by YJ code | YJ ingredient → substance (64 rows), holder → English name and GLEIF group (51 rows) |
+| Japan: substances not in RxNorm | UMLS (exact name; ATC from the UMLS ATC source) | `https://identifiers.org/umls:` IRIs | English search terms, 4 curated fallback classes |
+| 薬効分類 ↔ ATC crosswalk | computed from the products (`scripts/build_ndb.py`) | narrowMatch / relatedMatch / broadMatch by product counts | none |
 
 Each lookup was compared with the earlier hand-made tables when it replaced them; all matched
 (see [decisions.md](decisions.md), 2026-10-15). The failures are part of the record too: RxNorm's
@@ -53,6 +59,10 @@ recorded in the provenance graph.
 | `vocab/src/indications.csv` | 3 in-scope MeSH descriptors, fallback ja/zh labels | scope decision | descriptors must exist in MeSH |
 | `vocab/src/sponsor_lei.csv` | Drugs@FDA sponsor → LEI, match type, GLEIF search, note | Drugs@FDA abbreviates names; GLEIF search maps 5 of 13 wrongly | the GLEIF search in each row is re-run on every build |
 | `vocab/src/*_ja_zh.csv` | Japanese and Chinese labels | no free API for class or specialty names | compared with Wikidata; disagreements listed in [label-review.md](label-review.md) |
+| `vocab/src/ndb_ingredients.csv` | 64 YJ ingredient codes → substance ids and diabetes indications | the price list's 成分名 is a Japanese salt name with no API to RxNorm/UMLS | every product's YJ ingredient must have a row, and the price list's 成分名 must equal the curated one, or the build stops |
+| `vocab/src/ndb_substances.csv` | 26 Japan substances: English search term, fallback class with reason | RxNorm lacks 12 of them; 4 have no ATC code | a substance already in the CMS set, or one without a class, stops the build |
+| `vocab/src/ndb_product_indications.csv` | 1 product-level indication override (Wegovy: obesity) | Wegovy shares Ozempic's YJ ingredient code | matched by name prefix |
+| `vocab/src/jp_manufacturers.csv` | 51 Japanese holders → English name, link to a GLEIF group | the price list gives Japanese names only | a holder missing from the table stops the build |
 | `ontology/`, `shapes/` | ontology and SHACL shapes | they are the model | tests (section 3) |
 
 ## 2. Provenance in the graph
@@ -82,17 +92,17 @@ All API responses are cached in `data/raw/`, so a rebuild is offline and reprodu
 deleting a cache folder refreshes that source. Asking the graph where a graph came from is one query,
 [queries/provenance-of-a-graph.rq](../queries/provenance-of-a-graph.rq):
 
-| input | release | retrieved / generated |
-|---|---|---|
-| GLEIF LEI records | 2026-10-14T16:00:00Z | 2026-10-15T02:14:42Z |
-| Wikidata (CC0), labels by identifier | | 2026-10-15T02:35:08Z |
-| openFDA Drugs@FDA | 2026-10-14 | 2026-10-15T01:43:35Z |
-| scripts/labels_ja_zh.csv (generated, sha256 recorded) | | build time |
-| scripts/organizations.csv (generated, sha256 recorded) | | build time |
-| vocab/src/organization_labels_ja_zh.csv (curated, sha256 recorded) | | |
-| vocab/src/sponsor_lei.csv (curated, sha256 recorded) | | |
+| input | release | retrieved / generated | hash |
+|---|---|---|---|
+| GLEIF LEI records | 2026-10-14T16:00:00Z | 2026-10-15T02:14:42Z | |
+| Wikidata (CC0), labels by identifier | | 2026-10-25T10:40:38Z | |
+| openFDA Drugs@FDA | 2026-10-14 | 2026-10-15T01:43:35Z | |
+| scripts/labels_ja_zh.csv (generated) | | 2026-10-25T11:13:27Z | sha256:f114859d… |
+| scripts/organizations.csv (generated) | | 2026-10-25T11:13:27Z | sha256:7023e016… |
+| vocab/src/organization_labels_ja_zh.csv (curated) | | | sha256:b4d1503e… |
+| vocab/src/sponsor_lei.csv (curated) | | | sha256:6904aec6… |
 
-The full output, with the hashes, is in [query-results.md](query-results.md).
+The full output, with the full hashes, is in [query-results.md](query-results.md).
 
 Inside the vocabularies, provenance goes down to the label: every concept has a `skos:editorialNote`
 saying whether its Japanese and Chinese labels come from Wikidata (with the item) or are curated
@@ -130,9 +140,11 @@ not pipeline errors.
 
 - **Ontology:** semantic versions with `owl:versionIRI`, `owl:versionInfo`, `owl:priorVersion` and
   a `skos:changeNote` per release ([diabetes-market.ttl](../ontology/diabetes-market.ttl), now
-  0.4.0). A minor version changes axioms or properties (0.2.0 removed the age 65+ properties, 0.3.0
-  added the pseudonym); a definitions-only change is still a release, because definitions are part
-  of the contract (0.4.0). The RDF/XML copy is regenerated from the Turtle file and checked to be
+  0.5.0). A minor version changes axioms or properties (0.2.0 removed the age 65+ properties, 0.3.0
+  added the pseudonym, 0.5.0 added Japan: the Data Cube slice, the Japanese product attributes and
+  the defined classes `dm:GLP1Product` and `dm:SGLT2Product`); a definitions-only change is still a
+  release, because definitions are part of the contract (0.4.0). The shapes are versioned the same
+  way ([diabetes-market-shapes.ttl](../shapes/diabetes-market-shapes.ttl), now 0.3.0, 59 rules). The RDF/XML copy is regenerated from the Turtle file and checked to be
   isomorphic.
 - **Data and vocabularies:** identified by their content hash and (from a git checkout) the build's
   git commit in the provenance graph, and by the source releases they were derived from. Two builds with the same
@@ -208,6 +220,7 @@ The conventions a contributor follows when changing the model or adding a source
 | NUCC taxonomy | AMA/NUCC permission, US only, no derivative works | builds the SKOS scheme locally; it is not committed |
 | GLEIF, Wikidata | CC0 | publishes LEIs, legal names, Wikidata labels |
 | IDMP-O 1.4.0 | MIT | includes a 5-term extract with the MIT notice |
+| NDB Open Data, NHI price list (MHLW) | free to use with the source cited (NDB Open Data FAQ) | publishes the aggregates as RDF with the source on the dataset node |
 | KEGG | academic use only | considered for ATC and rejected |
 
 ## 8. Known limits
@@ -221,3 +234,10 @@ The conventions a contributor follows when changing the model or adding a source
   note say so.
 - Curated Japanese and Chinese labels without a Wikidata counterpart (most class names, NUCC
   specialties) are still pending native-speaker review.
+- **Japan:** NDB masks cells below 1,000 (oral) or 400 (injection), plus secondary masking, so
+  prefecture and age figures are lower bounds. Quantities are tablets, pens or kits and cannot be
+  added across products (compare in yen). The prefecture is where the claim was issued, not where the
+  patient lives. NDB's generic flag is the reimbursement definition (see `dm:isGeneric`).
+- **The NDB ZIP is updated in place by MHLW** (the prescription tables were refreshed on 2026-09-02).
+  `download_ndb.py` keeps a cached ZIP, and the release string in `provenance.py` is written by hand,
+  so a refreshed file is only picked up by deleting `data/raw/ndb/` and updating that string.
