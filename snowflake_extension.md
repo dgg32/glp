@@ -149,6 +149,5 @@ Article 2 now uses Snowflake as its presentation layer, so the NDB data followed
 ## Next
 - Article 2 figures: Snowsight screenshots listed in `docs/article_2.md` (Figures 1, 5, 6, 7).
 - Native-speaker review of the 12 new ja/zh property labels (ontology 0.5.1) and Japanese labels for the remaining 63 NUCC specialties in use (the Japanese answers fall back to English names for them).
-- Stardog: push ontology 0.5.2 (rebuilt and checked locally on 2026-10-31; labels only since 0.5.0).
 - Optional: a Cortex Search service on `VOCAB.LABEL` for value-level altLabels (SGLT2i, グリフロジン).
 - The article (third in the series): ontology-generated semantic layer; OSI keeps structure, metrics and descriptions but loses synonyms, instructions and verified queries, even in Snowflake's own export format; measured effect on Cortex Analyst.
