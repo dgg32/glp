@@ -1,0 +1,739 @@
+version: 0.1.1
+semantic_model:
+  - name: DIABETES_MARKET
+    description: "Type 2 diabetes drug prescribing, generated from the diabetes-market ontology 0.5.1. Medicare Part D, Connecticut, data year 2024: mostly people aged 65 and over. Counts are claims (fills and refills), not patients. CMS omits prescriber/product rows with fewer than 11 claims. Costs are gross, before rebates. Prescribers are pseudonyms; report aggregates only."
+    datasets:
+      - name: ORGANIZATION
+        source: GLP.SEMANTIC.SV_ORGANIZATION
+        primary_key:
+          - ORGANIZATION_ID
+        description: "A company that holds the marketing authorization for a medicinal product: in the US the corporate group of the Drugs@FDA application holder (e.g. Boehringer Ingelheim), in Japan the holder named in the NHI price list (e.g. 日本ベーリンガーインゲルハイム)."
+        fields:
+          - name: COMPANY_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: organization.COMPANY_NAME
+            dimension: {}
+            description: "Organization name in English. Legal name of the ultimate parent in GLEIF. Values: AMYLIN (also: Amylin Pharmaceuticals); ASTRAZENECA PLC (also: AstraZeneca AB); C.H. Boehringer Sohn AG & Co. KG (also: Boehringer Ingelheim Pharmaceuticals, Inc.); ELI LILLY AND COMPANY; Johnson & Johnson (also: Janssen Pharmaceuticals, Inc.); MERCK & CO., INC. (also: Merck Sharp & Dohme LLC); NOVO NORDISK A/S (also: Novo Nordisk Inc.); SANOFI (also: Sanofi-Aventis U.S. LLC, Sanofi US Services Inc.); VIATRIS INC. (also: Mylan Pharmaceuticals Inc.)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"organization\"],\"access_modifier\":\"public_access\"}"
+          - name: COMPANY_NAME_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: organization.COMPANY_NAME_JA
+            dimension: {}
+            description: "Organization name in Japanese. Values: MSD; アストラゼネカ; アミリン・ファーマシューティカルズ; イーライリリー・アンド・カンパニー; サノフィ; ジョンソン・エンド・ジョンソン; ノボノルディスク; ベーリンガーインゲルハイム; ヴィアトリス."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"組織\"],\"access_modifier\":\"public_access\"}"
+          - name: COMPANY_NAME_ZH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: organization.COMPANY_NAME_ZH
+            dimension: {}
+            description: Organization name in Chinese.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"组织\"],\"access_modifier\":\"public_access\"}"
+          - name: ORGANIZATION_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: organization.ORGANIZATION_ID
+            dimension: {}
+            description: "LEI of the GLEIF ultimate parent, or a local id."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+      - name: PRESCRIBER
+        source: GLP.SEMANTIC.SV_PRESCRIBER
+        primary_key:
+          - PRESCRIBER_ID
+        description: An individual (NPI type 1) who prescribes drugs reimbursed under Medicare Part D.
+        fields:
+          - name: CITY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescriber.CITY
+            dimension: {}
+            description: City.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"市区町村\",\"城市\"],\"access_modifier\":\"public_access\"}"
+          - name: CMS_PRESCRIBER_TYPE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescriber.CMS_PRESCRIBER_TYPE
+            dimension: {}
+            description: "Specialty as reported by CMS (Prscrbr_Type), a free-text label that differs from the NUCC code."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"CMS処方医区分\",\"CMS处方者类别\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_GLP1_PRESCRIBER
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescriber.IS_GLP1_PRESCRIBER
+            dimension: {}
+            description: A healthcare professional who wrote at least one prescription for a product containing a substance in the GLP-1 receptor agonist class (including narrower classes such as dual GIP/GLP-1 agonists).
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"GLP-1 receptor agonist prescriber\",\"GLP-1受容体作動薬処方医\",\"GLP-1受体激动剂处方者\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_SGLT2_PRESCRIBER
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescriber.IS_SGLT2_PRESCRIBER
+            dimension: {}
+            description: A healthcare professional who wrote at least one prescription for a product containing a substance in the SGLT2 inhibitor class.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"SGLT2 inhibitor prescriber\",\"SGLT2阻害薬処方医\",\"SGLT2抑制剂处方者\"],\"access_modifier\":\"public_access\"}"
+          - name: PRESCRIBER_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescriber.PRESCRIBER_ID
+            dimension: {}
+            description: "First 16 hex characters of HMAC-SHA256(secret key, NPI). Stable across runs with the same key; not reversible without it."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"pseudonymous ID\",\"仮名ID\",\"假名化ID\"],\"access_modifier\":\"public_access\"}"
+          - name: STATE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescriber.STATE
+            dimension: {}
+            description: State.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"州\"],\"access_modifier\":\"public_access\"}"
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"synonyms\":[\"healthcare professional\",\"医療従事者\",\"医疗专业人员\"]}"
+      - name: PRESCRIPTION
+        source: GLP.SEMANTIC.SV_PRESCRIPTION
+        primary_key:
+          - PRESCRIPTION_ID
+        description: "The total Part D claims, fills, days of supply, cost and beneficiaries of one healthcare professional for one medicinal product in one data year. One row of the CMS 'Prescribers by Provider and Drug' dataset."
+        fields:
+          - name: BENEFICIARIES_SUPPRESSED
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.BENEFICIARIES_SUPPRESSED
+            dimension: {}
+            description: Beneficiary count suppressed.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"beneficiary count suppressed\",\"受給者数秘匿\",\"受益人数已隐去\"],\"access_modifier\":\"public_access\"}"
+          - name: DATA_YEAR
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.DATA_YEAR
+            dimension: {}
+            description: Data year. Only 2024 is loaded.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"データ年\",\"数据年份\"],\"access_modifier\":\"public_access\"}"
+          - name: PRESCRIBER_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.PRESCRIBER_ID
+            dimension: {}
+            description: Pseudonymous prescriber key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PRESCRIPTION_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.PRESCRIPTION_ID
+            dimension: {}
+            description: "Key: data year / prescriber / product."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PRODUCT_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.PRODUCT_ID
+            dimension: {}
+            description: Product key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: BENEFICIARIES
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.BENEFICIARIES
+            description: "Number of distinct Medicare beneficiaries (CMS Tot_Benes). Absent when 1-10, to protect privacy."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"total beneficiaries\",\"受給者数\",\"受益人数\"],\"access_modifier\":\"public_access\"}"
+          - name: CLAIMS
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.CLAIMS
+            description: "Number of Part D claims, including refills (CMS Tot_Clms)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: DAY_SUPPLY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.DAY_SUPPLY
+            description: Total day supply.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: DRUG_COST
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.DRUG_COST
+            description: "Aggregate gross drug cost paid by Part D plan, beneficiary and other payers, in US dollars (CMS Tot_Drug_Cst)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: FILLS_30DAY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription.FILLS_30DAY
+            description: Claims standardized to 30-day fills; a 90-day fill counts as 3.0 (CMS Tot_30day_Fills).
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"synonyms\":[\"prescription aggregate\",\"処方集計\",\"处方汇总\"]}"
+      - name: PRESCRIPTION_CLASS
+        source: GLP.SEMANTIC.SV_PRESCRIPTION_CLASS
+        primary_key:
+          - PRESCRIPTION_ID
+          - CLASS_ID
+        description: "Claims attributed to therapeutic classes: one row per prescription and class of any of the product's substances, including all broader classes (skos:broader*). A combination product counts in each of its classes, so never add claims across classes; filter or group by one class."
+        fields:
+          - name: CLASS_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class.CLASS_ID
+            dimension: {}
+            description: Therapeutic class key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PRESCRIPTION_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class.PRESCRIPTION_ID
+            dimension: {}
+            description: Prescription key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLAIMS
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class.CLAIMS
+            description: "Number of Part D claims, including refills (CMS Tot_Clms)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: DRUG_COST
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class.DRUG_COST
+            description: "Aggregate gross drug cost paid by Part D plan, beneficiary and other payers, in US dollars (CMS Tot_Drug_Cst)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: FILLS_30DAY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class.FILLS_30DAY
+            description: Claims standardized to 30-day fills; a 90-day fill counts as 3.0 (CMS Tot_30day_Fills).
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+      - name: PRESCRIPTION_CLASS_COMPANY
+        source: GLP.SEMANTIC.SV_PRESCRIPTION_CLASS_COMPANY
+        primary_key:
+          - PRESCRIPTION_ID
+          - CLASS_ID
+          - ORGANIZATION_KEY
+        description: "Claims by therapeutic class and manufacturer, for market shares: one row per prescription, class and marketing authorization holder. Unbranded generics have no single manufacturer. A product with two holders (Byetta) counts for each."
+        fields:
+          - name: CLASS_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class_company.CLASS_ID
+            dimension: {}
+            description: Therapeutic class key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: MANUFACTURER
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class_company.MANUFACTURER
+            dimension: {}
+            description: "Manufactured by. Company name, or 'generic (no single manufacturer)'."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"manufactured by\"],\"access_modifier\":\"public_access\"}"
+          - name: PRESCRIPTION_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class_company.PRESCRIPTION_ID
+            dimension: {}
+            description: Prescription key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLAIMS
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class_company.CLAIMS
+            description: "Number of Part D claims, including refills (CMS Tot_Clms)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLAIMS_ALLOCATED
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class_company.CLAIMS_ALLOCATED
+            description: "Claims divided equally among the product's marketing authorization holders, so that the companies of a class add up to the class's claims. Use for market shares."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: DRUG_COST
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prescription_class_company.DRUG_COST
+            description: "Aggregate gross drug cost paid by Part D plan, beneficiary and other payers, in US dollars (CMS Tot_Drug_Cst)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+      - name: PRODUCT
+        source: GLP.SEMANTIC.SV_PRODUCT
+        primary_key:
+          - PRODUCT_ID
+        description: "A drug product as named in claims data: in Part D (CMS Brnd_Name, e.g. Jardiance; unbranded generics appear under their generic name), or in NDB Open Data, where each strength is its own product with a receipt code and a YJ code (e.g. ジャディアンス錠10mg)."
+        fields:
+          - name: BRAND_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.BRAND_NAME
+            dimension: {}
+            description: "Medicinal product name in English. Values: Alogliptin; Basaglar Kwikpen U-100; Bydureon Bcise; Byetta; Dapagliflozin; Farxiga; Glimepiride; Glipizide; Glipizide Er; Glipizide Xl; Glipizide-Metformin; Glyburide; Glyxambi; Insulin Glargine Solostar; Insulin Glargine-Yfgn; Invokamet; Invokana; Janumet; Janumet Xr; Januvia; Jardiance; Jentadueto; Jentadueto Xr; Lantus; Lantus Solostar; Liraglutide; Metformin Er Gastric; Metformin Er Osmotic; Metformin Hcl; Metformin Hcl Er; Mounjaro; Ozempic; Pioglitazone Hcl; Pioglitazone-Metformin; Rybelsus; Saxagliptin Hcl; Semglee (Yfgn) Pen; Soliqua 100-33; Steglatro; Synjardy; Synjardy Xr; Toujeo Max Solostar; Toujeo Solostar; Tradjenta; Trijardy Xr; Trulicity; Victoza 2-Pak; Victoza 3-Pak; Wegovy; Xigduo Xr; Xultophy 100-3.6."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"medicinal product\"],\"access_modifier\":\"public_access\"}"
+          - name: CMS_GENERIC_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.CMS_GENERIC_NAME
+            dimension: {}
+            description: "Generic name exactly as spelled in the CMS data (Gnrc_Name), e.g. 'Dapaglifloz Propaned/Metformin'."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"CMS一般名\",\"CMS通用名\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_COMBINATION
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.IS_COMBINATION
+            dimension: {}
+            description: Is combination product.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"is combination product\",\"配合剤\",\"复方制剂\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_GLP1_PRODUCT
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.IS_GLP1_PRODUCT
+            dimension: {}
+            description: "A medicinal product containing a substance in the GLP-1 receptor agonist class (including dual GIP/GLP-1 agonists), alone or in combination, whatever its Japanese therapeutic category (249 or 396)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"GLP-1 receptor agonist product\",\"GLP-1受容体作動薬製剤\",\"GLP-1受体激动剂产品\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_SGLT2_PRODUCT
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.IS_SGLT2_PRODUCT
+            dimension: {}
+            description: "A medicinal product containing a substance in the SGLT2 inhibitor class, alone or in combination."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"SGLT2 inhibitor product\",\"SGLT2阻害薬製剤\",\"SGLT2抑制剂产品\"],\"access_modifier\":\"public_access\"}"
+          - name: PRODUCT_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.PRODUCT_ID
+            dimension: {}
+            description: Product key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"synonyms\":[\"医薬品\",\"药品\"]}"
+      - name: SPECIALTY
+        source: GLP.SEMANTIC.SV_SPECIALTY
+        primary_key:
+          - SPECIALTY_CODE
+        description: "A concept from the NUCC Health Care Provider Taxonomy, published as a SKOS concept scheme. Joined as the prescriber's primary specialty (NPI Registry)."
+        fields:
+          - name: SPECIALTY_CODE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: specialty.SPECIALTY_CODE
+            dimension: {}
+            description: "NUCC taxonomy code, e.g. 207RE0101X."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: SPECIALTY_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: specialty.SPECIALTY_NAME
+            dimension: {}
+            description: Specialty name in English.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"specialty\"],\"access_modifier\":\"public_access\"}"
+          - name: SPECIALTY_NAME_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: specialty.SPECIALTY_NAME_JA
+            dimension: {}
+            description: "Specialty name in Japanese. English name where no Japanese label exists yet. Values: インターベンション循環器内科医; ナースプラクティショナー; フィジシャン・アシスタント; プライマリ・ケア・ナースプラクティショナー; ホスピタリスト; 内分泌・糖尿病・代謝内科医; 内科医; 内科系フィジシャン・アシスタント; 医療系教育・研修プログラム在籍者; 家庭医; 家庭医療ナースプラクティショナー; 循環器内科医; 急性期ナースプラクティショナー; 感染症内科医; 成人医療ナースプラクティショナー; 精神科ナースプラクティショナー; 精神科医; 老年内科医; 老年医療ナースプラクティショナー; 腎臓内科医."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"専門分野\"],\"access_modifier\":\"public_access\"}"
+          - name: SPECIALTY_NAME_ZH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: specialty.SPECIALTY_NAME_ZH
+            dimension: {}
+            description: Specialty name in Chinese. English name where no Chinese label exists yet.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"专科\"],\"access_modifier\":\"public_access\"}"
+      - name: THERAPEUTIC_CLASS
+        source: GLP.SEMANTIC.SV_THERAPEUTIC_CLASS
+        primary_key:
+          - CLASS_ID
+        description: "A concept in the therapeutic class scheme (e.g. SGLT2 inhibitors). The hierarchy itself is maintained as a SKOS concept scheme, not as OWL subclasses."
+        fields:
+          - name: ATC_CODE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.ATC_CODE
+            dimension: {}
+            description: "ATC code of the class, e.g. A10BK. Glinides and imeglimin have none."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_DEPTH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_DEPTH
+            dimension: {}
+            description: "Level in the class tree (skos:broader*): 1 drugs used in diabetes, 2 insulins or blood glucose lowering drugs, 3 drug classes such as SGLT2 inhibitors, 4 narrower classes such as dual GIP/GLP-1 agonists, which also count in their broader class."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_ID
+            dimension: {}
+            description: "Class key, e.g. SGLT2Inhibitor."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_NAME
+            dimension: {}
+            description: "Therapeutic class name in English. Values: Alpha glucosidase inhibitors; Biguanides; Blood glucose lowering drugs, excl. insulins; Dipeptidyl peptidase 4 (DPP-4) inhibitors; Drugs used in diabetes; Glimins; Glinides; Glucagon-like peptide-1 (GLP-1) analogues; Glucose-dependent Insulinotropic Polypeptide Receptor Agonists; Insulins and analogues; Insulins and analogues for injection, fast-acting; Insulins and analogues for injection, intermediate- or long-acting combined with fast-acting; Insulins and analogues for injection, intermediate-acting; Insulins and analogues for injection, long-acting; Sodium-glucose co-transporter 2 (SGLT2) inhibitors; Sulfonylureas; Thiazolidinediones."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"therapeutic class\"],\"access_modifier\":\"public_access\"}"
+          - name: CLASS_NAME_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_NAME_JA
+            dimension: {}
+            description: "Therapeutic class name in Japanese. Values: DPP-4阻害薬; GLP-1受容体作動薬; SGLT2阻害薬; α-グルコシダーゼ阻害薬; インスリン製剤; グリミン系薬; スルホニルウレア薬; チアゾリジン薬; ビグアナイド薬; 中間型インスリン; 持効型溶解インスリン; 持続性GIP/GLP-1受容体作動薬; 混合型インスリン; 糖尿病治療薬; 血糖降下薬（インスリンを除く）; 速効型インスリン分泌促進薬; 速効型・超速効型インスリン."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"薬効分類\"],\"access_modifier\":\"public_access\"}"
+          - name: CLASS_NAME_ZH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_NAME_ZH
+            dimension: {}
+            description: "Therapeutic class name in Chinese. Values: DPP-4抑制剂; GIP/GLP-1双受体激动剂; GLP-1受体激动剂; SGLT2抑制剂; α-葡萄糖苷酶抑制剂; 中效胰岛素; 双胍类药物; 噻唑烷二酮类药物; 格列奈类药物; 格列明类药物; 磺酰脲类药物; 糖尿病治疗药物; 胰岛素及其类似物; 速效胰岛素; 长效胰岛素; 降血糖药（不含胰岛素）; 预混胰岛素."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"治疗类别\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_DRUG_CLASS
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.IS_DRUG_CLASS
+            dimension: {}
+            description: "TRUE for the drug classes (SGLT2 inhibitors, GLP-1 receptor agonists, DPP-4 inhibitors, biguanides, long-acting insulins, ...): use it whenever a question says 'by drug class' or 'by class', so that broader and narrower classes are not listed next to them."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+    relationships:
+      - name: PRESCRIBER_TO_SPECIALTY
+        from: PRESCRIBER
+        to: SPECIALTY
+        from_columns:
+          - PRIMARY_SPECIALTY_CODE
+        to_columns:
+          - SPECIALTY_CODE
+      - name: PRESCRIPTION_TO_PRESCRIBER
+        from: PRESCRIPTION
+        to: PRESCRIBER
+        from_columns:
+          - PRESCRIBER_ID
+        to_columns:
+          - PRESCRIBER_ID
+      - name: PRESCRIPTION_TO_PRODUCT
+        from: PRESCRIPTION
+        to: PRODUCT
+        from_columns:
+          - PRODUCT_ID
+        to_columns:
+          - PRODUCT_ID
+      - name: PRESCRIPTION_CLASS_TO_PRESCRIPTION
+        from: PRESCRIPTION_CLASS
+        to: PRESCRIPTION
+        from_columns:
+          - PRESCRIPTION_ID
+        to_columns:
+          - PRESCRIPTION_ID
+      - name: PRESCRIPTION_CLASS_TO_THERAPEUTIC_CLASS
+        from: PRESCRIPTION_CLASS
+        to: THERAPEUTIC_CLASS
+        from_columns:
+          - CLASS_ID
+        to_columns:
+          - CLASS_ID
+      - name: PRESCRIPTION_CLASS_COMPANY_TO_ORGANIZATION
+        from: PRESCRIPTION_CLASS_COMPANY
+        to: ORGANIZATION
+        from_columns:
+          - ORGANIZATION_ID
+        to_columns:
+          - ORGANIZATION_ID
+      - name: PRESCRIPTION_CLASS_COMPANY_TO_PRESCRIPTION
+        from: PRESCRIPTION_CLASS_COMPANY
+        to: PRESCRIPTION
+        from_columns:
+          - PRESCRIPTION_ID
+        to_columns:
+          - PRESCRIPTION_ID
+      - name: PRESCRIPTION_CLASS_COMPANY_TO_THERAPEUTIC_CLASS
+        from: PRESCRIPTION_CLASS_COMPANY
+        to: THERAPEUTIC_CLASS
+        from_columns:
+          - CLASS_ID
+        to_columns:
+          - CLASS_ID
+    metrics:
+      - name: CLASS_CLAIMS
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prescription_class.claims)
+        description: Claims of products in a therapeutic class (including narrower classes). Filter or group by one class.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: CLASS_COST_PER_30DAY_FILL
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(prescription_class.drug_cost) / NULLIF(SUM(prescription_class.fills_30day), 0)"
+        description: "Gross drug cost per 30-day fill in USD within a therapeutic class: compares classes fairly when fill lengths differ."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: CLASS_COST_PER_CLAIM
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(prescription_class.drug_cost) / NULLIF(SUM(prescription_class.claims), 0)"
+        description: Gross drug cost per claim in USD within a therapeutic class.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: CLASS_DRUG_COST
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prescription_class.drug_cost)
+        description: Gross drug cost in USD of products in a therapeutic class. Filter or group by one class.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: COMPANY_CLAIMS
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prescription_class_company.claims)
+        description: "Claims of products by a manufacturer within a therapeutic class. Filter or group by one class. A product with two marketing authorization holders counts fully for each, so do not divide by the sum over companies."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: COMPANY_CLAIMS_ALLOCATED
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prescription_class_company.claims_allocated)
+        description: "Claims by manufacturer within a therapeutic class, with a product's claims split equally among its marketing authorization holders: the companies of a class add up to the class's claims. Market share = company_claims_allocated / its sum over all companies of the class."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: COMPANY_DRUG_COST
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prescription_class_company.drug_cost)
+        description: Gross drug cost in USD by manufacturer within a therapeutic class.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: COST_PER_CLAIM
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(prescription.drug_cost) / NULLIF(SUM(prescription.claims), 0)"
+        description: Gross drug cost per claim in USD.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: GLP1_CLAIMS
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(CASE WHEN prescription_class.class_id = 'GLP1ReceptorAgonist' THEN prescription_class.claims ELSE 0 END)
+        description: "Claims of products in the class Glucagon-like peptide-1 (GLP-1) analogues, including dual GIP/GLP-1 agonists (from the definition of dm:GLP1Prescriber)."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: PRESCRIBER_COUNT
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: COUNT(DISTINCT prescription.prescriber_id)
+        description: Number of distinct prescribers with at least one claim (Part D rows of 11 claims or more).
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: SGLT2_CLAIMS
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(CASE WHEN prescription_class.class_id = 'SGLT2Inhibitor' THEN prescription_class.claims ELSE 0 END)
+        description: Claims of products in the class Sodium-glucose co-transporter 2 (SGLT2) inhibitors (from the definition of dm:SGLT2Prescriber).
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: SGLT2_SHARE_VS_GLP1
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(CASE WHEN prescription_class.class_id = 'SGLT2Inhibitor' THEN prescription_class.claims ELSE 0 END) / NULLIF(SUM(CASE WHEN prescription_class.class_id = 'SGLT2Inhibitor' THEN prescription_class.claims ELSE 0 END) + SUM(CASE WHEN prescription_class.class_id = 'GLP1ReceptorAgonist' THEN prescription_class.claims ELSE 0 END), 0)"
+        description: SGLT2 inhibitor claims as a fraction of SGLT2 inhibitor plus GLP-1 receptor agonist claims (0 to 1).
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: TOTAL_30DAY_FILLS
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prescription.fills_30day)
+        description: Claims standardized to 30-day fills; a 90-day fill counts as 3.0 (CMS Tot_30day_Fills).
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"synonyms\":[\"total 30-day fills\",\"30日換算処方数\",\"30天折算处方数\"],\"access_modifier\":\"public_access\"}"
+      - name: TOTAL_CLAIMS
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prescription.claims)
+        description: "Number of Part D claims, including refills (CMS Tot_Clms). All Part D claims."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"synonyms\":[\"total claims\",\"処方件数\",\"处方次数\"],\"access_modifier\":\"public_access\"}"
+      - name: TOTAL_DAY_SUPPLY
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prescription.day_supply)
+        description: ""
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"synonyms\":[\"total day supply\",\"総処方日数\",\"总供药天数\"],\"access_modifier\":\"public_access\"}"
+      - name: TOTAL_DRUG_COST
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prescription.drug_cost)
+        description: "Aggregate gross drug cost paid by Part D plan, beneficiary and other payers, in US dollars (CMS Tot_Drug_Cst). All gross drug cost in USD."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"synonyms\":[\"total drug cost (USD)\",\"薬剤費総額（米ドル）\",\"药品总费用（美元）\"],\"access_modifier\":\"public_access\"}"
+    custom_extensions:
+      - vendor_name: SNOWFLAKE
+        data: "{\"module_custom_instructions\":{\"sql_generation\":\"Use total_claims and total_drug_cost for overall volume. For anything by therapeutic class use the class_* metrics and filter or group by one class: a combination product counts in every class it belongs to, so class figures never add up to the total. 'By drug class' means therapeutic_class.is_drug_class = TRUE. Cost comparisons between classes: also show class_cost_per_30day_fill, the fair comparison when fill lengths differ. For market shares by company divide company_claims_allocated by its sum over all companies of the class. Names exist in English, Japanese (*_ja) and Chinese (*_zh): answer with the names in the language of the question.\"},\"verified_queries\":[{\"name\":\"SGLT2_VS_GLP1_BY_SPECIALTY\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.DIABETES_MARKET DIMENSIONS specialty.specialty_name METRICS sglt2_claims, glp1_claims, sglt2_share_vs_glp1) ORDER BY sglt2_claims + glp1_claims DESC\",\"question\":\"What share of SGLT2 inhibitor plus GLP-1 receptor agonist claims are SGLT2 inhibitors, by prescriber specialty?\",\"verified_at\":1793404800,\"use_as_onboarding_question\":true},{\"name\":\"COST_PER_CLAIM_BY_DRUG_CLASS\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.DIABETES_MARKET DIMENSIONS therapeutic_class.class_name METRICS class_claims, class_drug_cost, class_cost_per_claim, class_cost_per_30day_fill WHERE therapeutic_class.is_drug_class AND NOT product.is_combination) ORDER BY class_cost_per_30day_fill DESC\",\"question\":\"What is the cost per claim and per 30-day fill by drug class, for single-ingredient products?\",\"verified_at\":1793404800,\"use_as_onboarding_question\":true},{\"name\":\"MARKET_SHARE_BY_MANUFACTURER\",\"sql\":\"SELECT class_name, manufacturer, company_claims, company_claims_allocated / SUM(company_claims_allocated) OVER (PARTITION BY class_name) AS claim_share FROM SEMANTIC_VIEW(GLP.SEMANTIC.DIABETES_MARKET DIMENSIONS therapeutic_class.class_name, prescription_class_company.manufacturer METRICS company_claims, company_claims_allocated WHERE prescription_class_company.class_id IN ('SGLT2Inhibitor', 'GLP1ReceptorAgonist')) ORDER BY class_name, claim_share DESC\",\"question\":\"What is each manufacturer's share of SGLT2 inhibitor and GLP-1 receptor agonist claims?\",\"verified_at\":1793404800,\"use_as_onboarding_question\":false},{\"name\":\"SGLT2_BY_SPECIALTY_JA\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.DIABETES_MARKET DIMENSIONS specialty.specialty_name_ja METRICS class_claims WHERE therapeutic_class.class_name_ja = 'SGLT2阻害薬') ORDER BY class_claims DESC LIMIT 10\",\"question\":\"SGLT2阻害薬を処方している専門分野は？\",\"verified_at\":1793404800,\"use_as_onboarding_question\":true},{\"name\":\"PRESCRIBER_OVERLAP\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.DIABETES_MARKET DIMENSIONS prescriber.is_sglt2_prescriber, prescriber.is_glp1_prescriber METRICS prescriber_count) ORDER BY 1, 2\",\"question\":\"How many prescribers write SGLT2 inhibitors, GLP-1 receptor agonists, or both?\",\"verified_at\":1793404800,\"use_as_onboarding_question\":false}]}"

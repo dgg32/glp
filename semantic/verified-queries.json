@@ -1,0 +1,37 @@
+[
+ {
+  "name": "sglt2_vs_glp1_by_specialty",
+  "source": "queries/sglt2-vs-glp1-by-specialty.rq",
+  "onboarding": true,
+  "question": "What share of SGLT2 inhibitor plus GLP-1 receptor agonist claims are SGLT2 inhibitors, by prescriber specialty?",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS specialty.specialty_name METRICS sglt2_claims, glp1_claims, sglt2_share_vs_glp1) ORDER BY sglt2_claims + glp1_claims DESC"
+ },
+ {
+  "name": "cost_per_claim_by_drug_class",
+  "source": "queries/cost-per-claim-by-class.rq",
+  "onboarding": true,
+  "question": "What is the cost per claim and per 30-day fill by drug class, for single-ingredient products?",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS therapeutic_class.class_name METRICS class_claims, class_drug_cost, class_cost_per_claim, class_cost_per_30day_fill WHERE therapeutic_class.is_drug_class AND NOT product.is_combination) ORDER BY class_cost_per_30day_fill DESC"
+ },
+ {
+  "name": "market_share_by_manufacturer",
+  "source": "queries/market-share-by-manufacturer.rq",
+  "onboarding": false,
+  "question": "What is each manufacturer's share of SGLT2 inhibitor and GLP-1 receptor agonist claims?",
+  "sql": "SELECT class_name, manufacturer, company_claims, company_claims_allocated / SUM(company_claims_allocated) OVER (PARTITION BY class_name) AS claim_share FROM SEMANTIC_VIEW({view} DIMENSIONS therapeutic_class.class_name, prescription_class_company.manufacturer METRICS company_claims, company_claims_allocated WHERE prescription_class_company.class_id IN ('SGLT2Inhibitor', 'GLP1ReceptorAgonist')) ORDER BY class_name, claim_share DESC"
+ },
+ {
+  "name": "sglt2_by_specialty_ja",
+  "source": "queries/sglt2-by-japanese-label.rq",
+  "onboarding": true,
+  "question": "SGLT2阻害薬を処方している専門分野は？",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS specialty.specialty_name_ja METRICS class_claims WHERE therapeutic_class.class_name_ja = 'SGLT2阻害薬') ORDER BY class_claims DESC LIMIT 10"
+ },
+ {
+  "name": "prescriber_overlap",
+  "source": "queries/prescriber-overlap-reasoning.rq",
+  "onboarding": false,
+  "question": "How many prescribers write SGLT2 inhibitors, GLP-1 receptor agonists, or both?",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS prescriber.is_sglt2_prescriber, prescriber.is_glp1_prescriber METRICS prescriber_count) ORDER BY 1, 2"
+ }
+]

@@ -25,9 +25,10 @@
     dcterms:creator "Sixing Huang" ;
     dcterms:created "2026-10-14"^^xsd:date ;
     dcterms:license <https://opensource.org/licenses/MIT> ;
-    owl:versionIRI <https://dgg32.github.io/glp/ontology/0.5.0> ;
-    owl:versionInfo "0.5.0" ;
-    owl:priorVersion <https://dgg32.github.io/glp/ontology/0.4.0> ;
+    owl:versionIRI <https://dgg32.github.io/glp/ontology/0.5.1> ;
+    owl:versionInfo "0.5.1" ;
+    owl:priorVersion <https://dgg32.github.io/glp/ontology/0.5.0> ;
+    skos:changeNote "0.5.1 (2026-10-31): labels only, no axiom changes. Japanese and Chinese labels for the US data properties (dm:totalClaims 処方件数, dm:totalDrugCost, dm:city, ...), so the Snowflake semantic view generated from the ontology has synonyms in all three languages. Curated, pending native-speaker review."@en ;
     skos:changeNote "0.5.0 (2026-10-25): Japan (NDB Open Data). Added dm:QuantitySlice (an RDF Data Cube slice) with dm:aboutProduct, dm:careSetting and dm:totalQuantity, the observation dimensions dm:prefecture, dm:month and dm:sexAgeGroup, the measure dm:quantity and the SDMX confidentiality attribute for masked cells; Japanese product attributes (dm:yjCode, dm:receiptCode, dm:nhiPrice, dm:dispensingUnit, dm:isGeneric, dm:isOriginator, dm:routeOfAdministration, dm:inJapaneseDrugClass); dm:partOfCorporateGroup; concept classes dm:Prefecture, dm:SexAgeGroup, dm:CareSetting, dm:JapaneseDrugClass; defined classes dm:SGLT2Product and dm:GLP1Product. dm:MedicinalProduct and dm:Organization now cover Japanese products and marketing authorization holders. No change to existing axioms."@en ;
     skos:changeNote "0.4.0 (2026-10-15): definitions only, no axiom changes. dm:Indication: indications are MeSH descriptors stated in FDA labels (example 'obesity' replaces 'chronic weight management'). dm:Organization: a company is the corporate group of a Drugs@FDA application holder, identified by the LEI of its GLEIF ultimate parent."@en ;
     skos:changeNote "0.3.0 (2026-10-14): added dm:pseudonymousId (prescribers are identified by a keyed hash, never by NPI or name, in loaded data) and dm:cmsGenericName."@en ;
@@ -290,71 +291,71 @@ dm:pseudonymousId a owl:DatatypeProperty , owl:FunctionalProperty ;
     rdfs:comment "The source data is public and names the prescribers, so a determined reader could still re-identify someone by matching claim counts. The pseudonym keeps names and NPIs out of the graph, demos and screenshots; it is not anonymization."@en .
 
 dm:cmsPrescriberType a owl:DatatypeProperty ;
-    rdfs:label "CMS prescriber type"@en ;
+    rdfs:label "CMS prescriber type"@en , "CMS処方医区分"@ja , "CMS处方者类别"@zh ;
     rdfs:domain dm:HealthcareProfessional ;
     rdfs:range xsd:string ;
     skos:definition "Specialty as reported by CMS (Prscrbr_Type), a free-text label that differs from the NUCC code."@en .
 
 dm:city a owl:DatatypeProperty ;
-    rdfs:label "city"@en ;
+    rdfs:label "city"@en , "市区町村"@ja , "城市"@zh ;
     rdfs:domain dm:HealthcareProfessional ;
     rdfs:range xsd:string .
 
 dm:state a owl:DatatypeProperty ;
-    rdfs:label "state"@en ;
+    rdfs:label "state"@en , "州"@ja , "州"@zh ;
     rdfs:domain dm:HealthcareProfessional ;
     rdfs:range xsd:string .
 
 # --- Prescription aggregate: all-ages figures ---
 dm:dataYear a owl:DatatypeProperty , owl:FunctionalProperty ;
-    rdfs:label "data year"@en ;
+    rdfs:label "data year"@en , "データ年"@ja , "数据年份"@zh ;
     rdfs:domain dm:Prescription ;
     rdfs:range xsd:gYear .
 
 dm:totalClaims a owl:DatatypeProperty , owl:FunctionalProperty ;
-    rdfs:label "total claims"@en ;
+    rdfs:label "total claims"@en , "処方件数"@ja , "处方次数"@zh ;
     rdfs:domain dm:Prescription ;
     rdfs:range xsd:nonNegativeInteger ;
     skos:definition "Number of Part D claims, including refills (CMS Tot_Clms)."@en .
 
 dm:total30DayFills a owl:DatatypeProperty , owl:FunctionalProperty ;
-    rdfs:label "total 30-day fills"@en ;
+    rdfs:label "total 30-day fills"@en , "30日換算処方数"@ja , "30天折算处方数"@zh ;
     rdfs:domain dm:Prescription ;
     rdfs:range xsd:decimal ;
     skos:definition "Claims standardized to 30-day fills; a 90-day fill counts as 3.0 (CMS Tot_30day_Fills)."@en .
 
 dm:totalDaySupply a owl:DatatypeProperty , owl:FunctionalProperty ;
-    rdfs:label "total day supply"@en ;
+    rdfs:label "total day supply"@en , "総処方日数"@ja , "总供药天数"@zh ;
     rdfs:domain dm:Prescription ;
     rdfs:range xsd:nonNegativeInteger .
 
 dm:totalDrugCost a owl:DatatypeProperty , owl:FunctionalProperty ;
-    rdfs:label "total drug cost (USD)"@en ;
+    rdfs:label "total drug cost (USD)"@en , "薬剤費総額（米ドル）"@ja , "药品总费用（美元）"@zh ;
     rdfs:domain dm:Prescription ;
     rdfs:range xsd:decimal ;
     skos:definition "Aggregate gross drug cost paid by Part D plan, beneficiary and other payers, in US dollars (CMS Tot_Drug_Cst)."@en .
 
 dm:totalBeneficiaries a owl:DatatypeProperty , owl:FunctionalProperty ;
-    rdfs:label "total beneficiaries"@en ;
+    rdfs:label "total beneficiaries"@en , "受給者数"@ja , "受益人数"@zh ;
     rdfs:domain dm:Prescription ;
     rdfs:range xsd:nonNegativeInteger ;
     skos:definition "Number of distinct Medicare beneficiaries (CMS Tot_Benes). Absent when 1-10, to protect privacy."@en .
 
 dm:beneficiaryCountSuppressed a owl:DatatypeProperty , owl:FunctionalProperty ;
-    rdfs:label "beneficiary count suppressed"@en ;
+    rdfs:label "beneficiary count suppressed"@en , "受給者数秘匿"@ja , "受益人数已隐去"@zh ;
     rdfs:domain dm:Prescription ;
     rdfs:range xsd:boolean ;
     rdfs:comment "Derived: CMS blanks Tot_Benes for 1-10 beneficiaries but publishes no flag for it."@en .
 
 # --- MedicinalProduct ---
 dm:cmsGenericName a owl:DatatypeProperty , owl:FunctionalProperty ;
-    rdfs:label "CMS generic name"@en ;
+    rdfs:label "CMS generic name"@en , "CMS一般名"@ja , "CMS通用名"@zh ;
     rdfs:domain dm:MedicinalProduct ;
     rdfs:range xsd:string ;
     skos:definition "Generic name exactly as spelled in the CMS data (Gnrc_Name), e.g. 'Dapaglifloz Propaned/Metformin'."@en .
 
 dm:isCombinationProduct a owl:DatatypeProperty , owl:FunctionalProperty ;
-    rdfs:label "is combination product"@en ;
+    rdfs:label "is combination product"@en , "配合剤"@ja , "复方制剂"@zh ;
     rdfs:domain dm:MedicinalProduct ;
     rdfs:range xsd:boolean .
 
