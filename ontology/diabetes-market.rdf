@@ -6,81 +6,29 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
 >
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/vocab/therapeutic-class/SGLT2Inhibitor">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-    <rdf:type rdf:resource="https://dgg32.github.io/glp/ontology#TherapeuticClass"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#inJapaneseDrugClass">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">in Japanese therapeutic category</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#JapaneseDrugClass"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#total30DayFills">
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#cmsGenericName">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">total 30-day fills</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
-    <skos:definition xml:lang="en">Claims standardized to 30-day fills; a 90-day fill counts as 3.0 (CMS Tot_30day_Fills).</skos:definition>
+    <rdfs:label xml:lang="en">CMS generic name</rdfs:label>
+    <rdfs:label xml:lang="ja">CMS一般名</rdfs:label>
+    <rdfs:label xml:lang="zh">CMS通用名</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <skos:definition xml:lang="en">Generic name exactly as spelled in the CMS data (Gnrc_Name), e.g. 'Dapaglifloz Propaned/Metformin'.</skos:definition>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b22">
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b12">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
     <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#inTherapeuticClass"/>
     <owl:hasValue rdf:resource="https://dgg32.github.io/glp/vocab/therapeutic-class/GLP1ReceptorAgonist"/>
   </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#SexAgeGroup">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
-    <rdfs:label xml:lang="en">sex and age band</rdfs:label>
-    <rdfs:label xml:lang="ja">性・年齢階級</rdfs:label>
-    <rdfs:label xml:lang="zh">性别年龄组</rdfs:label>
-    <skos:definition xml:lang="en">A sex combined with a five-year age band (0-4 ... 95-99, 100+), as NDB Open Data reports them.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#TherapeuticClass">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
-    <rdfs:label xml:lang="en">therapeutic class</rdfs:label>
-    <rdfs:label xml:lang="ja">薬効分類</rdfs:label>
-    <rdfs:label xml:lang="zh">治疗类别</rdfs:label>
-    <skos:definition xml:lang="en">A concept in the therapeutic class scheme (e.g. SGLT2 inhibitors). The hierarchy itself is maintained as a SKOS concept scheme, not as OWL subclasses.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#manufacturedBy">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">manufactured by</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Organization"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Prescription">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">prescription aggregate</rdfs:label>
-    <rdfs:label xml:lang="ja">処方集計</rdfs:label>
-    <rdfs:label xml:lang="zh">处方汇总</rdfs:label>
-    <skos:definition xml:lang="en">The total Part D claims, fills, days of supply, cost and beneficiaries of one healthcare professional for one medicinal product in one data year. One row of the CMS 'Prescribers by Provider and Drug' dataset.</skos:definition>
-    <rdfs:comment xml:lang="en">Modelled as a node (not as an edge with properties, as in a property graph) because RDF statements cannot carry attributes without reification.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11238-Substances/Substance">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">substance</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11238-Substances/"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b3">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#forProduct"/>
-    <owl:someValuesFrom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b4"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Prefecture">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
-    <rdfs:label xml:lang="en">prefecture</rdfs:label>
-    <rdfs:label xml:lang="ja">都道府県</rdfs:label>
-    <rdfs:label xml:lang="zh">都道府县</rdfs:label>
-    <skos:definition xml:lang="en">One of Japan's 47 prefectures, identified by its JIS X 0401 code (01-47).</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b13">
-    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
-    <rdf:rest rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b14"/>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#dataYear">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">data year</rdfs:label>
+    <rdfs:label xml:lang="ja">データ年</rdfs:label>
+    <rdfs:label xml:lang="zh">数据年份</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#gYear"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
@@ -91,36 +39,105 @@
     <dcterms:creator>Sixing Huang</dcterms:creator>
     <dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-10-14</dcterms:created>
     <dcterms:license rdf:resource="https://opensource.org/licenses/MIT"/>
-    <owl:versionIRI rdf:resource="https://dgg32.github.io/glp/ontology/0.5.0"/>
-    <owl:versionInfo>0.5.0</owl:versionInfo>
-    <owl:priorVersion rdf:resource="https://dgg32.github.io/glp/ontology/0.4.0"/>
+    <owl:versionIRI rdf:resource="https://dgg32.github.io/glp/ontology/0.5.1"/>
+    <owl:versionInfo>0.5.1</owl:versionInfo>
+    <owl:priorVersion rdf:resource="https://dgg32.github.io/glp/ontology/0.5.0"/>
+    <skos:changeNote xml:lang="en">0.5.1 (2026-10-31): labels only, no axiom changes. Japanese and Chinese labels for the US data properties (dm:totalClaims 処方件数, dm:totalDrugCost, dm:city, ...), so the Snowflake semantic view generated from the ontology has synonyms in all three languages. Curated, pending native-speaker review.</skos:changeNote>
     <skos:changeNote xml:lang="en">0.5.0 (2026-10-25): Japan (NDB Open Data). Added dm:QuantitySlice (an RDF Data Cube slice) with dm:aboutProduct, dm:careSetting and dm:totalQuantity, the observation dimensions dm:prefecture, dm:month and dm:sexAgeGroup, the measure dm:quantity and the SDMX confidentiality attribute for masked cells; Japanese product attributes (dm:yjCode, dm:receiptCode, dm:nhiPrice, dm:dispensingUnit, dm:isGeneric, dm:isOriginator, dm:routeOfAdministration, dm:inJapaneseDrugClass); dm:partOfCorporateGroup; concept classes dm:Prefecture, dm:SexAgeGroup, dm:CareSetting, dm:JapaneseDrugClass; defined classes dm:SGLT2Product and dm:GLP1Product. dm:MedicinalProduct and dm:Organization now cover Japanese products and marketing authorization holders. No change to existing axioms.</skos:changeNote>
     <skos:changeNote xml:lang="en">0.4.0 (2026-10-15): definitions only, no axiom changes. dm:Indication: indications are MeSH descriptors stated in FDA labels (example 'obesity' replaces 'chronic weight management'). dm:Organization: a company is the corporate group of a Drugs@FDA application holder, identified by the LEI of its GLEIF ultimate parent.</skos:changeNote>
     <skos:changeNote xml:lang="en">0.3.0 (2026-10-14): added dm:pseudonymousId (prescribers are identified by a keyed hash, never by NPI or name, in loaded data) and dm:cmsGenericName.</skos:changeNote>
     <skos:changeNote xml:lang="en">0.2.0 (2026-10-14): removed the age 65+ datatype properties to stay well inside the Stardog Cloud Free 1M-edge limit; dm:writes is now inferred only; IDMP-O definitions moved to imports/idmp-o-1.4.0-extract.ttl.</skos:changeNote>
     <rdfs:comment xml:lang="en">IDMP-O and OMG Commons terms are referenced, not imported. The few external terms used are declared below (label + isDefinedBy only), following the MIREOT approach that IDMP-O itself adopted in release 1.8.0. Load the full IDMP-O into its own named graph if its axioms are needed.</rdfs:comment>
   </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#hasActiveSubstance">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">has active substance</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Substance"/>
-    <rdfs:comment xml:lang="en">Shortcut for the IDMP-O pattern product -hasActiveIngredient-&gt; ActiveIngredient role -isPlayedBy-&gt; Substance. The property chain makes data modelled the IDMP-O way also answer queries that use this shortcut.</rdfs:comment>
-    <owl:propertyChainAxiom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b25"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Organization">
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#GLP1Prescriber">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="https://www.omg.org/spec/Commons/Organizations/Organization"/>
-    <rdfs:label xml:lang="en">organization</rdfs:label>
-    <rdfs:label xml:lang="ja">組織</rdfs:label>
-    <rdfs:label xml:lang="zh">组织</rdfs:label>
-    <skos:definition xml:lang="en">A company that holds the marketing authorization for a medicinal product: in the US the corporate group of the Drugs@FDA application holder (e.g. Boehringer Ingelheim), in Japan the holder named in the NHI price list (e.g. 日本ベーリンガーインゲルハイム).</skos:definition>
-    <rdfs:comment xml:lang="en">Drugs@FDA application holders are grouped by their GLEIF ultimate parent; the LEI of that parent is the dcterms:identifier and the last segment of the IRI. A Japanese subsidiary of such a group links to it with dm:partOfCorporateGroup.</rdfs:comment>
+    <rdfs:label xml:lang="en">GLP-1 receptor agonist prescriber</rdfs:label>
+    <rdfs:label xml:lang="ja">GLP-1受容体作動薬処方医</rdfs:label>
+    <rdfs:label xml:lang="zh">GLP-1受体激动剂处方者</rdfs:label>
+    <skos:definition xml:lang="en">A healthcare professional who wrote at least one prescription for a product containing a substance in the GLP-1 receptor agonist class (including narrower classes such as dual GIP/GLP-1 agonists).</skos:definition>
+    <owl:equivalentClass rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b8"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b5">
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b15">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <owl:intersectionOf rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b18"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#hasIndication">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/hasTherapeuticIndication"/>
+    <rdfs:label xml:lang="en">has indication</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Indication"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#isOriginator">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">is originator</rdfs:label>
+    <rdfs:label xml:lang="ja">先発品</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <skos:definition xml:lang="en">Flagged 先発品 (originator) in the NHI price list. Neither generic nor originator: older products that predate the distinction and unified-name listings.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Prefecture">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:label xml:lang="en">prefecture</rdfs:label>
+    <rdfs:label xml:lang="ja">都道府県</rdfs:label>
+    <rdfs:label xml:lang="zh">都道府县</rdfs:label>
+    <skos:definition xml:lang="en">One of Japan's 47 prefectures, identified by its JIS X 0401 code (01-47).</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#CareSetting">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:label xml:lang="en">care setting</rdfs:label>
+    <rdfs:label xml:lang="ja">診療区分</rdfs:label>
+    <rdfs:label xml:lang="zh">诊疗类别</rdfs:label>
+    <skos:definition xml:lang="en">Where a drug was prescribed and dispensed: outpatient with a prescription filled at a community pharmacy (院外), outpatient dispensed in the clinic or hospital (院内), or inpatient (入院).</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b22">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
     <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#inTherapeuticClass"/>
-    <owl:hasValue rdf:resource="https://dgg32.github.io/glp/vocab/therapeutic-class/SGLT2Inhibitor"/>
+    <owl:hasValue rdf:resource="https://dgg32.github.io/glp/vocab/therapeutic-class/GLP1ReceptorAgonist"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#broader">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#broaderTransitive"/>
+    <rdfs:label xml:lang="en">has broader</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#SexAgeGroup">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:label xml:lang="en">sex and age band</rdfs:label>
+    <rdfs:label xml:lang="ja">性・年齢階級</rdfs:label>
+    <rdfs:label xml:lang="zh">性别年龄组</rdfs:label>
+    <skos:definition xml:lang="en">A sex combined with a five-year age band (0-4 ... 95-99, 100+), as NDB Open Data reports them.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#quantity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://purl.org/linked-data/cube#MeasureProperty"/>
+    <rdfs:label xml:lang="en">quantity</rdfs:label>
+    <rdfs:label xml:lang="ja">処方数量</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <skos:definition xml:lang="en">Dispensed quantity in the product's dispensing unit. Absent when NDB masked the cell; the observation then carries sdmx-attribute:confStatus sdmx-code:confStatus-C.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalClaims">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">total claims</rdfs:label>
+    <rdfs:label xml:lang="ja">処方件数</rdfs:label>
+    <rdfs:label xml:lang="zh">处方次数</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+    <skos:definition xml:lang="en">Number of Part D claims, including refills (CMS Tot_Clms).</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalDaySupply">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">total day supply</rdfs:label>
+    <rdfs:label xml:lang="ja">総処方日数</rdfs:label>
+    <rdfs:label xml:lang="zh">总供药天数</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#routeOfAdministration">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
@@ -131,10 +148,229 @@
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <skos:definition xml:lang="en">"oral" or "injection": the NDB table family (内服 / 注射) the product is reported in. Masking thresholds differ: 1,000 for oral, 400 for injection tables.</skos:definition>
   </rdf:Description>
-  <rdf:Description rdf:about="http://www.w3.org/ns/prov#Person">
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#minAge">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">minimum age</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#SexAgeGroup"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <skos:definition xml:lang="en">Lower bound of the age band in years (65 for 65-69).</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#JapaneseDrugClass">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">person</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://www.w3.org/ns/prov#"/>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:label xml:lang="en">Japanese therapeutic category</rdfs:label>
+    <rdfs:label xml:lang="ja">薬効分類</rdfs:label>
+    <rdfs:label xml:lang="zh">日本药效分类</rdfs:label>
+    <skos:definition xml:lang="en">A three-digit therapeutic category of the Japan Standard Commodity Classification (薬効分類), as used by the NHI price list and NDB Open Data, e.g. 396 糖尿病用剤.</skos:definition>
+    <rdfs:comment xml:lang="en">Not the same tree as ATC: GLP-1 receptor agonists are filed under 249 (other hormone preparations). The SKOS mapping properties in vocab/jp-drug-class.ttl relate the two.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Prescription">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">prescription aggregate</rdfs:label>
+    <rdfs:label xml:lang="ja">処方集計</rdfs:label>
+    <rdfs:label xml:lang="zh">处方汇总</rdfs:label>
+    <skos:definition xml:lang="en">The total Part D claims, fills, days of supply, cost and beneficiaries of one healthcare professional for one medicinal product in one data year. One row of the CMS 'Prescribers by Provider and Drug' dataset.</skos:definition>
+    <rdfs:comment xml:lang="en">Modelled as a node (not as an edge with properties, as in a property graph) because RDF statements cannot carry attributes without reification.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#manufacturedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">manufactured by</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Organization"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalQuantity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">total quantity</rdfs:label>
+    <rdfs:label xml:lang="ja">総計（処方数量）</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#QuantitySlice"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <skos:definition xml:lang="en">The national total of the row (総計). Unmasked unless the whole product is below the masking threshold in that care setting; then the slice carries sdmx-attribute:confStatus instead.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#MedicinalProduct">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/MedicinalProduct"/>
+    <rdfs:label xml:lang="en">medicinal product</rdfs:label>
+    <rdfs:label xml:lang="ja">医薬品</rdfs:label>
+    <rdfs:label xml:lang="zh">药品</rdfs:label>
+    <skos:definition xml:lang="en">A drug product as named in claims data: in Part D (CMS Brnd_Name, e.g. Jardiance; unbranded generics appear under their generic name), or in NDB Open Data, where each strength is its own product with a receipt code and a YJ code (e.g. ジャディアンス錠10mg).</skos:definition>
+    <rdfs:comment xml:lang="en">US products are brand-level (all strengths together), Japanese products strength-level, because that is how each source counts. Compare them through their substances and classes, not one to one.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalBeneficiaries">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">total beneficiaries</rdfs:label>
+    <rdfs:label xml:lang="ja">受給者数</rdfs:label>
+    <rdfs:label xml:lang="zh">受益人数</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+    <skos:definition xml:lang="en">Number of distinct Medicare beneficiaries (CMS Tot_Benes). Absent when 1-10, to protect privacy.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#QuantitySlice">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://purl.org/linked-data/cube#Slice"/>
+    <rdfs:label xml:lang="en">quantity slice</rdfs:label>
+    <rdfs:label xml:lang="ja">数量スライス</rdfs:label>
+    <rdfs:label xml:lang="zh">数量切片</rdfs:label>
+    <skos:definition xml:lang="en">The quantity of one medicinal product dispensed in one care setting in one NDB Open Data release, broken down by one dimension (prefecture, month or sex-age band). One row of one NDB table; its cells are the qb:observation values.</skos:definition>
+    <rdfs:comment xml:lang="en">An RDF Data Cube slice fixes product, care setting and dimension once, so each cell needs only three triples: the link from the slice, the dimension value, and the quantity or the confidentiality flag.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#hasPrimarySpecialty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:subPropertyOf rdf:resource="https://dgg32.github.io/glp/ontology#hasSpecialty"/>
+    <rdfs:label xml:lang="en">has primary specialty</rdfs:label>
+    <rdfs:comment xml:lang="en">The NPI Registry taxonomy flagged primary.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Organization">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="https://www.omg.org/spec/Commons/Organizations/Organization"/>
+    <rdfs:label xml:lang="en">organization</rdfs:label>
+    <rdfs:label xml:lang="ja">組織</rdfs:label>
+    <rdfs:label xml:lang="zh">组织</rdfs:label>
+    <skos:definition xml:lang="en">A company that holds the marketing authorization for a medicinal product: in the US the corporate group of the Drugs@FDA application holder (e.g. Boehringer Ingelheim), in Japan the holder named in the NHI price list (e.g. 日本ベーリンガーインゲルハイム).</skos:definition>
+    <rdfs:comment xml:lang="en">Drugs@FDA application holders are grouped by their GLEIF ultimate parent; the LEI of that parent is the dcterms:identifier and the last segment of the IRI. A Japanese subsidiary of such a group links to it with dm:partOfCorporateGroup.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#careSetting">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">care setting</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#QuantitySlice"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#CareSetting"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#broaderTransitive">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+    <rdfs:label xml:lang="en">has broader transitive</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#beneficiaryCountSuppressed">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">beneficiary count suppressed</rdfs:label>
+    <rdfs:label xml:lang="ja">受給者数秘匿</rdfs:label>
+    <rdfs:label xml:lang="zh">受益人数已隐去</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:comment xml:lang="en">Derived: CMS blanks Tot_Benes for 1-10 beneficiaries but publishes no flag for it.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#MeasureProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">measure property</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/hasTherapeuticIndication">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has therapeutic indication</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Specialty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:label xml:lang="en">specialty</rdfs:label>
+    <rdfs:label xml:lang="ja">専門分野</rdfs:label>
+    <rdfs:label xml:lang="zh">专科</rdfs:label>
+    <skos:definition xml:lang="en">A concept from the NUCC Health Care Provider Taxonomy, published as a SKOS concept scheme.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Indication">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/TherapeuticIndication"/>
+    <rdfs:label xml:lang="en">indication</rdfs:label>
+    <rdfs:label xml:lang="ja">適応症</rdfs:label>
+    <rdfs:label xml:lang="zh">适应症</rdfs:label>
+    <skos:definition xml:lang="en">A disease or condition a medicinal product is authorized to treat, as stated in its FDA label, e.g. type 2 diabetes mellitus or obesity.</skos:definition>
+    <rdfs:comment xml:lang="en">Indication concepts are MeSH descriptors (skos:exactMatch to MeSH) in the SKOS indication scheme.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Substance">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11238-Substances/Substance"/>
+    <rdfs:label xml:lang="en">substance</rdfs:label>
+    <rdfs:label xml:lang="ja">有効成分</rdfs:label>
+    <rdfs:label xml:lang="zh">活性成分</rdfs:label>
+    <skos:definition xml:lang="en">An active substance of a medicinal product, e.g. empagliflozin. A combination product has more than one.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b4">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#hasActiveSubstance"/>
+    <owl:someValuesFrom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b5"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b7">
+    <rdf:first rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b2"/>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#forProduct">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">for product</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#componentProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">component</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b20">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <owl:intersectionOf rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b23"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#inJapaneseDrugClass">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">in Japanese therapeutic category</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#JapaneseDrugClass"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#observation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">observation</rdfs:label>
+    <rdfs:domain rdf:resource="http://purl.org/linked-data/cube#Slice"/>
+    <rdfs:range rdf:resource="http://purl.org/linked-data/cube#Observation"/>
+    <rdfs:comment xml:lang="en">Observations are not typed in the data (one triple each saved); the range types them under reasoning.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b16">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#hasActiveSubstance"/>
+    <owl:someValuesFrom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b17"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b23">
+    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdf:rest rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b24"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#partOfCorporateGroup">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">part of corporate group</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Organization"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Organization"/>
+    <skos:definition xml:lang="en">Links a national company (e.g. the Japanese marketing authorization holder 日本ベーリンガーインゲルハイム) to its corporate group as identified by GLEIF.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#city">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">city</rdfs:label>
+    <rdfs:label xml:lang="ja">市区町村</rdfs:label>
+    <rdfs:label xml:lang="zh">城市</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#nhiPrice">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">NHI price (JPY per unit)</rdfs:label>
+    <rdfs:label xml:lang="ja">薬価</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <skos:definition xml:lang="en">Reimbursement price in yen per dispensing unit (tablet, pen, ...), as printed in NDB Open Data.</skos:definition>
+    <rdfs:comment xml:lang="en">MHLW updated the prices in the 11th release to the price list of 2026-09-02, so quantity x price is the FY2024 volume at current prices, not FY2024 spending.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#SGLT2Product">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">SGLT2 inhibitor product</rdfs:label>
+    <rdfs:label xml:lang="ja">SGLT2阻害薬製剤</rdfs:label>
+    <rdfs:label xml:lang="zh">SGLT2抑制剂产品</rdfs:label>
+    <skos:definition xml:lang="en">A medicinal product containing a substance in the SGLT2 inhibitor class, alone or in combination.</skos:definition>
+    <owl:equivalentClass rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b15"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#pseudonymousId">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
@@ -147,234 +383,20 @@
     <skos:definition xml:lang="en">First 16 hex characters of HMAC-SHA256(secret key, NPI). Stable across runs with the same key; not reversible without it.</skos:definition>
     <rdfs:comment xml:lang="en">The source data is public and names the prescribers, so a determined reader could still re-identify someone by matching claim counts. The pseudonym keeps names and NPIs out of the graph, demos and screenshots; it is not anonymization.</rdfs:comment>
   </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Substance">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11238-Substances/Substance"/>
-    <rdfs:label xml:lang="en">substance</rdfs:label>
-    <rdfs:label xml:lang="ja">有効成分</rdfs:label>
-    <rdfs:label xml:lang="zh">活性成分</rdfs:label>
-    <skos:definition xml:lang="en">An active substance of a medicinal product, e.g. empagliflozin. A combination product has more than one.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#cmsGenericName">
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#total30DayFills">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">CMS generic name</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-    <skos:definition xml:lang="en">Generic name exactly as spelled in the CMS data (Gnrc_Name), e.g. 'Dapaglifloz Propaned/Metformin'.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#slice">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">slice</rdfs:label>
-    <rdfs:domain rdf:resource="http://purl.org/linked-data/cube#DataSet"/>
-    <rdfs:range rdf:resource="http://purl.org/linked-data/cube#Slice"/>
-    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalDaySupply">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">total day supply</rdfs:label>
+    <rdfs:label xml:lang="en">total 30-day fills</rdfs:label>
+    <rdfs:label xml:lang="ja">30日換算処方数</rdfs:label>
+    <rdfs:label xml:lang="zh">30天折算处方数</rdfs:label>
     <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <skos:definition xml:lang="en">Claims standardized to 30-day fills; a 90-day fill counts as 3.0 (CMS Tot_30day_Fills).</skos:definition>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b11">
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b21">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
     <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#hasActiveSubstance"/>
-    <owl:someValuesFrom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b12"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#QuantitySlice">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://purl.org/linked-data/cube#Slice"/>
-    <rdfs:label xml:lang="en">quantity slice</rdfs:label>
-    <rdfs:label xml:lang="ja">数量スライス</rdfs:label>
-    <rdfs:label xml:lang="zh">数量切片</rdfs:label>
-    <skos:definition xml:lang="en">The quantity of one medicinal product dispensed in one care setting in one NDB Open Data release, broken down by one dimension (prefecture, month or sex-age band). One row of one NDB table; its cells are the qb:observation values.</skos:definition>
-    <rdfs:comment xml:lang="en">An RDF Data Cube slice fixes product, care setting and dimension once, so each cell needs only three triples: the link from the slice, the dimension value, and the quantity or the confidentiality flag.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b17">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#inTherapeuticClass"/>
-    <owl:hasValue rdf:resource="https://dgg32.github.io/glp/vocab/therapeutic-class/SGLT2Inhibitor"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#prefecture">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdf:type rdf:resource="http://purl.org/linked-data/cube#DimensionProperty"/>
-    <rdfs:label xml:lang="en">prefecture</rdfs:label>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Prefecture"/>
-    <skos:definition xml:lang="en">The prefecture of the medical institution that issued the claim (not where the patient lives).</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#hasSpecialty">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">has specialty</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Specialty"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#MedicinalProduct">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/MedicinalProduct"/>
-    <rdfs:label xml:lang="en">medicinal product</rdfs:label>
-    <rdfs:label xml:lang="ja">医薬品</rdfs:label>
-    <rdfs:label xml:lang="zh">药品</rdfs:label>
-    <skos:definition xml:lang="en">A drug product as named in claims data: in Part D (CMS Brnd_Name, e.g. Jardiance; unbranded generics appear under their generic name), or in NDB Open Data, where each strength is its own product with a receipt code and a YJ code (e.g. ジャディアンス錠10mg).</skos:definition>
-    <rdfs:comment xml:lang="en">US products are brand-level (all strengths together), Japanese products strength-level, because that is how each source counts. Compare them through their substances and classes, not one to one.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#CareSetting">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
-    <rdfs:label xml:lang="en">care setting</rdfs:label>
-    <rdfs:label xml:lang="ja">診療区分</rdfs:label>
-    <rdfs:label xml:lang="zh">诊疗类别</rdfs:label>
-    <skos:definition xml:lang="en">Where a drug was prescribed and dispensed: outpatient with a prescription filled at a community pharmacy (院外), outpatient dispensed in the clinic or hospital (院内), or inpatient (入院).</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#GLP1Product">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">GLP-1 receptor agonist product</rdfs:label>
-    <rdfs:label xml:lang="ja">GLP-1受容体作動薬製剤</rdfs:label>
-    <rdfs:label xml:lang="zh">GLP-1受体激动剂产品</rdfs:label>
-    <skos:definition xml:lang="en">A medicinal product containing a substance in the GLP-1 receptor agonist class (including dual GIP/GLP-1 agonists), alone or in combination, whatever its Japanese therapeutic category (249 or 396).</skos:definition>
-    <owl:equivalentClass rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b20"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalDrugCost">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">total drug cost (USD)</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
-    <skos:definition xml:lang="en">Aggregate gross drug cost paid by Part D plan, beneficiary and other payers, in US dollars (CMS Tot_Drug_Cst).</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#receiptCode">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">receipt code</rdfs:label>
-    <rdfs:label xml:lang="ja">レセプト電算処理システム用コード</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-    <skos:definition xml:lang="en">The 9-digit drug code of the claims (receipt) processing system (医薬品コード), the key of NDB Open Data.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">concept</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#Slice">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">slice</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#writes">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">writes</rdfs:label>
-    <rdfs:comment xml:lang="en">Not stored in the data: only dm:prescribedBy is asserted and dm:writes is inferred through owl:inverseOf (saves one triple per prescription). Queries without reasoning must use ^dm:prescribedBy.</rdfs:comment>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
-    <owl:inverseOf rdf:resource="https://dgg32.github.io/glp/ontology#prescribedBy"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#broader">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#broaderTransitive"/>
-    <rdfs:label xml:lang="en">has broader</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#hasIndication">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:subPropertyOf rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/hasTherapeuticIndication"/>
-    <rdfs:label xml:lang="en">has indication</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Indication"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#quantity">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://purl.org/linked-data/cube#MeasureProperty"/>
-    <rdfs:label xml:lang="en">quantity</rdfs:label>
-    <rdfs:label xml:lang="ja">処方数量</rdfs:label>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
-    <skos:definition xml:lang="en">Dispensed quantity in the product's dispensing unit. Absent when NDB masked the cell; the observation then carries sdmx-attribute:confStatus sdmx-code:confStatus-C.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#sliceStructure">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">slice structure</rdfs:label>
-    <rdfs:domain rdf:resource="http://purl.org/linked-data/cube#Slice"/>
-    <rdfs:range rdf:resource="http://purl.org/linked-data/cube#SliceKey"/>
-    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#partOfCorporateGroup">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">part of corporate group</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Organization"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Organization"/>
-    <skos:definition xml:lang="en">Links a national company (e.g. the Japanese marketing authorization holder 日本ベーリンガーインゲルハイム) to its corporate group as identified by GLEIF.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Indication">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/TherapeuticIndication"/>
-    <rdfs:label xml:lang="en">indication</rdfs:label>
-    <rdfs:label xml:lang="ja">適応症</rdfs:label>
-    <rdfs:label xml:lang="zh">适应症</rdfs:label>
-    <skos:definition xml:lang="en">A disease or condition a medicinal product is authorized to treat, as stated in its FDA label, e.g. type 2 diabetes mellitus or obesity.</skos:definition>
-    <rdfs:comment xml:lang="en">Indication concepts are MeSH descriptors (skos:exactMatch to MeSH) in the SKOS indication scheme.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/vocab/therapeutic-class/GLP1ReceptorAgonist">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-    <rdf:type rdf:resource="https://dgg32.github.io/glp/ontology#TherapeuticClass"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#Specialty">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
-    <rdfs:label xml:lang="en">specialty</rdfs:label>
-    <rdfs:label xml:lang="ja">専門分野</rdfs:label>
-    <rdfs:label xml:lang="zh">专科</rdfs:label>
-    <skos:definition xml:lang="en">A concept from the NUCC Health Care Provider Taxonomy, published as a SKOS concept scheme.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#dispensingUnit">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">dispensing unit</rdfs:label>
-    <rdfs:label xml:lang="ja">単位</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-    <skos:definition xml:lang="en">The unit in which quantities are counted (錠 tablet, キット kit, 筒 cartridge ...). Quantities in different units cannot be added.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#isCombinationProduct">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">is combination product</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#minAge">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">minimum age</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#SexAgeGroup"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-    <skos:definition xml:lang="en">Lower bound of the age band in years (65 for 65-69).</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#inTherapeuticClass">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">in therapeutic class</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Substance"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#TherapeuticClass"/>
-    <rdfs:comment xml:lang="en">Assert only the most specific class. The property chain rolls membership up the SKOS hierarchy, so empagliflozin in 'SGLT2 inhibitors' is also inferred to be in 'blood glucose lowering drugs'.</rdfs:comment>
-    <owl:propertyChainAxiom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b27"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#cmsPrescriberType">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:label xml:lang="en">CMS prescriber type</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-    <skos:definition xml:lang="en">Specialty as reported by CMS (Prscrbr_Type), a free-text label that differs from the NUCC code.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#MeasureProperty">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">measure property</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#dataYear">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">data year</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#gYear"/>
+    <owl:someValuesFrom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b22"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#aboutProduct">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
@@ -384,77 +406,25 @@
     <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
     <rdfs:comment xml:lang="en">Not dm:forProduct, whose domain is dm:Prescription: with reasoning, every slice would become a prescription.</rdfs:comment>
   </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b28">
+    <rdf:first rdf:resource="http://www.w3.org/2004/02/skos/core#broaderTransitive"/>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#inTherapeuticClass">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">in therapeutic class</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Substance"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#TherapeuticClass"/>
+    <rdfs:comment xml:lang="en">Assert only the most specific class. The property chain rolls membership up the SKOS hierarchy, so empagliflozin in 'SGLT2 inhibitors' is also inferred to be in 'blood glucose lowering drugs'.</rdfs:comment>
+    <owl:propertyChainAxiom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b27"/>
+  </rdf:Description>
   <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#SGLT2Prescriber">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
     <rdfs:label xml:lang="en">SGLT2 inhibitor prescriber</rdfs:label>
     <rdfs:label xml:lang="ja">SGLT2阻害薬処方医</rdfs:label>
     <rdfs:label xml:lang="zh">SGLT2抑制剂处方者</rdfs:label>
     <skos:definition xml:lang="en">A healthcare professional who wrote at least one prescription for a product containing a substance in the SGLT2 inhibitor class.</skos:definition>
-    <owl:equivalentClass rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b1"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#beneficiaryCountSuppressed">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">beneficiary count suppressed</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
-    <rdfs:comment xml:lang="en">Derived: CMS blanks Tot_Benes for 1-10 beneficiaries but publishes no flag for it.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#month">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://purl.org/linked-data/cube#DimensionProperty"/>
-    <rdfs:label xml:lang="en">month of care</rdfs:label>
-    <rdfs:label xml:lang="ja">診療月</rdfs:label>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#gYearMonth"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#isOriginator">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">is originator</rdfs:label>
-    <rdfs:label xml:lang="ja">先発品</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
-    <skos:definition xml:lang="en">Flagged 先発品 (originator) in the NHI price list. Neither generic nor originator: older products that predate the distinction and unified-name listings.</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#sexAgeGroup">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdf:type rdf:resource="http://purl.org/linked-data/cube#DimensionProperty"/>
-    <rdfs:label xml:lang="en">sex and age band</rdfs:label>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#SexAgeGroup"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#npi">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">NPI</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-    <skos:definition xml:lang="en">US National Provider Identifier (10 digits).</skos:definition>
-    <rdfs:comment xml:lang="en">Privacy by design: never written to the generated RDF. Prescribers are identified by dm:pseudonymousId instead.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#HealthcareProfessional">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Person"/>
-    <rdfs:label xml:lang="en">healthcare professional</rdfs:label>
-    <rdfs:label xml:lang="ja">医療従事者</rdfs:label>
-    <rdfs:label xml:lang="zh">医疗专业人员</rdfs:label>
-    <skos:definition xml:lang="en">An individual (NPI type 1) who prescribes drugs reimbursed under Medicare Part D.</skos:definition>
-    <rdfs:seeAlso rdf:resource="http://hl7.org/fhir/Practitioner"/>
-    <rdfs:comment xml:lang="en">Not covered by IDMP-O, which models regulatory product identity rather than commercial data. HL7 FHIR Practitioner is the closest standard concept (seeAlso, not a logical alignment).</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#forProduct">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">for product</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalBeneficiaries">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">total beneficiaries</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
-    <skos:definition xml:lang="en">Number of distinct Medicare beneficiaries (CMS Tot_Benes). Absent when 1-10, to protect privacy.</skos:definition>
+    <owl:equivalentClass rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b1"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#isGeneric">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
@@ -466,10 +436,28 @@
     <skos:definition xml:lang="en">Generic (後発医薬品) according to NDB Open Data's 後発品区分; biosimilars count as generics.</skos:definition>
     <rdfs:comment xml:lang="en">The reimbursement definition, not the pharmaceutical one: generics priced at the originator's level (marked ★ in the NHI price list) are not flagged. Most metformin generics (the 'MT' products, priced like Metgluco) are such a case, so metformin's generic share looks near zero.</rdfs:comment>
   </rdf:Description>
-  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/hasActiveIngredient">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">has active ingredient</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/"/>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#HealthcareProfessional">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Person"/>
+    <rdfs:label xml:lang="en">healthcare professional</rdfs:label>
+    <rdfs:label xml:lang="ja">医療従事者</rdfs:label>
+    <rdfs:label xml:lang="zh">医疗专业人员</rdfs:label>
+    <skos:definition xml:lang="en">An individual (NPI type 1) who prescribes drugs reimbursed under Medicare Part D.</skos:definition>
+    <rdfs:seeAlso rdf:resource="http://hl7.org/fhir/Practitioner"/>
+    <rdfs:comment xml:lang="en">Not covered by IDMP-O, which models regulatory product identity rather than commercial data. HL7 FHIR Practitioner is the closest standard concept (seeAlso, not a logical alignment).</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#GLP1Product">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">GLP-1 receptor agonist product</rdfs:label>
+    <rdfs:label xml:lang="ja">GLP-1受容体作動薬製剤</rdfs:label>
+    <rdfs:label xml:lang="zh">GLP-1受体激动剂产品</rdfs:label>
+    <skos:definition xml:lang="en">A medicinal product containing a substance in the GLP-1 receptor agonist class (including dual GIP/GLP-1 agonists), alone or in combination, whatever its Japanese therapeutic category (249 or 396).</skos:definition>
+    <owl:equivalentClass rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b20"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#DataSet">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">data set</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#yjCode">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
@@ -480,9 +468,72 @@
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <skos:definition xml:lang="en">The 12-character NHI price list code (薬価基準収載医薬品コード). Characters 1-4 are the therapeutic category, 1-7 the ingredient, 8 the dosage form.</skos:definition>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b7">
-    <rdf:first rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b2"/>
+  <rdf:Description rdf:about="https://www.omg.org/spec/Commons/Organizations/Organization">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">organization</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://www.omg.org/spec/Commons/Organizations/"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalDrugCost">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">total drug cost (USD)</rdfs:label>
+    <rdfs:label xml:lang="ja">薬剤費総額（米ドル）</rdfs:label>
+    <rdfs:label xml:lang="zh">药品总费用（美元）</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <skos:definition xml:lang="en">Aggregate gross drug cost paid by Part D plan, beneficiary and other payers, in US dollars (CMS Tot_Drug_Cst).</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b13">
+    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
+    <rdf:rest rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b14"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11238-Substances/Substance">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">substance</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11238-Substances/"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b3">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#forProduct"/>
+    <owl:someValuesFrom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b4"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#state">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">state</rdfs:label>
+    <rdfs:label xml:lang="ja">州</rdfs:label>
+    <rdfs:label xml:lang="zh">州</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/TherapeuticIndication">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">therapeutic indication</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">concept</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#hasSpecialty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has specialty</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Specialty"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b5">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#inTherapeuticClass"/>
+    <owl:hasValue rdf:resource="https://dgg32.github.io/glp/vocab/therapeutic-class/SGLT2Inhibitor"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b14">
+    <rdf:first rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b9"/>
     <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/MedicinalProduct">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">medicinal product</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#prescribedBy">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
@@ -491,181 +542,74 @@
     <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
     <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
   </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#DimensionProperty">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">dimension property</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#careSetting">
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#writes">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">care setting</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#QuantitySlice"/>
-    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#CareSetting"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://www.omg.org/spec/Commons/Organizations/Organization">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">organization</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="https://www.omg.org/spec/Commons/Organizations/"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#SGLT2Product">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">SGLT2 inhibitor product</rdfs:label>
-    <rdfs:label xml:lang="ja">SGLT2阻害薬製剤</rdfs:label>
-    <rdfs:label xml:lang="zh">SGLT2抑制剂产品</rdfs:label>
-    <skos:definition xml:lang="en">A medicinal product containing a substance in the SGLT2 inhibitor class, alone or in combination.</skos:definition>
-    <owl:equivalentClass rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b15"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#broaderTransitive">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
-    <rdfs:label xml:lang="en">has broader transitive</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#JapaneseDrugClass">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
-    <rdfs:label xml:lang="en">Japanese therapeutic category</rdfs:label>
-    <rdfs:label xml:lang="ja">薬効分類</rdfs:label>
-    <rdfs:label xml:lang="zh">日本药效分类</rdfs:label>
-    <skos:definition xml:lang="en">A three-digit therapeutic category of the Japan Standard Commodity Classification (薬効分類), as used by the NHI price list and NDB Open Data, e.g. 396 糖尿病用剤.</skos:definition>
-    <rdfs:comment xml:lang="en">Not the same tree as ATC: GLP-1 receptor agonists are filed under 249 (other hormone preparations). The SKOS mapping properties in vocab/jp-drug-class.ttl relate the two.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b10">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#forProduct"/>
-    <owl:someValuesFrom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b11"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b8">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <owl:intersectionOf rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b13"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#hasPrimarySpecialty">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:subPropertyOf rdf:resource="https://dgg32.github.io/glp/ontology#hasSpecialty"/>
-    <rdfs:label xml:lang="en">has primary specialty</rdfs:label>
-    <rdfs:comment xml:lang="en">The NPI Registry taxonomy flagged primary.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b4">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#hasActiveSubstance"/>
-    <owl:someValuesFrom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b5"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b18">
-    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdf:rest rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b19"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#nhiPrice">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">NHI price (JPY per unit)</rdfs:label>
-    <rdfs:label xml:lang="ja">薬価</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
-    <skos:definition xml:lang="en">Reimbursement price in yen per dispensing unit (tablet, pen, ...), as printed in NDB Open Data.</skos:definition>
-    <rdfs:comment xml:lang="en">MHLW updated the prices in the 11th release to the price list of 2026-09-02, so quantity x price is the FY2024 volume at current prices, not FY2024 spending.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalClaims">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">total claims</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
-    <skos:definition xml:lang="en">Number of Part D claims, including refills (CMS Tot_Clms).</skos:definition>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b21">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#hasActiveSubstance"/>
-    <owl:someValuesFrom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b22"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://www.omg.org/spec/Commons/RolesAndCompositions/isPlayedBy">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">is played by</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="https://www.omg.org/spec/Commons/RolesAndCompositions/"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#observation">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">observation</rdfs:label>
-    <rdfs:domain rdf:resource="http://purl.org/linked-data/cube#Slice"/>
-    <rdfs:range rdf:resource="http://purl.org/linked-data/cube#Observation"/>
-    <rdfs:comment xml:lang="en">Observations are not typed in the data (one triple each saved); the range types them under reasoning.</rdfs:comment>
-    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b27">
-    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#inTherapeuticClass"/>
-    <rdf:rest rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b28"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/hasTherapeuticIndication">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">has therapeutic indication</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#state">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:label xml:lang="en">state</rdfs:label>
+    <rdfs:label xml:lang="en">writes</rdfs:label>
+    <rdfs:comment xml:lang="en">Not stored in the data: only dm:prescribedBy is asserted and dm:writes is inferred through owl:inverseOf (saves one triple per prescription). Queries without reasoning must use ^dm:prescribedBy.</rdfs:comment>
     <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Prescription"/>
+    <owl:inverseOf rdf:resource="https://dgg32.github.io/glp/ontology#prescribedBy"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b25">
-    <rdf:first rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/hasActiveIngredient"/>
-    <rdf:rest rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b26"/>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b11">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#hasActiveSubstance"/>
+    <owl:someValuesFrom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b12"/>
   </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#totalQuantity">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:label xml:lang="en">total quantity</rdfs:label>
-    <rdfs:label xml:lang="ja">総計（処方数量）</rdfs:label>
-    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#QuantitySlice"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
-    <skos:definition xml:lang="en">The national total of the row (総計). Unmasked unless the whole product is below the masking threshold in that care setting; then the slice carries sdmx-attribute:confStatus instead.</skos:definition>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#sliceStructure">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">slice structure</rdfs:label>
+    <rdfs:domain rdf:resource="http://purl.org/linked-data/cube#Slice"/>
+    <rdfs:range rdf:resource="http://purl.org/linked-data/cube#SliceKey"/>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
   </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#GLP1Prescriber">
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b6">
+    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
+    <rdf:rest rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b7"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b1">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">GLP-1 receptor agonist prescriber</rdfs:label>
-    <rdfs:label xml:lang="ja">GLP-1受容体作動薬処方医</rdfs:label>
-    <rdfs:label xml:lang="zh">GLP-1受体激动剂处方者</rdfs:label>
-    <skos:definition xml:lang="en">A healthcare professional who wrote at least one prescription for a product containing a substance in the GLP-1 receptor agonist class (including narrower classes such as dual GIP/GLP-1 agonists).</skos:definition>
-    <owl:equivalentClass rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b8"/>
+    <owl:intersectionOf rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b6"/>
   </rdf:Description>
-  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/TherapeuticIndication">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">therapeutic indication</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b9">
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b9">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
     <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#writes"/>
-    <owl:someValuesFrom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b10"/>
+    <owl:someValuesFrom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b10"/>
   </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#SliceKey">
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#hasActiveSubstance">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has active substance</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Substance"/>
+    <rdfs:comment xml:lang="en">Shortcut for the IDMP-O pattern product -hasActiveIngredient-&gt; ActiveIngredient role -isPlayedBy-&gt; Substance. The property chain makes data modelled the IDMP-O way also answer queries that use this shortcut.</rdfs:comment>
+    <owl:propertyChainAxiom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b25"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b27">
+    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#inTherapeuticClass"/>
+    <rdf:rest rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b28"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/vocab/therapeutic-class/GLP1ReceptorAgonist">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://dgg32.github.io/glp/ontology#TherapeuticClass"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#prefecture">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://purl.org/linked-data/cube#DimensionProperty"/>
+    <rdfs:label xml:lang="en">prefecture</rdfs:label>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#Prefecture"/>
+    <skos:definition xml:lang="en">The prefecture of the medical institution that issued the claim (not where the patient lives).</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b8">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">slice key</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
+    <owl:intersectionOf rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b13"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b26">
-    <rdf:first rdf:resource="https://www.omg.org/spec/Commons/RolesAndCompositions/isPlayedBy"/>
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#Observation">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">observation</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b24">
-    <rdf:first rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b21"/>
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#city">
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#npi">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:label xml:lang="en">city</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">NPI</rdfs:label>
     <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#DataSet">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">data set</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
+    <skos:definition xml:lang="en">US National Provider Identifier (10 digits).</skos:definition>
+    <rdfs:comment xml:lang="en">Privacy by design: never written to the generated RDF. Prescribers are identified by dm:pseudonymousId instead.</rdfs:comment>
   </rdf:Description>
   <rdf:Description rdf:about="http://purl.org/linked-data/sdmx/2009/code#confStatus-C">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
@@ -673,19 +617,63 @@
     <rdfs:label xml:lang="ja">秘匿</rdfs:label>
     <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/sdmx/2009/code"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b2">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#writes"/>
-    <owl:someValuesFrom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b3"/>
+  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/hasActiveIngredient">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has active ingredient</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b12">
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#month">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://purl.org/linked-data/cube#DimensionProperty"/>
+    <rdfs:label xml:lang="en">month of care</rdfs:label>
+    <rdfs:label xml:lang="ja">診療月</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#gYearMonth"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#TherapeuticClass">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:label xml:lang="en">therapeutic class</rdfs:label>
+    <rdfs:label xml:lang="ja">薬効分類</rdfs:label>
+    <rdfs:label xml:lang="zh">治疗类别</rdfs:label>
+    <skos:definition xml:lang="en">A concept in the therapeutic class scheme (e.g. SGLT2 inhibitors). The hierarchy itself is maintained as a SKOS concept scheme, not as OWL subclasses.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b17">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
     <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#inTherapeuticClass"/>
-    <owl:hasValue rdf:resource="https://dgg32.github.io/glp/vocab/therapeutic-class/GLP1ReceptorAgonist"/>
+    <owl:hasValue rdf:resource="https://dgg32.github.io/glp/vocab/therapeutic-class/SGLT2Inhibitor"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b20">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <owl:intersectionOf rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b23"/>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b18">
+    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdf:rest rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b19"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b10">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#forProduct"/>
+    <owl:someValuesFrom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b11"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#dispensingUnit">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">dispensing unit</rdfs:label>
+    <rdfs:label xml:lang="ja">単位</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <skos:definition xml:lang="en">The unit in which quantities are counted (錠 tablet, キット kit, 筒 cartridge ...). Quantities in different units cannot be added.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#cmsPrescriberType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">CMS prescriber type</rdfs:label>
+    <rdfs:label xml:lang="ja">CMS処方医区分</rdfs:label>
+    <rdfs:label xml:lang="zh">CMS处方者类别</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <skos:definition xml:lang="en">Specialty as reported by CMS (Prscrbr_Type), a free-text label that differs from the NUCC code.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#sexAgeGroup">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://purl.org/linked-data/cube#DimensionProperty"/>
+    <rdfs:label xml:lang="en">sex and age band</rdfs:label>
+    <rdfs:range rdf:resource="https://dgg32.github.io/glp/ontology#SexAgeGroup"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://purl.org/linked-data/sdmx/2009/attribute#confStatus">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
@@ -693,47 +681,84 @@
     <rdfs:comment xml:lang="en">Set to sdmx-code:confStatus-C (confidential) on NDB cells and totals that MHLW masked. NDB does not say whether a cell was masked for being small (primary) or to protect another cell (secondary), so the generic code is used.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/sdmx/2009/attribute"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b14">
-    <rdf:first rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b9"/>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#isCombinationProduct">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">is combination product</rdfs:label>
+    <rdfs:label xml:lang="ja">配合剤</rdfs:label>
+    <rdfs:label xml:lang="zh">复方制剂</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b24">
+    <rdf:first rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b21"/>
     <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
   </rdf:Description>
-  <rdf:Description rdf:about="http://purl.org/linked-data/cube#componentProperty">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:label xml:lang="en">component</rdfs:label>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/ontology#receiptCode">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    <rdfs:label xml:lang="en">receipt code</rdfs:label>
+    <rdfs:label xml:lang="ja">レセプト電算処理システム用コード</rdfs:label>
+    <rdfs:domain rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <skos:definition xml:lang="en">The 9-digit drug code of the claims (receipt) processing system (医薬品コード), the key of NDB Open Data.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b25">
+    <rdf:first rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/hasActiveIngredient"/>
+    <rdf:rest rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b26"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#DimensionProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">dimension property</rdfs:label>
     <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b15">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <owl:intersectionOf rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b18"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b1">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <owl:intersectionOf rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b6"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/MedicinalProduct">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">medicinal product</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="https://spec.pistoiaalliance.org/idmp/ontology/ISO/ISO11615-MedicinalProducts/"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b16">
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b2">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#hasActiveSubstance"/>
-    <owl:someValuesFrom rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b17"/>
+    <owl:onProperty rdf:resource="https://dgg32.github.io/glp/ontology#writes"/>
+    <owl:someValuesFrom rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b3"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b19">
-    <rdf:first rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b16"/>
+  <rdf:Description rdf:about="https://www.omg.org/spec/Commons/RolesAndCompositions/isPlayedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">is played by</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://www.omg.org/spec/Commons/RolesAndCompositions/"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/ns/prov#Person">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">person</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://www.w3.org/ns/prov#"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://dgg32.github.io/glp/vocab/therapeutic-class/SGLT2Inhibitor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://dgg32.github.io/glp/ontology#TherapeuticClass"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#SliceKey">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">slice key</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#Slice">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">slice</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#slice">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">slice</rdfs:label>
+    <rdfs:domain rdf:resource="http://purl.org/linked-data/cube#DataSet"/>
+    <rdfs:range rdf:resource="http://purl.org/linked-data/cube#Slice"/>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b19">
+    <rdf:first rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b16"/>
     <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b28">
-    <rdf:first rdf:resource="http://www.w3.org/2004/02/skos/core#broaderTransitive"/>
+  <rdf:Description rdf:about="http://purl.org/linked-data/cube#Observation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">observation</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/linked-data/cube"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="na6585b66dadc4114a5d7afc771541ee2b26">
+    <rdf:first rdf:resource="https://www.omg.org/spec/Commons/RolesAndCompositions/isPlayedBy"/>
     <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b23">
-    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#MedicinalProduct"/>
-    <rdf:rest rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b24"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b6">
-    <rdf:first rdf:resource="https://dgg32.github.io/glp/ontology#HealthcareProfessional"/>
-    <rdf:rest rdf:nodeID="n9dafe0976a79496a9d08e21c508ed664b7"/>
   </rdf:Description>
 </rdf:RDF>

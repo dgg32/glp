@@ -1,0 +1,2 @@
+snowflake-connector-python==5.1.0
+python-dotenv==1.2.4

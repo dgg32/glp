@@ -5,9 +5,11 @@ data/clean/
 __pycache__/
 *.part
 .venv/
+.venv-snowflake/
 vocab/nucc-specialty.ttl
 # Pseudonymized but re-identifiable by joining with the public CMS file; publish scripts, not data.
 data/rdf/
 data/validation/
+data/snowflake/
 # Holds local MCP config incl. credentials (e.g. Neo4j password)
 .mcp.json
