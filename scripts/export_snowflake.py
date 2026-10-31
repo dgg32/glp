@@ -1,23 +1,25 @@
-"""Export the Connecticut knowledge graph as relational tables for Snowflake, into data/snowflake/.
+"""Export the knowledge graph (Connecticut and Japan) as relational tables for Snowflake, into data/snowflake/.
 
-Each table is one SPARQL SELECT over the generated graphs, so the tables are projections of the
-validated knowledge graph, not a second pipeline next to it: same pseudonyms, same manufacturer links,
-same class tree. Schemas mirror the named graphs: VOCAB holds the shared SKOS vocabularies, US the
-Medicare Part D data and the products and companies it refers to (JP is left for the NDB data).
+Each table is one SPARQL SELECT over the generated graphs, read only from the table's source graphs, so the
+tables are projections of the validated knowledge graph, not a second pipeline next to it: same pseudonyms,
+same manufacturer links, same class tree. Schemas mirror the named graphs: VOCAB holds the shared SKOS
+vocabularies, US the Medicare Part D data and the products and companies it refers to, JP the NDB Open Data
+products and the RDF Data Cube flattened to one row per cell (masked cells kept, with IS_MASKED).
 
 What SQL cannot do the export materializes, and says so in the table comment:
   VOCAB.CLASS_ANCESTOR, VOCAB.SPECIALTY_ANCESTOR  skos:broader* as (concept, ancestor) pairs, self included
-  US.PRODUCT_CLASS                                 hasActiveSubstance/inTherapeuticClass/broader*, distinct
-The OWL defined classes (SGLT2Prescriber, ...) are not exported; the semantic view derives them.
+  US.PRODUCT_CLASS, JP.PRODUCT_CLASS               hasActiveSubstance/inTherapeuticClass/broader*, distinct
+The OWL defined classes (SGLT2Prescriber, GLP1Product, ...) are not exported; the semantic views derive them.
 
 Checks before anything is written to tables.json (scripts/load_snowflake.py loads nothing without it):
   1. gate      data/rdf passed scripts/check_local.py (same provenance hash)
   2. keys      primary keys unique, NOT NULL columns filled
   3. refs      every foreign key resolves
-  4. counts    22,034 prescriptions, 3,896 prescribers, 51 products
+  4. counts    22,034 prescriptions, 3,896 prescribers, 51 products; 510 Japanese products, 150,288 cells
   5. parity    queries/sglt2-vs-glp1-by-specialty.rq and cost-per-claim-by-class.rq, run on the graph,
                give the same numbers as the same questions computed from the exported tables; the graph
-               results go into tables.json as the expectations for scripts/deploy_semantic_view.py
+               results go into tables.json as the expectations for scripts/deploy_semantic_view.py, together
+               with the results of every queries/jp-*.rq (checked in Snowflake, through the semantic views)
 
 Privacy: as in data/rdf, no names and no NPIs; prescribers are the HMAC pseudonyms of build_rdf.py.
 data/snowflake/ is gitignored for the same reason as data/rdf/ (re-identifiable by joining with CMS).
@@ -41,17 +43,23 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "snowflake"
 BASE = "https://dgg32.github.io/glp/"
 GRAPHS = ["vocab/therapeutic-class", "vocab/substance", "vocab/indication", "vocab/nucc-specialty",
-          "products", "cms-partd-2024", "npi-registry", "drugsfda"]
-# IRI namespaces whose local part becomes the table key
-ID_BASES = [BASE + p for p in ("data/rx/", "data/hcp/", "data/product/", "data/organization/",
+          "products", "cms-partd-2024", "npi-registry", "drugsfda",
+          "vocab/jp-drug-class", "vocab/jp-prefecture", "vocab/ndb-dimensions", "ndb-products", "ndb-2024"]
+# IRI namespaces whose local part becomes the table key (the Japanese ones first: they are nested)
+ID_BASES = [BASE + p for p in ("data/product/jp/", "data/organization/jp/", "data/ndb/key/",
+                               "data/rx/", "data/hcp/", "data/product/", "data/organization/",
                                "vocab/therapeutic-class/", "vocab/substance/", "vocab/indication/",
-                               "vocab/specialty/")]
-EXPECTED_ROWS = {"US.PRESCRIPTION": 22_034, "US.PRESCRIBER": 3_896, "US.PRODUCT": 51}
+                               "vocab/specialty/", "vocab/jp-drug-class/", "vocab/prefecture/",
+                               "vocab/care-setting/", "vocab/sex-age/")]
+EXPECTED_ROWS = {"US.PRESCRIPTION": 22_034, "US.PRESCRIBER": 3_896, "US.PRODUCT": 51,
+                 "JP.PRODUCT": 510, "JP.QUANTITY": 150_288}
 
 PREFIXES = """PREFIX dm: <https://dgg32.github.io/glp/ontology#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#>
 """
 
 
@@ -131,15 +139,71 @@ GROUP BY ?i ?en ?ja ?zh"""),
          key=["SPECIALTY_CODE", "ANCESTOR_SPECIALTY_CODE"],
          refs={"SPECIALTY_CODE": "VOCAB.SPECIALTY", "ANCESTOR_SPECIALTY_CODE": "VOCAB.SPECIALTY"},
          query="SELECT DISTINCT ?s ?a WHERE { ?s a dm:Specialty ; skos:broader* ?a . ?a a dm:Specialty }"),
+    dict(name="VOCAB.JP_DRUG_CLASS", graphs=["vocab/jp-drug-class"],
+         comment="Japan's therapeutic categories (薬効分類, Japan Standard Commodity Classification) as a SKOS scheme.",
+         columns=["JP_CLASS_CODE VARCHAR NOT NULL", "IRI VARCHAR NOT NULL", "PREF_LABEL_EN VARCHAR NOT NULL",
+                  "PREF_LABEL_JA VARCHAR NOT NULL", "PREF_LABEL_ZH VARCHAR", "BROADER_JP_CLASS_CODE VARCHAR"],
+         key=["JP_CLASS_CODE"], refs={"BROADER_JP_CLASS_CODE": "VOCAB.JP_DRUG_CLASS"},
+         query=f"""SELECT ?c (?c AS ?iri) ?en ?ja ?zh ?broader WHERE {{
+  ?c a dm:JapaneseDrugClass .
+  {labels("?c")}
+  OPTIONAL {{ ?c skos:broader ?broader }} }}"""),
+    dict(name="VOCAB.JP_CLASS_MATCH", graphs=["vocab/jp-drug-class"],
+         comment="The computed crosswalk 薬効分類 -> ATC-based class tree (skos:exactMatch, narrowMatch, broadMatch, "
+                 "relatedMatch), with the product counts that justify each link (skos:editorialNote).",
+         columns=["JP_CLASS_CODE VARCHAR NOT NULL", "MATCH_TYPE VARCHAR NOT NULL", "CLASS_ID VARCHAR NOT NULL",
+                  "EVIDENCE VARCHAR"],
+         key=["JP_CLASS_CODE", "CLASS_ID"],
+         refs={"JP_CLASS_CODE": "VOCAB.JP_DRUG_CLASS", "CLASS_ID": "VOCAB.THERAPEUTIC_CLASS"},
+         query=f"""SELECT ?c ?type ?cls ?note WHERE {{
+  VALUES (?p ?type) {{ (skos:exactMatch "exact") (skos:narrowMatch "narrow") (skos:broadMatch "broad")
+                      (skos:relatedMatch "related") }}
+  ?c a dm:JapaneseDrugClass ; ?p ?cls .
+  OPTIONAL {{ ?c skos:editorialNote ?note
+             FILTER(STRSTARTS(STR(?note), CONCAT(?type, "Match ", STRAFTER(STR(?cls), "{BASE}vocab/therapeutic-class/"), ":"))) }} }}"""),
+    dict(name="VOCAB.PREFECTURE", graphs=["vocab/jp-prefecture"],
+         comment="Japan's 47 prefectures as a SKOS scheme, keyed by JIS X 0401 code.",
+         columns=["PREFECTURE_CODE VARCHAR NOT NULL", "IRI VARCHAR NOT NULL", "PREF_LABEL_EN VARCHAR NOT NULL",
+                  "PREF_LABEL_JA VARCHAR NOT NULL", "PREF_LABEL_ZH VARCHAR", "ISO_CODE VARCHAR", "WIKIDATA_ID VARCHAR"],
+         key=["PREFECTURE_CODE"], refs={},
+         query=f"""SELECT ?c (?c AS ?iri) ?en ?ja ?zh ?iso ?wd WHERE {{
+  ?c a dm:Prefecture .
+  {labels("?c")}
+  OPTIONAL {{ ?c dcterms:identifier ?iso }}
+  {code("?c", "skos:exactMatch", "http://www.wikidata.org/entity/", "wd")} }}"""),
+    dict(name="VOCAB.CARE_SETTING", graphs=["vocab/ndb-dimensions"],
+         comment="NDB care settings (外来（院外）, 外来（院内）, 入院) as a SKOS scheme.",
+         columns=["CARE_SETTING_ID VARCHAR NOT NULL", "IRI VARCHAR NOT NULL", "PREF_LABEL_EN VARCHAR NOT NULL",
+                  "PREF_LABEL_JA VARCHAR NOT NULL", "PREF_LABEL_ZH VARCHAR", "BROADER_CARE_SETTING_ID VARCHAR",
+                  "DEFINITION_EN VARCHAR"],
+         key=["CARE_SETTING_ID"], refs={"BROADER_CARE_SETTING_ID": "VOCAB.CARE_SETTING"},
+         query=f"""SELECT ?c (?c AS ?iri) ?en ?ja ?zh ?broader ?def WHERE {{
+  ?c a dm:CareSetting .
+  {labels("?c")}
+  OPTIONAL {{ ?c skos:broader ?broader }}
+  OPTIONAL {{ ?c skos:definition ?def FILTER(lang(?def) = "en") }} }}"""),
+    dict(name="VOCAB.SEX_AGE_GROUP", graphs=["vocab/ndb-dimensions"],
+         comment="NDB sex and five-year age bands as a SKOS scheme: F and M on top, bands below with their minimum age.",
+         columns=["SEX_AGE_CODE VARCHAR NOT NULL", "IRI VARCHAR NOT NULL", "PREF_LABEL_EN VARCHAR NOT NULL",
+                  "PREF_LABEL_JA VARCHAR NOT NULL", "PREF_LABEL_ZH VARCHAR", "SEX VARCHAR", "MIN_AGE NUMBER(3)"],
+         key=["SEX_AGE_CODE"], refs={"SEX": "VOCAB.SEX_AGE_GROUP"},
+         query=f"""SELECT ?c (?c AS ?iri) ?en ?ja ?zh ?sex ?age WHERE {{
+  ?c a dm:SexAgeGroup .
+  {labels("?c")}
+  OPTIONAL {{ ?c skos:broader ?sex }}
+  OPTIONAL {{ ?c dm:minAge ?age }} }}"""),
     dict(name="VOCAB.LABEL", graphs=["vocab/therapeutic-class", "vocab/substance", "vocab/indication",
-                                     "vocab/nucc-specialty"],
+                                     "vocab/nucc-specialty", "vocab/jp-drug-class", "vocab/jp-prefecture",
+                                     "vocab/ndb-dimensions"],
          comment="Every SKOS label (pref, alt, hidden) in en/ja/zh: the source of semantic view synonyms.",
          columns=["CONCEPT_KIND VARCHAR NOT NULL", "CONCEPT_ID VARCHAR NOT NULL", "LANGUAGE VARCHAR NOT NULL",
                   "LABEL_TYPE VARCHAR NOT NULL", "LABEL VARCHAR NOT NULL"],
          key=["CONCEPT_KIND", "CONCEPT_ID", "LANGUAGE", "LABEL_TYPE", "LABEL"], refs={},
          query="""SELECT DISTINCT ?kind ?c (lang(?label) AS ?lang) ?type ?label WHERE {
   VALUES (?t ?kind) { (dm:TherapeuticClass "therapeutic_class") (dm:Substance "substance")
-                      (dm:Indication "indication") (dm:Specialty "specialty") }
+                      (dm:Indication "indication") (dm:Specialty "specialty")
+                      (dm:JapaneseDrugClass "jp_drug_class") (dm:Prefecture "prefecture")
+                      (dm:CareSetting "care_setting") (dm:SexAgeGroup "sex_age_group") }
   VALUES (?p ?type) { (skos:prefLabel "pref") (skos:altLabel "alt") (skos:hiddenLabel "hidden") }
   ?c a ?t ; ?p ?label . }"""),
     dict(name="US.ORGANIZATION", graphs=["drugsfda"],
@@ -213,6 +277,73 @@ GROUP BY ?o ?en ?ja ?zh ?lei"""),
   OPTIONAL { ?rx dm:totalDaySupply ?supply }
   OPTIONAL { ?rx dm:totalDrugCost ?cost }
   OPTIONAL { ?rx dm:totalBeneficiaries ?benes } }"""),
+    dict(name="JP.ORGANIZATION", graphs=["ndb-products"],
+         comment="Japanese marketing authorization holders (NHI price list). CORPORATE_GROUP_ID links the Japanese "
+                 "subsidiary to the same GLEIF group as the US application holder (dm:partOfCorporateGroup).",
+         columns=["ORGANIZATION_ID VARCHAR NOT NULL", "IRI VARCHAR NOT NULL", "NAME_EN VARCHAR NOT NULL",
+                  "NAME_JA VARCHAR NOT NULL", "CORPORATE_GROUP_ID VARCHAR"],
+         key=["ORGANIZATION_ID"], refs={"CORPORATE_GROUP_ID": "US.ORGANIZATION"},
+         query=f"""SELECT ?o (?o AS ?iri) ?en ?ja ?grp WHERE {{
+  ?o a dm:Organization .
+  {labels("?o", "rdfs:label")}
+  OPTIONAL {{ ?o dm:partOfCorporateGroup ?grp }} }}"""),
+    dict(name="JP.PRODUCT", graphs=["ndb-products"],
+         comment="NDB Open Data products at strength level, keyed by receipt code. NHI_PRICE is yen per dispensing "
+                 "unit (price list of 2026-09-02). IS_GENERIC follows the reimbursement definition (generics priced "
+                 "like their originator, such as most metformin, are not flagged).",
+         columns=["PRODUCT_ID VARCHAR NOT NULL", "IRI VARCHAR NOT NULL", "PRODUCT_NAME_JA VARCHAR NOT NULL",
+                  "PRODUCT_NAME VARCHAR", "YJ_CODE VARCHAR NOT NULL", "JP_CLASS_CODE VARCHAR NOT NULL",
+                  "NHI_PRICE NUMBER(12,2) NOT NULL", "DISPENSING_UNIT VARCHAR NOT NULL", "ROUTE VARCHAR NOT NULL",
+                  "IS_GENERIC BOOLEAN NOT NULL", "IS_ORIGINATOR BOOLEAN NOT NULL", "IS_COMBINATION BOOLEAN NOT NULL",
+                  "ORGANIZATION_ID VARCHAR"],
+         key=["PRODUCT_ID"], refs={"JP_CLASS_CODE": "VOCAB.JP_DRUG_CLASS", "ORGANIZATION_ID": "JP.ORGANIZATION"},
+         query="""SELECT ?p (?p AS ?iri) ?name ?hidden ?yj ?jpc ?price ?unit ?route ?generic ?originator ?combo ?mah WHERE {
+  ?p a dm:MedicinalProduct ; rdfs:label ?name ; dm:yjCode ?yj ; dm:inJapaneseDrugClass ?jpc ; dm:nhiPrice ?price ;
+     dm:dispensingUnit ?unit ; dm:routeOfAdministration ?route ; dm:isGeneric ?generic ;
+     dm:isOriginator ?originator ; dm:isCombinationProduct ?combo .
+  OPTIONAL { ?p skos:hiddenLabel ?hidden }
+  OPTIONAL { ?p dm:manufacturedBy ?mah } }"""),
+    dict(name="JP.PRODUCT_SUBSTANCE", graphs=["ndb-products"],
+         comment="dm:hasActiveSubstance for the Japanese products (many-to-many: combination products have several).",
+         columns=["PRODUCT_ID VARCHAR NOT NULL", "SUBSTANCE_ID VARCHAR NOT NULL"],
+         key=["PRODUCT_ID", "SUBSTANCE_ID"], refs={"PRODUCT_ID": "JP.PRODUCT", "SUBSTANCE_ID": "VOCAB.SUBSTANCE"},
+         query="SELECT ?p ?s WHERE { ?p a dm:MedicinalProduct ; dm:hasActiveSubstance ?s }"),
+    dict(name="JP.PRODUCT_CLASS", graphs=["ndb-products", "vocab/substance", "vocab/therapeutic-class"],
+         comment="Materialized roll-up: Japanese product -> every class above any of its substances "
+                 "(hasActiveSubstance/inTherapeuticClass/broader*), one row per pair.",
+         columns=["PRODUCT_ID VARCHAR NOT NULL", "CLASS_ID VARCHAR NOT NULL"],
+         key=["PRODUCT_ID", "CLASS_ID"], refs={"PRODUCT_ID": "JP.PRODUCT", "CLASS_ID": "VOCAB.THERAPEUTIC_CLASS"},
+         query="""SELECT DISTINCT ?p ?c WHERE {
+  ?p a dm:MedicinalProduct ; dm:hasActiveSubstance/dm:inTherapeuticClass/skos:broader* ?c . }"""),
+    dict(name="JP.NATIONAL_TOTAL", graphs=["ndb-2024"],
+         comment="National total quantity (総計) per product and care setting, from the RDF Data Cube slices (equal in "
+                 "the prefecture, month and sex-age slices). TOTAL_QUANTITY is NULL where NDB masked the whole row.",
+         columns=["PRODUCT_ID VARCHAR NOT NULL", "CARE_SETTING_ID VARCHAR NOT NULL", "TOTAL_QUANTITY NUMBER(18,5)",
+                  "IS_MASKED BOOLEAN NOT NULL"],
+         key=["PRODUCT_ID", "CARE_SETTING_ID"],
+         refs={"PRODUCT_ID": "JP.PRODUCT", "CARE_SETTING_ID": "VOCAB.CARE_SETTING"},
+         query=f"""SELECT ?p ?setting ?total (!BOUND(?total) AS ?masked) WHERE {{
+  ?s a dm:QuantitySlice ; qb:sliceStructure <{BASE}data/ndb/key/prefecture> ; dm:aboutProduct ?p ; dm:careSetting ?setting .
+  OPTIONAL {{ ?s dm:totalQuantity ?total }} }}"""),
+    dict(name="JP.QUANTITY", graphs=["ndb-2024"],
+         comment="NDB Open Data FY2024 cells, one row per product, care setting, breakdown and cell (the RDF Data Cube "
+                 "observations). Each breakdown (prefecture, month, sex-age) on its own adds up to the national total, "
+                 "so never add cells across breakdowns. QUANTITY is in the product's dispensing unit and NULL where "
+                 "masked (IS_MASKED, sdmx-code:confStatus-C).",
+         columns=["PRODUCT_ID VARCHAR NOT NULL", "CARE_SETTING_ID VARCHAR NOT NULL", "BREAKDOWN VARCHAR NOT NULL",
+                  "CELL VARCHAR NOT NULL", "PREFECTURE_CODE VARCHAR", "MONTH DATE", "SEX_AGE_CODE VARCHAR",
+                  "QUANTITY NUMBER(18,5)", "IS_MASKED BOOLEAN NOT NULL"],
+         key=["PRODUCT_ID", "CARE_SETTING_ID", "BREAKDOWN", "CELL"],
+         refs={"PRODUCT_ID": "JP.PRODUCT", "CARE_SETTING_ID": "VOCAB.CARE_SETTING",
+               "PREFECTURE_CODE": "VOCAB.PREFECTURE", "SEX_AGE_CODE": "VOCAB.SEX_AGE_GROUP"},
+         query=f"""SELECT ?p ?setting ?key ?cell ?pref (CONCAT(STR(?m), "-01") AS ?month) ?band ?q
+       (EXISTS {{ ?o sdmx-attribute:confStatus ?status }} AS ?masked) WHERE {{
+  ?s a dm:QuantitySlice ; qb:sliceStructure ?key ; dm:aboutProduct ?p ; dm:careSetting ?setting ; qb:observation ?o .
+  OPTIONAL {{ ?o dm:prefecture ?pref }}
+  OPTIONAL {{ ?o dm:month ?m }}
+  OPTIONAL {{ ?o dm:sexAgeGroup ?band }}
+  OPTIONAL {{ ?o dm:quantity ?q }}
+  BIND(COALESCE(STRAFTER(STR(?pref), "{BASE}vocab/prefecture/"), STR(?m), STRAFTER(STR(?band), "{BASE}vocab/sex-age/")) AS ?cell) }}"""),
 ]
 
 
@@ -243,9 +374,12 @@ def load_store():
     return store
 
 
-def select(store, query):
-    return store.query(PREFIXES + query.replace("FROM <tag:stardog:api:context:all>", ""),
-                       use_default_graph_as_union=True)
+def select(store, query, graphs=None):
+    """graphs: read only these named graphs (a table's sources); None: all of them."""
+    query = PREFIXES + query.replace("FROM <tag:stardog:api:context:all>", "")
+    if graphs is None:
+        return store.query(query, use_default_graph_as_union=True)
+    return store.query(query, default_graph=[ox.NamedNode(BASE + "graph/" + g) for g in graphs])
 
 
 def check_table(table, rows, errors):
@@ -321,19 +455,41 @@ def check_parity(store, data, errors):
     return expected | {"cost-per-claim-by-class": graph}
 
 
+def graph_results(store):
+    """The Japan questions (queries/jp-*.rq) on the graph, as expectations for the Snowflake side, where
+    scripts/deploy_semantic_view.py checks them through the semantic views. The reasoning query becomes its OWL
+    definition spelled out (no reasoner here): products with a substance in the GLP-1 class or a narrower one."""
+    out = {}
+    for path in sorted((ROOT / "queries").glob("jp-*.rq")):
+        text = path.read_text()
+        if "# reasoning: true" in text:
+            text = text.replace("?prod a dm:GLP1Product ;", "?prod dm:hasActiveSubstance/dm:inTherapeuticClass/"
+                                "skos:broader* <https://dgg32.github.io/glp/vocab/therapeutic-class/GLP1ReceptorAgonist> ;")
+        result = select(store, text)
+        out[path.stem] = [{str(v)[1:]: (s[v].value if s[v] is not None else None) for v in result.variables}
+                          for s in result]
+    return out
+
+
 def main():
     require_local_check()
     store = load_store()
     data, errors = {}, []
     for t in TABLES:
         names = column_names(t)
-        data[t["name"]] = [tuple(cell(s[i], names[i]) for i in range(len(names))) for s in select(store, t["query"])]
+        data[t["name"]] = [tuple(cell(s[i], names[i]) for i in range(len(names)))
+                           for s in select(store, t["query"], t["graphs"])]
         check_table(t, data[t["name"]], errors)
     check_refs(TABLES, data, errors)
     for name, n in EXPECTED_ROWS.items():
         if len(data[name]) != n:
             errors.append(f"{name}: {len(data[name]):,} rows, expected {n:,}")
-    parity = check_parity(store, data, errors) if not errors else {}
+    # The Japan semantic view gets all-drug totals from the top class, so every product must reach it once.
+    for name in ("US.PRODUCT_CLASS", "JP.PRODUCT_CLASS"):
+        products = {r[0] for r in data[name.replace("_CLASS", "")]}
+        if missing := products - {r[0] for r in data[name] if r[1] == "DrugsUsedInDiabetes"}:
+            errors.append(f"{name}: {len(missing)} products outside DrugsUsedInDiabetes, e.g. {sorted(missing)[0]}")
+    parity = check_parity(store, data, errors) | graph_results(store) if not errors else {}
     for t in TABLES:
         print(f"{len(data[t['name']]):>8,}  {t['name']}")
     if errors:

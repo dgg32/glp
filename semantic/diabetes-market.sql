@@ -132,7 +132,7 @@ CREATE OR REPLACE SEMANTIC VIEW GLP.SEMANTIC.DIABETES_MARKET
       WITH SYNONYMS = ('therapeutic class')
       COMMENT = 'Therapeutic class name in English. Values: Alpha glucosidase inhibitors; Biguanides; Blood glucose lowering drugs, excl. insulins; Dipeptidyl peptidase 4 (DPP-4) inhibitors; Drugs used in diabetes; Glimins; Glinides; Glucagon-like peptide-1 (GLP-1) analogues; Glucose-dependent Insulinotropic Polypeptide Receptor Agonists; Insulins and analogues; Insulins and analogues for injection, fast-acting; Insulins and analogues for injection, intermediate- or long-acting combined with fast-acting; Insulins and analogues for injection, intermediate-acting; Insulins and analogues for injection, long-acting; Sodium-glucose co-transporter 2 (SGLT2) inhibitors; Sulfonylureas; Thiazolidinediones.',
     therapeutic_class.class_name_ja AS therapeutic_class.CLASS_NAME_JA
-      WITH SYNONYMS = ('薬効分類')
+      WITH SYNONYMS = ('薬効群', 'ATC分類')
       COMMENT = 'Therapeutic class name in Japanese. Values: DPP-4阻害薬; GLP-1受容体作動薬; SGLT2阻害薬; α-グルコシダーゼ阻害薬; インスリン製剤; グリミン系薬; スルホニルウレア薬; チアゾリジン薬; ビグアナイド薬; 中間型インスリン; 持効型溶解インスリン; 持続性GIP/GLP-1受容体作動薬; 混合型インスリン; 糖尿病治療薬; 血糖降下薬（インスリンを除く）; 速効型インスリン分泌促進薬; 速効型・超速効型インスリン.',
     therapeutic_class.class_name_zh AS therapeutic_class.CLASS_NAME_ZH
       WITH SYNONYMS = ('治疗类别')
@@ -192,7 +192,7 @@ CREATE OR REPLACE SEMANTIC VIEW GLP.SEMANTIC.DIABETES_MARKET
     company_drug_cost AS SUM(prescription_class_company.drug_cost)
       COMMENT = 'Gross drug cost in USD by manufacturer within a therapeutic class.'
   )
-  COMMENT = 'Type 2 diabetes drug prescribing, generated from the diabetes-market ontology 0.5.1. Medicare Part D, Connecticut, data year 2024: mostly people aged 65 and over. Counts are claims (fills and refills), not patients. CMS omits prescriber/product rows with fewer than 11 claims. Costs are gross, before rebates. Prescribers are pseudonyms; report aggregates only.'
+  COMMENT = 'Type 2 diabetes drug prescribing, generated from the diabetes-market ontology 0.5.2. Medicare Part D, Connecticut, data year 2024: mostly people aged 65 and over. Counts are claims (fills and refills), not patients. CMS omits prescriber/product rows with fewer than 11 claims. Costs are gross, before rebates. Prescribers are pseudonyms; report aggregates only.'
   AI_SQL_GENERATION 'Use total_claims and total_drug_cost for overall volume. For anything by therapeutic class use the class_* metrics and filter or group by one class: a combination product counts in every class it belongs to, so class figures never add up to the total. ''By drug class'' means therapeutic_class.is_drug_class = TRUE. Cost comparisons between classes: also show class_cost_per_30day_fill, the fair comparison when fill lengths differ. For market shares by company divide company_claims_allocated by its sum over all companies of the class. Names exist in English, Japanese (*_ja) and Chinese (*_zh): answer with the names in the language of the question.'
   AI_VERIFIED_QUERIES (
     sglt2_vs_glp1_by_specialty AS (

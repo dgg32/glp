@@ -1,0 +1,1020 @@
+version: 0.1.1
+semantic_model:
+  - name: JAPAN_MARKET
+    description: "Diabetes drugs dispensed in Japan, generated from the diabetes-market ontology 0.5.2. NDB Open Data, 11th release: FY2024 (April 2024 - March 2025), all of Japan, all ages. Quantities are dispensed tablets, pens or kits, not patients or prescriptions, and cannot be added across products; values are quantity times the NHI price (price list of 2026-09-02), in yen. Cells below 1,000 (oral) or 400 (injection) are masked. The prefecture is where the claim was issued. No prescribers or specialties exist for Japan."
+    datasets:
+      - name: CARE_SETTING
+        source: GLP.SEMANTIC.SV_JP_CARE_SETTING
+        primary_key:
+          - CARE_SETTING_ID
+        description: "Where a drug was prescribed and dispensed: outpatient with a prescription filled at a community pharmacy (院外), outpatient dispensed in the clinic or hospital (院内), or inpatient (入院)."
+        fields:
+          - name: CARE_SETTING_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: care_setting.CARE_SETTING_ID
+            dimension: {}
+            description: Care setting key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CARE_SETTING_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: care_setting.CARE_SETTING_NAME
+            dimension: {}
+            description: "Care setting name in English. Values: inpatient; outpatient; outpatient, community pharmacy; outpatient, dispensed in-house."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"care setting\"],\"access_modifier\":\"public_access\"}"
+          - name: CARE_SETTING_NAME_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: care_setting.CARE_SETTING_NAME_JA
+            dimension: {}
+            description: "Care setting name in Japanese. Values: 入院; 外来; 外来（院内）; 外来（院外）."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"診療区分\"],\"access_modifier\":\"public_access\"}"
+          - name: CARE_SETTING_NAME_ZH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: care_setting.CARE_SETTING_NAME_ZH
+            dimension: {}
+            description: Care setting name in Chinese.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"诊疗类别\"],\"access_modifier\":\"public_access\"}"
+      - name: JP_DRUG_CLASS
+        source: GLP.SEMANTIC.SV_JP_JP_DRUG_CLASS
+        primary_key:
+          - JP_CLASS_CODE
+        description: "A three-digit therapeutic category of the Japan Standard Commodity Classification (薬効分類), as used by the NHI price list and NDB Open Data, e.g. 396 糖尿病用剤. Joined as the product's category. Most GLP-1 drugs are filed under 249, not 396."
+        fields:
+          - name: JP_CLASS_CODE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: jp_drug_class.JP_CLASS_CODE
+            dimension: {}
+            description: "Three-digit code, e.g. 396."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: JP_CLASS_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: jp_drug_class.JP_CLASS_NAME
+            dimension: {}
+            description: Japanese therapeutic category name in English.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"Japanese therapeutic category\"],\"access_modifier\":\"public_access\"}"
+          - name: JP_CLASS_NAME_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: jp_drug_class.JP_CLASS_NAME_JA
+            dimension: {}
+            description: "Japanese therapeutic category name in Japanese. Values: その他のホルモン剤（抗ホルモン剤を含む。）; 糖尿病用剤."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"薬効分類\"],\"access_modifier\":\"public_access\"}"
+          - name: JP_CLASS_NAME_ZH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: jp_drug_class.JP_CLASS_NAME_ZH
+            dimension: {}
+            description: Japanese therapeutic category name in Chinese.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"日本药效分类\"],\"access_modifier\":\"public_access\"}"
+      - name: MONTH_VALUE
+        source: GLP.SEMANTIC.SV_JP_MONTH_VALUE
+        primary_key:
+          - PRODUCT_ID
+          - CARE_SETTING_ID
+          - MONTH
+          - CLASS_ID
+        description: "Values by month of care. Masked cells are left out, so sums are lower bounds. One row per product and therapeutic class of any of its substances, including all broader classes (skos:broader*): filter or group by one class, or use the *_all metrics, which count each product once (the top class)."
+        fields:
+          - name: CARE_SETTING_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: month_value.CARE_SETTING_ID
+            dimension: {}
+            description: "outpatient-external (community pharmacy, 院外), outpatient-internal (dispensed in-house, 院内) or inpatient (入院)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: month_value.CLASS_ID
+            dimension: {}
+            description: Therapeutic class key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: MONTH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: month_value.MONTH
+            dimension: {}
+            description: "Month of care. First day of the month of care, 2024-04 to 2025-03."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"month of care\",\"診療月\"],\"access_modifier\":\"public_access\"}"
+          - name: PRODUCT_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: month_value.PRODUCT_ID
+            dimension: {}
+            description: Product key (receipt code).
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: GENERIC_QUANTITY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: month_value.GENERIC_QUANTITY
+            description: "Quantity of products flagged generic (reimbursement definition), else 0. Comparable with quantity within one class only."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: QUANTITY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: month_value.QUANTITY
+            description: Dispensed quantity in the product's dispensing unit. Absent when NDB masked the cell; the observation then carries sdmx-attribute:confStatus sdmx-code:confStatus-C.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: VALUE_YEN
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: month_value.VALUE_YEN
+            description: "Quantity times the NHI price, in yen."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+      - name: NATIONAL_VALUE
+        source: GLP.SEMANTIC.SV_JP_NATIONAL_VALUE
+        primary_key:
+          - PRODUCT_ID
+          - CARE_SETTING_ID
+          - CLASS_ID
+        description: "National totals (総計) per product and care setting, FY2024. Use it unless the question is by prefecture, month or sex and age. Products whose whole row NDB masked are left out. One row per product and therapeutic class of any of its substances, including all broader classes (skos:broader*): filter or group by one class, or use the *_all metrics, which count each product once (the top class)."
+        fields:
+          - name: CARE_SETTING_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: national_value.CARE_SETTING_ID
+            dimension: {}
+            description: "outpatient-external (community pharmacy, 院外), outpatient-internal (dispensed in-house, 院内) or inpatient (入院)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: national_value.CLASS_ID
+            dimension: {}
+            description: Therapeutic class key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PRODUCT_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: national_value.PRODUCT_ID
+            dimension: {}
+            description: Product key (receipt code).
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_TOTAL_VALUE_YEN
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: national_value.CLASS_TOTAL_VALUE_YEN
+            description: "The national value of the row's class (all products, all care settings), repeated on every row: the denominator of class_market_share."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: MARKET_TOTAL_VALUE_YEN
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: national_value.MARKET_TOTAL_VALUE_YEN
+            description: "The national value of all diabetes drugs, repeated on every row: the denominator of market_share."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: QUANTITY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: national_value.QUANTITY
+            description: The national total of the row (総計). Unmasked unless the whole product is below the masking threshold in that care setting; then the slice carries sdmx-attribute:confStatus instead.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"total quantity\",\"総計（処方数量）\"],\"access_modifier\":\"public_access\"}"
+          - name: VALUE_YEN
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: national_value.VALUE_YEN
+            description: "Quantity times the NHI price, in yen."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+      - name: PREFECTURE
+        source: GLP.SEMANTIC.SV_JP_PREFECTURE
+        primary_key:
+          - PREFECTURE_CODE
+        description: "One of Japan's 47 prefectures, identified by its JIS X 0401 code (01-47)."
+        fields:
+          - name: PREFECTURE_CODE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture.PREFECTURE_CODE
+            dimension: {}
+            description: "JIS X 0401 code, 01-47."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PREFECTURE_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture.PREFECTURE_NAME
+            dimension: {}
+            description: Prefecture name in English.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"prefecture\"],\"access_modifier\":\"public_access\"}"
+          - name: PREFECTURE_NAME_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture.PREFECTURE_NAME_JA
+            dimension: {}
+            description: "Prefecture name in Japanese. Values: 三重県; 京都府; 佐賀県; 兵庫県; 北海道; 千葉県; 和歌山県; 埼玉県; 大分県; 大阪府; 奈良県; 宮城県; 宮崎県; 富山県; 山口県; 山形県; 山梨県; 岐阜県; 岡山県; 岩手県; 島根県; 広島県; 徳島県; 愛媛県; 愛知県; 新潟県; 東京都; 栃木県; 沖縄県; 滋賀県; 熊本県; 石川県; 神奈川県; 福井県; 福岡県; 福島県; 秋田県; 群馬県; 茨城県; 長崎県; 長野県; 青森県; 静岡県; 香川県; 高知県; 鳥取県; 鹿児島県."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"都道府県\"],\"access_modifier\":\"public_access\"}"
+          - name: PREFECTURE_NAME_ZH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture.PREFECTURE_NAME_ZH
+            dimension: {}
+            description: Prefecture name in Chinese.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"都道府县\"],\"access_modifier\":\"public_access\"}"
+      - name: PREFECTURE_VALUE
+        source: GLP.SEMANTIC.SV_JP_PREFECTURE_VALUE
+        primary_key:
+          - PRODUCT_ID
+          - CARE_SETTING_ID
+          - PREFECTURE_CODE
+          - CLASS_ID
+        description: "Values by prefecture of the issuing medical institution. Masked cells are left out, so sums are lower bounds. One row per product and therapeutic class of any of its substances, including all broader classes (skos:broader*): filter or group by one class, or use the *_all metrics, which count each product once (the top class)."
+        fields:
+          - name: CARE_SETTING_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture_value.CARE_SETTING_ID
+            dimension: {}
+            description: "outpatient-external (community pharmacy, 院外), outpatient-internal (dispensed in-house, 院内) or inpatient (入院)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture_value.CLASS_ID
+            dimension: {}
+            description: Therapeutic class key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PREFECTURE_CODE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture_value.PREFECTURE_CODE
+            dimension: {}
+            description: "JIS X 0401 code, 01-47."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PRODUCT_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture_value.PRODUCT_ID
+            dimension: {}
+            description: Product key (receipt code).
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: QUANTITY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture_value.QUANTITY
+            description: Dispensed quantity in the product's dispensing unit. Absent when NDB masked the cell; the observation then carries sdmx-attribute:confStatus sdmx-code:confStatus-C.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"処方数量\"],\"access_modifier\":\"public_access\"}"
+          - name: VALUE_YEN
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: prefecture_value.VALUE_YEN
+            description: "Quantity times the NHI price, in yen."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+      - name: PRODUCT
+        source: GLP.SEMANTIC.SV_JP_PRODUCT
+        primary_key:
+          - PRODUCT_ID
+        description: "A drug product as named in claims data: in Part D (CMS Brnd_Name, e.g. Jardiance; unbranded generics appear under their generic name), or in NDB Open Data, where each strength is its own product with a receipt code and a YJ code (e.g. ジャディアンス錠10mg). NDB Open Data products at strength level."
+        fields:
+          - name: ACTIVE_SUBSTANCES
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.ACTIVE_SUBSTANCES
+            dimension: {}
+            description: "Substance name in English. Active substances in English, joined with ' + ' for combination products."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"substance\"],\"access_modifier\":\"public_access\"}"
+          - name: ACTIVE_SUBSTANCES_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.ACTIVE_SUBSTANCES_JA
+            dimension: {}
+            description: "Substance name in Japanese. Active substances in Japanese, joined with '・'."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"有効成分\"],\"access_modifier\":\"public_access\"}"
+          - name: COMPANY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.COMPANY
+            dimension: {}
+            description: "Links a national company (e.g. the Japanese marketing authorization holder 日本ベーリンガーインゲルハイム) to its corporate group as identified by GLEIF. For market shares by company: the corporate group (GLEIF ultimate parent, the same company as in the US data) where known, else the marketing authorization holder. Values: VIATRIS INC. (also: Viatris Healthcare G.K., ヴィアトリス・ヘルスケア, Mylan Pharmaceuticals Inc.); MERCK & CO., INC. (also: MSD K.K., ＭＳＤ, Merck Sharp & Dohme LLC); C.H. Boehringer Sohn AG & Co. KG (also: Nippon Boehringer Ingelheim Co., Ltd., 日本ベーリンガーインゲルハイム, Boehringer Ingelheim Pharmaceuticals, Inc.); NOVO NORDISK A/S (also: Novo Nordisk Pharma Ltd., ノボ ノルディスク ファーマ, Novo Nordisk Inc.); SANOFI (also: Sanofi K.K., サノフィ, Sanofi-Aventis U.S. LLC, Sanofi US Services Inc.); ELI LILLY AND COMPANY (also: Eli Lilly Japan K.K., 日本イーライリリー); ASTRAZENECA PLC (also: AstraZeneca K.K., アストラゼネカ, AstraZeneca AB); otherwise the marketing authorization holder's own name."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"part of corporate group\"],\"access_modifier\":\"public_access\"}"
+          - name: COMPANY_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.COMPANY_JA
+            dimension: {}
+            description: "The company in Japanese: the corporate group where known, else the holder. Values: ヴィアトリス (also: ヴィアトリス・ヘルスケア); MSD (also: ＭＳＤ); ベーリンガーインゲルハイム (also: 日本ベーリンガーインゲルハイム); ノボノルディスク (also: ノボ ノルディスク ファーマ); サノフィ (also: ); イーライリリー・アンド・カンパニー (also: 日本イーライリリー); アストラゼネカ (also: ); otherwise the marketing authorization holder's own name."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: DISPENSING_UNIT
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.DISPENSING_UNIT
+            dimension: {}
+            description: "The unit in which quantities are counted (錠 tablet, キット kit, 筒 cartridge ...). Quantities in different units cannot be added."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"単位\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_COMBINATION
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.IS_COMBINATION
+            dimension: {}
+            description: Is combination product.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"is combination product\",\"配合剤\",\"复方制剂\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_GENERIC
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.IS_GENERIC
+            dimension: {}
+            description: Generic (後発医薬品) according to NDB Open Data's 後発品区分; biosimilars count as generics. Generics priced like their originator (most metformin 'MT' generics) are not flagged.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"後発品\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_GLP1_PRODUCT
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.IS_GLP1_PRODUCT
+            dimension: {}
+            description: "A medicinal product containing a substance in the GLP-1 receptor agonist class (including dual GIP/GLP-1 agonists), alone or in combination, whatever its Japanese therapeutic category (249 or 396)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"GLP-1 receptor agonist product\",\"GLP-1受容体作動薬製剤\",\"GLP-1受体激动剂产品\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_ORIGINATOR
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.IS_ORIGINATOR
+            dimension: {}
+            description: "Flagged 先発品 (originator) in the NHI price list. Neither generic nor originator: older products that predate the distinction and unified-name listings."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"先発品\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_SGLT2_PRODUCT
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.IS_SGLT2_PRODUCT
+            dimension: {}
+            description: "A medicinal product containing a substance in the SGLT2 inhibitor class, alone or in combination."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"SGLT2 inhibitor product\",\"SGLT2阻害薬製剤\",\"SGLT2抑制剂产品\"],\"access_modifier\":\"public_access\"}"
+          - name: MARKETING_AUTHORIZATION_HOLDER
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.MARKETING_AUTHORIZATION_HOLDER
+            dimension: {}
+            description: Manufactured by. Japanese marketing authorization holder in English; NULL for unified-name generics.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"manufactured by\"],\"access_modifier\":\"public_access\"}"
+          - name: MARKETING_AUTHORIZATION_HOLDER_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.MARKETING_AUTHORIZATION_HOLDER_JA
+            dimension: {}
+            description: "Japanese marketing authorization holder in Japanese, e.g. 日本ベーリンガーインゲルハイム."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PRODUCT_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.PRODUCT_ID
+            dimension: {}
+            description: "The 9-digit drug code of the claims (receipt) processing system (医薬品コード), the key of NDB Open Data."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"receipt code\",\"レセプト電算処理システム用コード\"],\"access_modifier\":\"public_access\"}"
+          - name: PRODUCT_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.PRODUCT_NAME
+            dimension: {}
+            description: "The same name with half-width characters, e.g. ジャディアンス錠10mg."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PRODUCT_NAME_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.PRODUCT_NAME_JA
+            dimension: {}
+            description: "Medicinal product name in Japanese. As printed in NDB, with full-width characters, e.g. ジャディアンス錠１０ｍｇ."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"医薬品\"],\"access_modifier\":\"public_access\"}"
+          - name: ROUTE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.ROUTE
+            dimension: {}
+            description: "\"oral\" or \"injection\": the NDB table family (内服 / 注射) the product is reported in. Masking thresholds differ: 1,000 for oral, 400 for injection tables."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"route of administration\",\"投与経路\"],\"access_modifier\":\"public_access\"}"
+          - name: YJ_CODE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.YJ_CODE
+            dimension: {}
+            description: "The 12-character NHI price list code (薬価基準収載医薬品コード). Characters 1-4 are the therapeutic category, 1-7 the ingredient, 8 the dosage form."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"薬価基準収載医薬品コード\"],\"access_modifier\":\"public_access\"}"
+          - name: NHI_PRICE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: product.NHI_PRICE
+            description: "Reimbursement price in yen per dispensing unit (tablet, pen, ...), as printed in NDB Open Data."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"NHI price (JPY per unit)\",\"薬価\"],\"access_modifier\":\"public_access\"}"
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"synonyms\":[\"medicinal product\",\"药品\"]}"
+      - name: SEX_AGE_GROUP
+        source: GLP.SEMANTIC.SV_JP_SEX_AGE_GROUP
+        primary_key:
+          - SEX_AGE_CODE
+        description: "A sex combined with a five-year age band (0-4 ... 95-99, 100+), as NDB Open Data reports them."
+        fields:
+          - name: MIN_AGE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_group.MIN_AGE
+            dimension: {}
+            description: Lower bound of the age band in years (65 for 65-69).
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"minimum age\"],\"access_modifier\":\"public_access\"}"
+          - name: SEX
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_group.SEX
+            dimension: {}
+            description: F (female) or M (male).
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: SEX_AGE_CODE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_group.SEX_AGE_CODE
+            dimension: {}
+            description: "F or M with the band's minimum age, e.g. F75."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: SEX_AGE_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_group.SEX_AGE_NAME
+            dimension: {}
+            description: Sex and age band name in English.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"sex and age band\"],\"access_modifier\":\"public_access\"}"
+          - name: SEX_AGE_NAME_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_group.SEX_AGE_NAME_JA
+            dimension: {}
+            description: Sex and age band name in Japanese.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"性・年齢階級\"],\"access_modifier\":\"public_access\"}"
+          - name: SEX_AGE_NAME_ZH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_group.SEX_AGE_NAME_ZH
+            dimension: {}
+            description: Sex and age band name in Chinese.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"性别年龄组\"],\"access_modifier\":\"public_access\"}"
+      - name: SEX_AGE_VALUE
+        source: GLP.SEMANTIC.SV_JP_SEX_AGE_VALUE
+        primary_key:
+          - PRODUCT_ID
+          - CARE_SETTING_ID
+          - SEX_AGE_CODE
+          - CLASS_ID
+        description: "Values by sex and five-year age band of the patient. Masked cells are left out, so sums are lower bounds. One row per product and therapeutic class of any of its substances, including all broader classes (skos:broader*): filter or group by one class, or use the *_all metrics, which count each product once (the top class)."
+        fields:
+          - name: CARE_SETTING_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_value.CARE_SETTING_ID
+            dimension: {}
+            description: "outpatient-external (community pharmacy, 院外), outpatient-internal (dispensed in-house, 院内) or inpatient (入院)."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_value.CLASS_ID
+            dimension: {}
+            description: Therapeutic class key.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: PRODUCT_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_value.PRODUCT_ID
+            dimension: {}
+            description: Product key (receipt code).
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: SEX_AGE_CODE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_value.SEX_AGE_CODE
+            dimension: {}
+            description: "F or M with the band's minimum age, e.g. F75."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: QUANTITY
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_value.QUANTITY
+            description: Dispensed quantity in the product's dispensing unit. Absent when NDB masked the cell; the observation then carries sdmx-attribute:confStatus sdmx-code:confStatus-C.
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: VALUE_YEN
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_value.VALUE_YEN
+            description: "Quantity times the NHI price, in yen."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: VALUE_YEN_AGE75PLUS
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_value.VALUE_YEN_AGE75PLUS
+            description: "value_yen of patients aged 75 and over (後期高齢者), else 0."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: VALUE_YEN_FEMALE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: sex_age_value.VALUE_YEN_FEMALE
+            description: "value_yen of female patients, else 0."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+      - name: THERAPEUTIC_CLASS
+        source: GLP.SEMANTIC.SV_JP_THERAPEUTIC_CLASS
+        primary_key:
+          - CLASS_ID
+        description: "A concept in the therapeutic class scheme (e.g. SGLT2 inhibitors). The hierarchy itself is maintained as a SKOS concept scheme, not as OWL subclasses."
+        fields:
+          - name: ATC_CODE
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.ATC_CODE
+            dimension: {}
+            description: "ATC code of the class, e.g. A10BK. Glinides and imeglimin have none."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_DEPTH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_DEPTH
+            dimension: {}
+            description: "Level in the class tree (skos:broader*): 1 drugs used in diabetes, 2 insulins or blood glucose lowering drugs, 3 drug classes such as SGLT2 inhibitors, 4 narrower classes such as dual GIP/GLP-1 agonists, which also count in their broader class."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_ID
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_ID
+            dimension: {}
+            description: "Class key, e.g. SGLT2Inhibitor."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+          - name: CLASS_NAME
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_NAME
+            dimension: {}
+            description: "Therapeutic class name in English. Values: Alpha glucosidase inhibitors; Biguanides; Blood glucose lowering drugs, excl. insulins; Dipeptidyl peptidase 4 (DPP-4) inhibitors; Drugs used in diabetes; Glimins; Glinides; Glucagon-like peptide-1 (GLP-1) analogues; Glucose-dependent Insulinotropic Polypeptide Receptor Agonists; Insulins and analogues; Insulins and analogues for injection, fast-acting; Insulins and analogues for injection, intermediate- or long-acting combined with fast-acting; Insulins and analogues for injection, intermediate-acting; Insulins and analogues for injection, long-acting; Sodium-glucose co-transporter 2 (SGLT2) inhibitors; Sulfonylureas; Thiazolidinediones."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"therapeutic class\"],\"access_modifier\":\"public_access\"}"
+          - name: CLASS_NAME_JA
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_NAME_JA
+            dimension: {}
+            description: "Therapeutic class name in Japanese. Values: DPP-4阻害薬; GLP-1受容体作動薬; SGLT2阻害薬; α-グルコシダーゼ阻害薬; インスリン製剤; グリミン系薬; スルホニルウレア薬; チアゾリジン薬; ビグアナイド薬; 中間型インスリン; 持効型溶解インスリン; 持続性GIP/GLP-1受容体作動薬; 混合型インスリン; 糖尿病治療薬; 血糖降下薬（インスリンを除く）; 速効型インスリン分泌促進薬; 速効型・超速効型インスリン."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"薬効群\",\"ATC分類\"],\"access_modifier\":\"public_access\"}"
+          - name: CLASS_NAME_ZH
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.CLASS_NAME_ZH
+            dimension: {}
+            description: "Therapeutic class name in Chinese. Values: DPP-4抑制剂; GIP/GLP-1双受体激动剂; GLP-1受体激动剂; SGLT2抑制剂; α-葡萄糖苷酶抑制剂; 中效胰岛素; 双胍类药物; 噻唑烷二酮类药物; 格列奈类药物; 格列明类药物; 磺酰脲类药物; 糖尿病治疗药物; 胰岛素及其类似物; 速效胰岛素; 长效胰岛素; 降血糖药（不含胰岛素）; 预混胰岛素."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"synonyms\":[\"治疗类别\"],\"access_modifier\":\"public_access\"}"
+          - name: IS_DRUG_CLASS
+            expression:
+              dialects:
+                - dialect: SNOWFLAKE
+                  expression: therapeutic_class.IS_DRUG_CLASS
+            dimension: {}
+            description: "TRUE for the drug classes (SGLT2 inhibitors, GLP-1 receptor agonists, DPP-4 inhibitors, biguanides, long-acting insulins, ...): use it whenever a question says 'by drug class' or 'by class', so that broader and narrower classes are not listed next to them."
+            custom_extensions:
+              - vendor_name: SNOWFLAKE
+                data: "{\"access_modifier\":\"public_access\"}"
+    relationships:
+      - name: MONTH_VALUE_TO_CARE_SETTING
+        from: MONTH_VALUE
+        to: CARE_SETTING
+        from_columns:
+          - CARE_SETTING_ID
+        to_columns:
+          - CARE_SETTING_ID
+      - name: MONTH_VALUE_TO_PRODUCT
+        from: MONTH_VALUE
+        to: PRODUCT
+        from_columns:
+          - PRODUCT_ID
+        to_columns:
+          - PRODUCT_ID
+      - name: MONTH_VALUE_TO_THERAPEUTIC_CLASS
+        from: MONTH_VALUE
+        to: THERAPEUTIC_CLASS
+        from_columns:
+          - CLASS_ID
+        to_columns:
+          - CLASS_ID
+      - name: NATIONAL_VALUE_TO_CARE_SETTING
+        from: NATIONAL_VALUE
+        to: CARE_SETTING
+        from_columns:
+          - CARE_SETTING_ID
+        to_columns:
+          - CARE_SETTING_ID
+      - name: NATIONAL_VALUE_TO_PRODUCT
+        from: NATIONAL_VALUE
+        to: PRODUCT
+        from_columns:
+          - PRODUCT_ID
+        to_columns:
+          - PRODUCT_ID
+      - name: NATIONAL_VALUE_TO_THERAPEUTIC_CLASS
+        from: NATIONAL_VALUE
+        to: THERAPEUTIC_CLASS
+        from_columns:
+          - CLASS_ID
+        to_columns:
+          - CLASS_ID
+      - name: PREFECTURE_VALUE_TO_CARE_SETTING
+        from: PREFECTURE_VALUE
+        to: CARE_SETTING
+        from_columns:
+          - CARE_SETTING_ID
+        to_columns:
+          - CARE_SETTING_ID
+      - name: PREFECTURE_VALUE_TO_PREFECTURE
+        from: PREFECTURE_VALUE
+        to: PREFECTURE
+        from_columns:
+          - PREFECTURE_CODE
+        to_columns:
+          - PREFECTURE_CODE
+      - name: PREFECTURE_VALUE_TO_PRODUCT
+        from: PREFECTURE_VALUE
+        to: PRODUCT
+        from_columns:
+          - PRODUCT_ID
+        to_columns:
+          - PRODUCT_ID
+      - name: PREFECTURE_VALUE_TO_THERAPEUTIC_CLASS
+        from: PREFECTURE_VALUE
+        to: THERAPEUTIC_CLASS
+        from_columns:
+          - CLASS_ID
+        to_columns:
+          - CLASS_ID
+      - name: PRODUCT_TO_JP_DRUG_CLASS
+        from: PRODUCT
+        to: JP_DRUG_CLASS
+        from_columns:
+          - JP_CLASS_CODE
+        to_columns:
+          - JP_CLASS_CODE
+      - name: SEX_AGE_VALUE_TO_CARE_SETTING
+        from: SEX_AGE_VALUE
+        to: CARE_SETTING
+        from_columns:
+          - CARE_SETTING_ID
+        to_columns:
+          - CARE_SETTING_ID
+      - name: SEX_AGE_VALUE_TO_PRODUCT
+        from: SEX_AGE_VALUE
+        to: PRODUCT
+        from_columns:
+          - PRODUCT_ID
+        to_columns:
+          - PRODUCT_ID
+      - name: SEX_AGE_VALUE_TO_SEX_AGE_GROUP
+        from: SEX_AGE_VALUE
+        to: SEX_AGE_GROUP
+        from_columns:
+          - SEX_AGE_CODE
+        to_columns:
+          - SEX_AGE_CODE
+      - name: SEX_AGE_VALUE_TO_THERAPEUTIC_CLASS
+        from: SEX_AGE_VALUE
+        to: THERAPEUTIC_CLASS
+        from_columns:
+          - CLASS_ID
+        to_columns:
+          - CLASS_ID
+    metrics:
+      - name: AGE_75PLUS_VALUE_SHARE
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(sex_age_value.value_yen_age75plus) / NULLIF(SUM(sex_age_value.value_yen), 0)"
+        description: Share (0 to 1) of the value dispensed to patients aged 75 and over (後期高齢者).
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: AGE_CLASS_VALUE_YEN
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(sex_age_value.value_yen)
+        description: Value in yen of a therapeutic class by sex and age band. Filter or group by one class.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: AGE_VALUE_YEN_ALL
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(CASE WHEN sex_age_value.class_id = 'DrugsUsedInDiabetes' THEN sex_age_value.value_yen END)
+        description: "Value in yen of all drugs used in diabetes by sex and age band, each product counted once."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: CLASS_MARKET_SHARE
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(national_value.value_yen) / NULLIF(MAX(national_value.class_total_value_yen), 0)"
+        description: "Share (0 to 1) of the class's national value, for one class at a time. Grouped or filtered by product.company it is the company's market share in the class: the denominator stays the whole class whatever the filter on products or companies (it covers all care settings)."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: CLASS_VALUE_YEN
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(national_value.value_yen)
+        description: "Value in yen of the products in a therapeutic class (including narrower classes), national totals. Filter or group by one class; a combination product counts in each of its classes."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: FEMALE_VALUE_SHARE
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(sex_age_value.value_yen_female) / NULLIF(SUM(sex_age_value.value_yen), 0)"
+        description: Share (0 to 1) of the value dispensed to female patients.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: MARKET_SHARE
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(national_value.value_yen) / NULLIF(MAX(national_value.market_total_value_yen), 0)"
+        description: "Share (0 to 1) of the national value of all drugs used in diabetes, whatever the filter on classes, products or companies (it covers all care settings). By class: a class's share of the market."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: MONTH_CLASS_VALUE_YEN
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(month_value.value_yen)
+        description: Value in yen of a therapeutic class by month. Filter or group by one class.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: MONTH_GENERIC_QUANTITY_SHARE
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(month_value.generic_quantity) / NULLIF(SUM(month_value.quantity), 0)"
+        description: Generic share (0 to 1) of the dispensed quantity. Meaningful within one class only; group or filter by class and month.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: MONTH_VALUE_YEN_ALL
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(CASE WHEN month_value.class_id = 'DrugsUsedInDiabetes' THEN month_value.value_yen END)
+        description: "Value in yen of all drugs used in diabetes by month, each product counted once."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: PREFECTURE_CLASS_VALUE_YEN
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(prefecture_value.value_yen)
+        description: Value in yen of a therapeutic class by prefecture. Filter or group by one class.
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: PREFECTURE_SGLT2_VALUE_SHARE
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: "SUM(CASE WHEN prefecture_value.class_id = 'SGLT2Inhibitor' THEN prefecture_value.value_yen END) / NULLIF(SUM(CASE WHEN prefecture_value.class_id = 'DrugsUsedInDiabetes' THEN prefecture_value.value_yen END), 0)"
+        description: "Share (0 to 1) of Sodium-glucose co-transporter 2 (SGLT2) inhibitors in the value of all drugs used in diabetes (from the definition of dm:SGLT2Product: products with an SGLT2 inhibitor, alone or in combination)."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: PREFECTURE_VALUE_YEN_ALL
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(CASE WHEN prefecture_value.class_id = 'DrugsUsedInDiabetes' THEN prefecture_value.value_yen END)
+        description: "Value in yen of all drugs used in diabetes by prefecture, each product counted once."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: PRODUCT_COUNT
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: COUNT(DISTINCT product.product_id)
+        description: Number of distinct products (strength level).
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+      - name: TOTAL_VALUE_YEN
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: SUM(CASE WHEN national_value.class_id = 'DrugsUsedInDiabetes' THEN national_value.value_yen END)
+        description: "Value in yen of all drugs used in diabetes, each product counted once (national totals)."
+        custom_extensions:
+          - vendor_name: SNOWFLAKE
+            data: "{\"access_modifier\":\"public_access\"}"
+    custom_extensions:
+      - vendor_name: SNOWFLAKE
+        data: "{\"module_custom_instructions\":{\"sql_generation\":\"Answer in yen (value_yen metrics), never by adding quantities across products. The four fact datasets are four breakdowns of the same national figures: never combine them; use national_value unless the question is by prefecture, month, or sex and age. Every fact row is one product in one therapeutic class, broader classes included: for all diabetes drugs use the *_all metrics, which count each product once (they handle the top class internally: never filter class_id yourself to get all drugs); for a class, filter or group by one class. 'By drug class' means therapeutic_class.is_drug_class = TRUE. A class's share of the market: market_share by class. A company's market share in a class: class_market_share with product.company and that class (never divide by the company's own total). 'Single-ingredient' means NOT product.is_combination. Prefecture, month and age figures are lower bounds (masked cells). Names exist in English, Japanese (*_ja) and Chinese (*_zh): answer with the names in the language of the question.\"},\"verified_queries\":[{\"name\":\"JP_CLASS_SHARE_YEN\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.JAPAN_MARKET DIMENSIONS therapeutic_class.class_name METRICS class_value_yen, market_share WHERE therapeutic_class.class_id IN ('Insulin', 'Biguanide', 'Sulfonylurea', 'Thiazolidinedione', 'DPP4Inhibitor', 'AlphaGlucosidaseInhibitor', 'Glinide', 'Glimin', 'SGLT2Inhibitor', 'GLP1ReceptorAgonist') AND NOT product.is_combination) ORDER BY class_value_yen DESC\",\"question\":\"What share of Japan's diabetes drug value does each drug class have, for single-ingredient products?\",\"verified_at\":1793404800,\"use_as_onboarding_question\":true},{\"name\":\"JP_COMPANY_SHARE_SGLT2_DPP4\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.JAPAN_MARKET DIMENSIONS therapeutic_class.class_name, product.company METRICS class_value_yen, class_market_share WHERE therapeutic_class.class_id IN ('SGLT2Inhibitor', 'DPP4Inhibitor')) ORDER BY class_name, class_value_yen DESC\",\"question\":\"Which companies lead the SGLT2 inhibitor and DPP-4 inhibitor markets in Japan by value?\",\"verified_at\":1793404800,\"use_as_onboarding_question\":true},{\"name\":\"JP_AGE_PROFILE_BY_CLASS\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.JAPAN_MARKET DIMENSIONS therapeutic_class.class_name METRICS age_class_value_yen, age_75plus_value_share, female_value_share WHERE therapeutic_class.class_id IN ('Insulin', 'Biguanide', 'Sulfonylurea', 'Thiazolidinedione', 'DPP4Inhibitor', 'AlphaGlucosidaseInhibitor', 'Glinide', 'Glimin', 'SGLT2Inhibitor', 'GLP1ReceptorAgonist')) ORDER BY age_75plus_value_share DESC\",\"question\":\"What share of each drug class's value goes to patients aged 75 and over, and to women?\",\"verified_at\":1793404800,\"use_as_onboarding_question\":false},{\"name\":\"JP_GENERIC_SHARE_BY_MONTH\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.JAPAN_MARKET DIMENSIONS therapeutic_class.class_name, month_value.month METRICS month_generic_quantity_share WHERE month_value.care_setting_id = 'outpatient-external' AND NOT product.is_combination AND therapeutic_class.class_id IN ('Biguanide', 'Sulfonylurea', 'Thiazolidinedione', 'DPP4Inhibitor', 'AlphaGlucosidaseInhibitor', 'Glinide')) ORDER BY class_name, month\",\"question\":\"長期収載品の選定療養が始まった2024年10月の前後で、院外処方の後発品の割合は薬効群ごとに毎月どう変わった？\",\"verified_at\":1793404800,\"use_as_onboarding_question\":false},{\"name\":\"JP_GLP1_MONTHLY_UPTAKE\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.JAPAN_MARKET DIMENSIONS month_value.month, product.active_substances METRICS month_class_value_yen WHERE therapeutic_class.class_id = 'GLP1ReceptorAgonist' AND NOT product.is_combination) ORDER BY month, month_class_value_yen DESC\",\"question\":\"How did the monthly value of each GLP-1 receptor agonist substance develop in Japan?\",\"verified_at\":1793404800,\"use_as_onboarding_question\":false},{\"name\":\"JP_SGLT2_SHARE_BY_PREFECTURE\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.JAPAN_MARKET DIMENSIONS prefecture.prefecture_name_ja METRICS prefecture_sglt2_value_share, prefecture_value_yen_all) ORDER BY prefecture_sglt2_value_share DESC\",\"question\":\"都道府県別のSGLT2阻害薬のシェアは？\",\"verified_at\":1793404800,\"use_as_onboarding_question\":true},{\"name\":\"JP_GLP1_PRODUCTS_BY_CATEGORY\",\"sql\":\"SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.JAPAN_MARKET DIMENSIONS jp_drug_class.jp_class_name_ja METRICS product_count WHERE product.is_glp1_product) ORDER BY product_count DESC\",\"question\":\"GLP-1受容体作動薬製剤は薬効分類ごとにいくつある？\",\"verified_at\":1793404800,\"use_as_onboarding_question\":false}]}"
