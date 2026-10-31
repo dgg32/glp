@@ -606,7 +606,7 @@ setting:outpatient a skos:Concept,
 <https://dgg32.github.io/glp/vocab/care-setting> a skos:ConceptScheme ;
     dcterms:creator "Sixing Huang" ;
     dcterms:description "Where a drug was prescribed and dispensed, as NDB Open Data splits its tables."@en ;
-    dcterms:modified "2026-10-25"^^xsd:date ;
+    dcterms:modified "2026-10-31"^^xsd:date ;
     dcterms:title "Care settings (NDB Open Data)"@en,
         "診療区分（NDBオープンデータ）"@ja,
         "诊疗类别（NDB开放数据）"@zh ;
@@ -681,7 +681,7 @@ sexage:M a skos:Concept,
 <https://dgg32.github.io/glp/vocab/sex-age> a skos:ConceptScheme ;
     dcterms:creator "Sixing Huang" ;
     dcterms:description "Sex combined with the 21 five-year age bands of NDB Open Data (0-4 ... 95-99, 100+). Each band has its sex as broader concept, so queries can roll up by sex."@en ;
-    dcterms:modified "2026-10-25"^^xsd:date ;
+    dcterms:modified "2026-10-31"^^xsd:date ;
     dcterms:title "Sex and age bands (NDB Open Data)"@en,
         "性・年齢階級（NDBオープンデータ）"@ja,
         "性别与年龄组（NDB开放数据）"@zh ;

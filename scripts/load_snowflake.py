@@ -5,7 +5,7 @@ data/snowflake/tables.json, which export_snowflake.py writes only after its chec
 Then, per table: CREATE OR REPLACE with primary and foreign keys (declared, not enforced by Snowflake),
 PUT to the table stage, COPY INTO (abort on the first bad row). Snowflake commits DDL immediately, so
 there is no all-or-nothing transaction as in load_stardog.py; instead the load is verified afterwards
-(row counts, total claims and cost) and stops with an error if anything differs. Rerunnable.
+(row counts, total claims and cost, total Japanese quantity and masked cells) and stops with an error if anything differs. Rerunnable.
 
 Provenance: each table comment names its source graphs and the export it came from, and every load
 appends one row per table to PUBLIC.LOAD_LOG (time, RDF provenance hash, file hash, rows).
@@ -75,6 +75,15 @@ def local_totals():
     return claims, cost
 
 
+def local_jp_totals():
+    quantity, masked = Decimal(0), 0
+    with open(EXPORT / "JP.QUANTITY.csv", newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            quantity += Decimal(r["QUANTITY"] or 0)
+            masked += r["IS_MASKED"] == "true"
+    return quantity, masked
+
+
 def main():
     manifest = checked_export()
     tables = manifest["tables"]
@@ -110,6 +119,9 @@ def main():
     claims, cost = run("SELECT SUM(TOTAL_CLAIMS), SUM(TOTAL_DRUG_COST) FROM US.PRESCRIPTION")[0]
     if (claims, cost) != local_totals():
         errors.append(f"US.PRESCRIPTION totals differ: Snowflake {(claims, cost)}, export {local_totals()}")
+    quantity, masked = run("SELECT SUM(QUANTITY), COUNT_IF(IS_MASKED) FROM JP.QUANTITY")[0]
+    if (quantity, masked) != local_jp_totals():
+        errors.append(f"JP.QUANTITY totals differ: Snowflake {(quantity, masked)}, export {local_jp_totals()}")
     if errors:
         sys.exit("load verification failed:\n  " + "\n  ".join(errors))
 
@@ -117,7 +129,8 @@ def main():
                     [(t["name"], t["rows"], t["sha256"], manifest["rdf_provenance"], manifest["exported_at"])
                      for t in tables])
     con.commit()
-    print(f"verified: {len(tables)} tables, {claims:,} claims, ${cost:,.2f} gross cost")
+    print(f"verified: {len(tables)} tables, {claims:,} claims, ${cost:,.2f} gross cost; "
+          f"{quantity:,} units dispensed in Japan, {masked:,} masked cells")
     con.close()
 
 

@@ -416,3 +416,28 @@ countries share the substance and class vocabularies.
 - **2026-10-26: AllegroGraph dropped.** The server was removed; `setup_allegrograph.py`,
   `load_allegrograph.py` and `run_queries.py --ag` are deleted, and the three share queries have their
   `ROUND` back (Stardog and Oxigraph handle it). The Oxigraph `xsd:double` casts stay.
+
+## 2026-10-31: Japan in Snowflake; Snowflake as the presentation layer of article 2
+- Article 2 shows the data through Snowflake (worksheets, semantic view, Cortex Analyst) instead of Stardog
+  Studio. The RDF graph stays the source of truth, built and checked locally; Stardog stays the SPARQL endpoint
+  of the MCP server.
+- **JP schema** from the NDB graphs (`export_snowflake.py`): PRODUCT, PRODUCT_SUBSTANCE, PRODUCT_CLASS,
+  ORGANIZATION (CORPORATE_GROUP_ID -> US.ORGANIZATION, i.e. dm:partOfCorporateGroup), NATIONAL_TOTAL (equal in
+  all three breakdowns, checked), QUANTITY (the Data Cube as one row per cell; masked cells kept with
+  IS_MASKED). VOCAB gains JP_DRUG_CLASS, JP_CLASS_MATCH (the crosswalk with its evidence), PREFECTURE,
+  CARE_SETTING, SEX_AGE_GROUP. Each table now reads only its source graphs (pyoxigraph `default_graph`), so the
+  NDB products cannot leak into US tables.
+- Quantities are NUMBER(18,5): NDB has up to five decimals. NUMBER(18,2) passed the rounded parity checks but
+  failed the loader's exact total (0.88 units), which is why the loader now checks JP totals too.
+- **JAPAN_MARKET semantic view** from the same generator: one fact dataset per Data Cube breakdown
+  (qb:sliceStructure becomes the schema, so breakdowns are never added together), at the grain product x
+  setting [x cell] x class; all-drug metrics read the top class, which every product reaches once (checked by
+  the export). Share metrics divide by a class or market total precomputed in the view, so a company filter
+  cannot shrink the denominator (Analyst computed Boehringer's SGLT2 share as 78% of its own sales before).
+- Cross-country questions are plain SQL (`queries/snowflake/`), because a semantic view holds one model; the
+  deploy checks them and all seven Japan verified queries against the graph's SPARQL answers (225 rows).
+- The generator now reports labels that two ontology terms share. It found dm:TherapeuticClass and
+  dm:JapaneseDrugClass both labelled 「薬効分類」@ja, so in the Japan view the synonym went to the ATC-based class
+  tree. Ontology 0.5.2: 薬効分類 stays with dm:JapaneseDrugClass (it is the name of the 日本標準商品分類
+  categories); dm:TherapeuticClass becomes 薬効群 with skos:altLabel ATC分類 (not the prefLabel: glinides and
+  glimins are project classes, so the tree is ATC-based, not pure ATC). The generator reads skos:altLabel too.

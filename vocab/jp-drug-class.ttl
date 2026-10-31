@@ -122,7 +122,7 @@ jpc:39 a skos:Concept,
 <https://dgg32.github.io/glp/vocab/jp-drug-class> a skos:ConceptScheme ;
     dcterms:creator "Sixing Huang" ;
     dcterms:description "The therapeutic categories of the Japan Standard Commodity Classification that the diabetes drugs in NDB Open Data are filed under, with SKOS mapping links to the ATC-based therapeutic class scheme. The mappings are computed from the products (scripts/build_ndb.py), not asserted by hand."@en ;
-    dcterms:modified "2026-10-25"^^xsd:date ;
+    dcterms:modified "2026-10-31"^^xsd:date ;
     dcterms:title "Japanese therapeutic categories (薬効分類)"@en,
         "薬効分類"@ja,
         "日本药效分类"@zh ;

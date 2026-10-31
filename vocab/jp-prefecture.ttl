@@ -759,7 +759,7 @@ pref:47 a skos:Concept,
 <https://dgg32.github.io/glp/vocab/prefecture> a skos:ConceptScheme ;
     dcterms:creator "Sixing Huang" ;
     dcterms:description "The 47 prefectures with their JIS X 0401 codes, as NDB Open Data reports them. Labels from Wikidata (CC0), found by ISO 3166-2 code."@en ;
-    dcterms:modified "2026-10-25"^^xsd:date ;
+    dcterms:modified "2026-10-31"^^xsd:date ;
     dcterms:title "Prefectures of Japan"@en,
         "都道府県"@ja,
         "日本都道府县"@zh ;

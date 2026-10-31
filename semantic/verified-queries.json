@@ -1,5 +1,6 @@
 [
  {
+  "view": "DIABETES_MARKET",
   "name": "sglt2_vs_glp1_by_specialty",
   "source": "queries/sglt2-vs-glp1-by-specialty.rq",
   "onboarding": true,
@@ -7,6 +8,7 @@
   "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS specialty.specialty_name METRICS sglt2_claims, glp1_claims, sglt2_share_vs_glp1) ORDER BY sglt2_claims + glp1_claims DESC"
  },
  {
+  "view": "DIABETES_MARKET",
   "name": "cost_per_claim_by_drug_class",
   "source": "queries/cost-per-claim-by-class.rq",
   "onboarding": true,
@@ -14,6 +16,7 @@
   "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS therapeutic_class.class_name METRICS class_claims, class_drug_cost, class_cost_per_claim, class_cost_per_30day_fill WHERE therapeutic_class.is_drug_class AND NOT product.is_combination) ORDER BY class_cost_per_30day_fill DESC"
  },
  {
+  "view": "DIABETES_MARKET",
   "name": "market_share_by_manufacturer",
   "source": "queries/market-share-by-manufacturer.rq",
   "onboarding": false,
@@ -21,6 +24,7 @@
   "sql": "SELECT class_name, manufacturer, company_claims, company_claims_allocated / SUM(company_claims_allocated) OVER (PARTITION BY class_name) AS claim_share FROM SEMANTIC_VIEW({view} DIMENSIONS therapeutic_class.class_name, prescription_class_company.manufacturer METRICS company_claims, company_claims_allocated WHERE prescription_class_company.class_id IN ('SGLT2Inhibitor', 'GLP1ReceptorAgonist')) ORDER BY class_name, claim_share DESC"
  },
  {
+  "view": "DIABETES_MARKET",
   "name": "sglt2_by_specialty_ja",
   "source": "queries/sglt2-by-japanese-label.rq",
   "onboarding": true,
@@ -28,10 +32,67 @@
   "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS specialty.specialty_name_ja METRICS class_claims WHERE therapeutic_class.class_name_ja = 'SGLT2阻害薬') ORDER BY class_claims DESC LIMIT 10"
  },
  {
+  "view": "DIABETES_MARKET",
   "name": "prescriber_overlap",
   "source": "queries/prescriber-overlap-reasoning.rq",
   "onboarding": false,
   "question": "How many prescribers write SGLT2 inhibitors, GLP-1 receptor agonists, or both?",
   "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS prescriber.is_sglt2_prescriber, prescriber.is_glp1_prescriber METRICS prescriber_count) ORDER BY 1, 2"
+ },
+ {
+  "view": "JAPAN_MARKET",
+  "name": "jp_class_share_yen",
+  "source": "queries/jp-class-share-yen.rq",
+  "onboarding": true,
+  "question": "What share of Japan's diabetes drug value does each drug class have, for single-ingredient products?",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS therapeutic_class.class_name METRICS class_value_yen, market_share WHERE therapeutic_class.class_id IN ('Insulin', 'Biguanide', 'Sulfonylurea', 'Thiazolidinedione', 'DPP4Inhibitor', 'AlphaGlucosidaseInhibitor', 'Glinide', 'Glimin', 'SGLT2Inhibitor', 'GLP1ReceptorAgonist') AND NOT product.is_combination) ORDER BY class_value_yen DESC"
+ },
+ {
+  "view": "JAPAN_MARKET",
+  "name": "jp_company_share_sglt2_dpp4",
+  "source": "queries/jp-boehringer-share-by-class.rq",
+  "onboarding": true,
+  "question": "Which companies lead the SGLT2 inhibitor and DPP-4 inhibitor markets in Japan by value?",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS therapeutic_class.class_name, product.company METRICS class_value_yen, class_market_share WHERE therapeutic_class.class_id IN ('SGLT2Inhibitor', 'DPP4Inhibitor')) ORDER BY class_name, class_value_yen DESC"
+ },
+ {
+  "view": "JAPAN_MARKET",
+  "name": "jp_age_profile_by_class",
+  "source": "queries/jp-age-profile-by-class.rq",
+  "onboarding": false,
+  "question": "What share of each drug class's value goes to patients aged 75 and over, and to women?",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS therapeutic_class.class_name METRICS age_class_value_yen, age_75plus_value_share, female_value_share WHERE therapeutic_class.class_id IN ('Insulin', 'Biguanide', 'Sulfonylurea', 'Thiazolidinedione', 'DPP4Inhibitor', 'AlphaGlucosidaseInhibitor', 'Glinide', 'Glimin', 'SGLT2Inhibitor', 'GLP1ReceptorAgonist')) ORDER BY age_75plus_value_share DESC"
+ },
+ {
+  "view": "JAPAN_MARKET",
+  "name": "jp_generic_share_by_month",
+  "source": "queries/jp-generic-share-by-month.rq",
+  "onboarding": false,
+  "question": "長期収載品の選定療養が始まった2024年10月の前後で、院外処方の後発品の割合は薬効群ごとに毎月どう変わった？",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS therapeutic_class.class_name, month_value.month METRICS month_generic_quantity_share WHERE month_value.care_setting_id = 'outpatient-external' AND NOT product.is_combination AND therapeutic_class.class_id IN ('Biguanide', 'Sulfonylurea', 'Thiazolidinedione', 'DPP4Inhibitor', 'AlphaGlucosidaseInhibitor', 'Glinide')) ORDER BY class_name, month"
+ },
+ {
+  "view": "JAPAN_MARKET",
+  "name": "jp_glp1_monthly_uptake",
+  "source": "queries/jp-glp1-monthly-uptake.rq",
+  "onboarding": false,
+  "question": "How did the monthly value of each GLP-1 receptor agonist substance develop in Japan?",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS month_value.month, product.active_substances METRICS month_class_value_yen WHERE therapeutic_class.class_id = 'GLP1ReceptorAgonist' AND NOT product.is_combination) ORDER BY month, month_class_value_yen DESC"
+ },
+ {
+  "view": "JAPAN_MARKET",
+  "name": "jp_sglt2_share_by_prefecture",
+  "source": "queries/jp-sglt2-share-by-prefecture.rq",
+  "onboarding": true,
+  "question": "都道府県別のSGLT2阻害薬のシェアは？",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS prefecture.prefecture_name_ja METRICS prefecture_sglt2_value_share, prefecture_value_yen_all) ORDER BY prefecture_sglt2_value_share DESC"
+ },
+ {
+  "view": "JAPAN_MARKET",
+  "name": "jp_glp1_products_by_category",
+  "source": "queries/jp-glp1-by-japanese-category-reasoning.rq",
+  "onboarding": false,
+  "question": "GLP-1受容体作動薬製剤は薬効分類ごとにいくつある？",
+  "sql": "SELECT * FROM SEMANTIC_VIEW({view} DIMENSIONS jp_drug_class.jp_class_name_ja METRICS product_count WHERE product.is_glp1_product) ORDER BY product_count DESC"
  }
 ]

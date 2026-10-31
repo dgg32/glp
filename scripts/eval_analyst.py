@@ -14,12 +14,25 @@ connector. Scores are checks against ground truth computed by plain SQL on the l
                                                                  the denominator: Byetta has two holders)
   ja-bi-share    「ベーリンガーのSGLT2阻害薬シェアは？」       claims and share right
 
+With --model jp, the Japan questions on JAPAN_MARKET (NDB Open Data), all in Japanese:
+
+  jp-tokyo       「東京都で処方された糖尿病治療薬の金額は？」     value right (prefecture cells, all settings)
+  jp-bi-share    「日本ベーリンガーインゲルハイムのSGLT2阻害薬シェアは？」  share right (the subsidiary resolved
+                                                                 to its corporate group)
+  jp-glp1-cat    「GLP-1受容体作動薬は薬効分類のどこに入っている？」  both 249 and 396 named; 23 products in 249,
+                                                                 2 in 396 (counted, or listed one per row)
+  jp-mounjaro    「マンジャロの月別の金額の推移は？」              April 2024 and March 2025 totals right, or
+                                                                 at least right when its rows are added up
+  jp-age         「75歳以上の患者への割合が最も高い薬効群は？」    the drug class with the highest share first
+                                                                 (glinides, not the DPP-4 inhibitors), share right
+
 Writes data/validation/analyst-eval-<label>.json and prints a summary.
 
-Usage: .venv-snowflake/bin/python scripts/eval_analyst.py <label> [--runs N] [--only question-id]
+Usage: .venv-snowflake/bin/python scripts/eval_analyst.py <label> [--model us|jp] [--runs N] [--only question-id]
 """
 import argparse
 import base64
+from collections import Counter
 import hashlib
 import json
 import os
@@ -39,6 +52,7 @@ from load_snowflake import connect  # noqa: E402  (also loads .env)
 
 ROOT = Path(__file__).resolve().parent.parent
 VIEWS = {"native": "GLP.SEMANTIC.DIABETES_MARKET", "osi": "GLP.SEMANTIC.DIABETES_MARKET_OSI"}
+JP_VIEWS = {"native": "GLP.SEMANTIC.JAPAN_MARKET", "osi": "GLP.SEMANTIC.JAPAN_MARKET_OSI"}
 JAPANESE = re.compile(r"[぀-ヿ一-鿿]")
 
 
@@ -133,6 +147,80 @@ def texts(rows):
 
 BI, NOVO = "529900P5FAANZASUYL28", "549300DAQ1CVT6CXN342"
 
+
+def jp_ground_truth(cur):
+    """Expected values for the Japan questions, from plain SQL on JP.* (not through the semantic views)."""
+    one = lambda sql: cur.execute(sql).fetchall()  # noqa: E731
+    value = "q.QUANTITY * p.NHI_PRICE"
+    cells = "GLP.JP.QUANTITY q JOIN GLP.JP.PRODUCT p ON p.PRODUCT_ID = q.PRODUCT_ID"
+    tokyo = one(f"SELECT SUM({value}) FROM {cells} WHERE q.BREAKDOWN = 'prefecture' AND q.PREFECTURE_CODE = '13'")[0][0]
+    sglt2 = dict(one(f"""SELECT COALESCE(o.CORPORATE_GROUP_ID, o.ORGANIZATION_ID, 'none'), SUM(t.TOTAL_QUANTITY * p.NHI_PRICE)
+        FROM GLP.JP.NATIONAL_TOTAL t JOIN GLP.JP.PRODUCT p ON p.PRODUCT_ID = t.PRODUCT_ID
+        JOIN GLP.JP.PRODUCT_SUBSTANCE ps ON ps.PRODUCT_ID = p.PRODUCT_ID
+        JOIN GLP.VOCAB.SUBSTANCE s ON s.SUBSTANCE_ID = ps.SUBSTANCE_ID AND s.CLASS_ID = 'SGLT2Inhibitor'
+        LEFT JOIN GLP.JP.ORGANIZATION o ON o.ORGANIZATION_ID = p.ORGANIZATION_ID GROUP BY 1"""))
+    mounjaro = dict(one(f"""SELECT TO_CHAR(q.MONTH, 'YYYY-MM'), SUM({value}) FROM {cells}
+        WHERE q.BREAKDOWN = 'month' AND p.PRODUCT_NAME_JA LIKE 'マンジャロ%' GROUP BY 1"""))
+    # drug classes = depth 3 of the class tree, as therapeutic_class.is_drug_class
+    oldest = one(f"""SELECT c.PREF_LABEL_EN, SUM(IFF(g.MIN_AGE >= 75, {value}, 0)) / SUM({value}) AS SHARE FROM {cells}
+        JOIN GLP.JP.PRODUCT_CLASS pc ON pc.PRODUCT_ID = p.PRODUCT_ID
+        JOIN GLP.VOCAB.THERAPEUTIC_CLASS c ON c.CLASS_ID = pc.CLASS_ID
+        JOIN GLP.VOCAB.SEX_AGE_GROUP g ON g.SEX_AGE_CODE = q.SEX_AGE_CODE
+        WHERE q.BREAKDOWN = 'sex-age'
+          AND (SELECT COUNT(*) FROM GLP.VOCAB.CLASS_ANCESTOR a WHERE a.CLASS_ID = c.CLASS_ID) = 3
+        GROUP BY 1 ORDER BY SHARE DESC LIMIT 1""")[0]
+    labels = dict(one("SELECT PREF_LABEL_EN, PREF_LABEL_JA FROM GLP.VOCAB.THERAPEUTIC_CLASS"))
+    return {"tokyo": float(tokyo), "bi_sglt2_share": float(sglt2[BI]) / float(sum(sglt2.values())),
+            "mounjaro": {m: float(v) for m, v in mounjaro.items()},
+            "oldest_class": [oldest[0], labels[oldest[0]]], "oldest_share": float(oldest[1])}
+
+
+def has_yen(values, target):
+    """Yen may come as yen, millions or billions (rounded to the unit shown)."""
+    return any(has(values, target / scale, rel=0.005) for scale in (1, 1e6, 1e8, 1e9))
+
+
+def jp_categories(rows):
+    """Products per Japanese category when the answer lists products one per row (code or Japanese name)."""
+    found = Counter()
+    for row in rows:
+        values = [str(v) for v in row]
+        for code, name in (("249", "その他のホルモン剤"), ("396", "糖尿病用剤")):
+            if code in values or any(v.startswith(name) for v in values):
+                found[code] += 1
+    return found
+
+
+def monthly_sums(rows):
+    """Values per month when the answer splits a month into several rows (e.g. one per strength)."""
+    sums = Counter()
+    for row in rows:
+        month = next((str(v)[:7] for v in row if re.fullmatch(r"\d{4}-\d{2}(-\d{2})?", str(v))), None)
+        values = [float(v) for v in row if not re.fullmatch(r"\d{4}-\d{2}(-\d{2})?", str(v))
+                  and re.fullmatch(r"-?\d+(\.\d+)?", str(v))]
+        if month and len(values) == 1:
+            sums[month] += values[0]
+    return sums
+
+
+JP_QUESTIONS = {
+    "jp-tokyo": ("東京都で処方された糖尿病治療薬の金額は？", lambda t, sql, rows: {
+        "value": has_yen(numbers(rows), t["tokyo"])}),
+    "jp-bi-share": ("日本ベーリンガーインゲルハイムのSGLT2阻害薬シェアは？", lambda t, sql, rows: {
+        "share": has_share(numbers(rows), t["bi_sglt2_share"])}),
+    "jp-glp1-cat": ("GLP-1受容体作動薬は薬効分類のどこに入っている？", lambda t, sql, rows: {
+        "both_categories": {"249", "396"} <= set(jp_categories(rows)),
+        "counts_23_2": {23.0, 2.0} <= set(numbers(rows)) or jp_categories(rows) == {"249": 23, "396": 2},
+        "japanese_labels": any(JAPANESE.search(x) for x in texts(rows))}),
+    "jp-mounjaro": ("マンジャロの月別の金額の推移は？", lambda t, sql, rows: {
+        "monthly_totals": all(has_yen(numbers(rows), t["mounjaro"][m]) for m in ("2024-04", "2025-03")),
+        "rows_add_up": all(has_yen([monthly_sums(rows)[m]], t["mounjaro"][m]) for m in ("2024-04", "2025-03"))}),
+    "jp-age": ("75歳以上の患者への割合が最も高い薬効群は？", lambda t, sql, rows: {
+        "right_class_first": bool(rows) and any(str(v) in t["oldest_class"] or str(v).rstrip("s") == t["oldest_class"][0].rstrip("s")
+                                                for v in rows[0]),
+        "share": has_share(numbers(rows), t["oldest_share"])}),
+}
+
 QUESTIONS = {
     "ja-specialty": ("SGLT2阻害薬の処方件数を専門分野別に教えて", lambda t, sql, rows: {
         "numbers": all(has(numbers(rows), t["sglt2_by_specialty"][s][0]) for s in
@@ -167,16 +255,18 @@ def main():
     ap.add_argument("label")
     ap.add_argument("--runs", type=int, default=3)
     ap.add_argument("--only")
+    ap.add_argument("--model", choices=["us", "jp"], default="us")
     args = ap.parse_args()
     con = connect()
     cur = con.cursor()
-    truth = ground_truth(cur)
+    views, questions = (VIEWS, QUESTIONS) if args.model == "us" else (JP_VIEWS, JP_QUESTIONS)
+    truth = (ground_truth if args.model == "us" else jp_ground_truth)(cur)
     token = jwt()
     results = []
-    for qid, (question, score) in QUESTIONS.items():
+    for qid, (question, score) in questions.items():
         if args.only and qid != args.only:
             continue
-        for kind, view in VIEWS.items():
+        for kind, view in views.items():
             for run in range(args.runs):
                 reply = ask(token, view, question)
                 content = reply.get("message", {}).get("content", [])
@@ -197,18 +287,19 @@ def main():
                 mark = "ERR" if "error" in entry else " ".join(f"{k}={'✓' if v else '✗'}" for k, v in entry["checks"].items())
                 print(f"{qid:12} {kind:6} run {run}: {mark}{' (warning)' if entry['warnings'] else ''}")
     out = ROOT / "data" / "validation" / f"analyst-eval-{args.label}.json"
-    out.write_text(json.dumps({"label": args.label, "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                               "runs": args.runs, "results": results}, indent=1, ensure_ascii=False))
+    out.write_text(json.dumps({"label": args.label, "model": args.model, "truth": truth,
+                               "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                               "runs": args.runs, "results": results}, indent=1, ensure_ascii=False, default=str))
 
-    print(f"\n{'question':12} {'check':18} " + " ".join(f"{k:>8}" for k in VIEWS))
-    for qid in QUESTIONS:
+    print(f"\n{'question':12} {'check':18} " + " ".join(f"{k:>8}" for k in views))
+    for qid in questions:
         entries = [e for e in results if e["question"] == qid]
         if not entries:
             continue
         checks = next((list(e["checks"]) for e in entries if "checks" in e), [])
         for check in checks + ["errors", "warnings"]:
             cells = []
-            for kind in VIEWS:
+            for kind in views:
                 es = [e for e in entries if e["view"] == kind]
                 if check == "errors":
                     n = sum("error" in e for e in es)

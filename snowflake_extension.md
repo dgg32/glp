@@ -26,9 +26,9 @@ The Boehringer Ingelheim Japan Semantic Engineer posting lists **"Experience wit
 
 | Schema | Tables |
 |---|---|
-| `VOCAB` (shared vocabularies) | THERAPEUTIC_CLASS (17), CLASS_ANCESTOR (48), SUBSTANCE (47), INDICATION (3), SPECIALTY (918), SPECIALTY_ANCESTOR (2,449), LABEL (2,174) |
+| `VOCAB` (shared vocabularies) | THERAPEUTIC_CLASS (17), CLASS_ANCESTOR (48), SUBSTANCE (47), INDICATION (3), SPECIALTY (918), SPECIALTY_ANCESTOR (2,449), JP_DRUG_CLASS (6), JP_CLASS_MATCH (15), PREFECTURE (47), CARE_SETTING (4), SEX_AGE_GROUP (44), LABEL (2,568) |
 | `US` (Connecticut, Part D 2024) | PRESCRIPTION (22,034), PRESCRIBER (3,896), PRESCRIBER_SPECIALTY (5,223), PRODUCT (51), PRODUCT_SUBSTANCE (66), PRODUCT_INDICATION (59), PRODUCT_MANUFACTURER (34), PRODUCT_CLASS (171), ORGANIZATION (9) |
-| `JP` | later: NDB products and cells, sharing VOCAB |
+| `JP` (NDB Open Data FY2024, added 2026-10-31) | PRODUCT (510), PRODUCT_SUBSTANCE (530), PRODUCT_CLASS (1,514), ORGANIZATION (51), NATIONAL_TOTAL (1,488), QUANTITY (150,288) |
 
 Checks: keys unique, NOT NULL filled, every foreign key resolves, expected counts, and **parity**: `sglt2-vs-glp1-by-specialty.rq` and `cost-per-claim-by-class.rq` run on the graph give the same numbers as the same questions computed from the tables (proven to fire: one extra Jardiance claim fails both).
 
@@ -118,8 +118,37 @@ Reading:
 
 Pipeline: `check_local.py` → `export_snowflake.py` → `load_snowflake.py` → `build_osi.py` → `deploy_semantic_view.py` → `eval_analyst.py <label>`.
 
+## Step 4: Japan (2026-10-31)
+Article 2 now uses Snowflake as its presentation layer, so the NDB data followed (decisions.md, 2026-10-31).
+- `export_snowflake.py` adds the JP schema and the Japanese vocabularies (table above); every table reads only its
+  source graphs. It stores the graph's answers to all `queries/jp-*.rq` in `tables.json` (the reasoning query as its
+  OWL definition spelled out) and checks that every product reaches the top class once.
+- `load_snowflake.py` also verifies the total Japanese quantity and the masked cell count (25,939,035,814.92462
+  units, 36,031 masked). That check caught NUMBER(18,2) rounding the five-decimal NDB quantities; now NUMBER(18,5).
+- `build_osi.py` generates `semantic/japan-market.{osi.yaml,sql}`: 10 datasets (fact datasets national_value,
+  prefecture_value, month_value, sex_age_value at class grain; product with the defined-class flags, substances and
+  company; therapeutic_class, jp_drug_class, prefecture, care_setting, sex_age_group), 15 metrics, 46 synonyms,
+  7 verified queries restating `queries/jp-*.rq`, company value lists generated from dm:partOfCorporateGroup.
+  The generator now warns when two ontology terms share a label. It found 薬効分類 on both dm:TherapeuticClass
+  and dm:JapaneseDrugClass; ontology 0.5.2 renames the former 薬効群 (altLabel ATC分類), so the views have 65 and 48
+  synonyms.
+- `queries/snowflake/jp-vs-connecticut-class-mix.sql` and `glp1-products-by-country.sql`: the cross-country
+  questions in plain SQL.
+- `deploy_semantic_view.py` deploys `JAPAN_MARKET` and `JAPAN_MARKET_OSI` next to the US views and checks all
+  7 Japan verified queries (225 rows) and both SQL files against the graph: all match, on both views.
+- `eval_analyst.py <label> --model jp`: five Japanese questions, 3 runs per view. Final (`analyst-eval-jp-final.json`),
+  native / OSI: Tokyo value 3/3 · 3/3; 日本ベーリンガーインゲルハイム SGLT2 share 3/3 · 3/3; GLP-1 categories named
+  3/3 · 3/3, counted 3/3 · 0/3; Mounjaro monthly totals 1/3 · 3/3 (native splits by strength; rows add up 3/3);
+  class with the highest 75+ share (glinides, not DPP-4) 3/3 · 3/3.
+- Fixes found by the evaluation (first run `jp`, then `jp-after`, `jp-after2`, `jp-after3`): company value lists
+  with the Japanese subsidiaries as aliases (Analyst guessed 'Boehringer Ingelheim' / the subsidiary name: share
+  2/3 · 0/3); `class_market_share` and `market_share` with precomputed denominators (it divided Boehringer's SGLT2
+  sales by Boehringer's total: 78%); the instruction about the top class reworded (native added a top-class
+  filter to a drug-class question and got no rows; OSI, without instructions, did not).
+
 ## Next
+- Article 2 figures: Snowsight screenshots listed in `docs/article_2.md` (Figures 1, 5, 6, 7).
 - Native-speaker review of the 12 new ja/zh property labels (ontology 0.5.1) and Japanese labels for the remaining 63 NUCC specialties in use (the Japanese answers fall back to English names for them).
-- Stardog: rebuild and check locally (`build_rdf.py`, `check_local.py`) before pushing ontology 0.5.1.
-- Optional: a Cortex Search service on `VOCAB.LABEL` for value-level altLabels (SGLT2i, グリフロジン); a `JP` schema from the NDB data.
+- Stardog: push ontology 0.5.2 (rebuilt and checked locally on 2026-10-31; labels only since 0.5.0).
+- Optional: a Cortex Search service on `VOCAB.LABEL` for value-level altLabels (SGLT2i, グリフロジン).
 - The article (third in the series): ontology-generated semantic layer; OSI keeps structure, metrics and descriptions but loses synonyms, instructions and verified queries, even in Snowflake's own export format; measured effect on Cortex Analyst.
