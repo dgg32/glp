@@ -64,7 +64,7 @@ Headroom: 1,000,000 edges − 247,211 (Connecticut, shared vocabularies, shapes 
 | Design | Japan triples | Total | Fits? |
 |---|---|---|---|
 | Flat observations (~6 triples each), all cells | ~900k | ~1.15M | no |
-| Slices, all cells (**chosen**) | 486,900 (measured) | 734,106 | yes, ~266k left |
+| Slices, all cells (**chosen**) | 486,900 (measured) | 734,133 (measured 2026-11-01, ontology 0.5.2) | yes, ~266k left |
 | Slices, zeros dropped (fallback) | ~364k | ~611k | yes, ~389k left |
 
 Zeros are kept because the graph is then lossless: a SHACL rule can check that every prefecture slice has exactly 47 observations, and a round-trip test can rebuild the Excel totals. If headroom is needed later, drop zeros first (−123k), then 入院 (heavily masked, −~90k). The 12th release (monthly) will not fit next to this; it needs its own database or only its month table.

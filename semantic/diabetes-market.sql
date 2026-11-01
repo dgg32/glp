@@ -176,13 +176,13 @@ CREATE OR REPLACE SEMANTIC VIEW GLP.SEMANTIC.DIABETES_MARKET
     class_drug_cost AS SUM(prescription_class.drug_cost)
       COMMENT = 'Gross drug cost in USD of products in a therapeutic class. Filter or group by one class.',
     class_cost_per_claim AS SUM(prescription_class.drug_cost) / NULLIF(SUM(prescription_class.claims), 0)
-      COMMENT = 'Gross drug cost per claim in USD within a therapeutic class.',
+      COMMENT = 'Gross drug cost per claim in USD within a therapeutic class. Includes combination products, counted in every class they belong to; the single-ingredient convention of the published findings adds WHERE NOT product.is_combination (Biguanides: 55 USD with combinations, 9 without).',
     class_cost_per_30day_fill AS SUM(prescription_class.drug_cost) / NULLIF(SUM(prescription_class.fills_30day), 0)
-      COMMENT = 'Gross drug cost per 30-day fill in USD within a therapeutic class: compares classes fairly when fill lengths differ.',
+      COMMENT = 'Gross drug cost per 30-day fill in USD within a therapeutic class: compares classes fairly when fill lengths differ. Includes combination products; add WHERE NOT product.is_combination for single-ingredient products only.',
     sglt2_claims AS SUM(CASE WHEN prescription_class.class_id = 'SGLT2Inhibitor' THEN prescription_class.claims ELSE 0 END)
-      COMMENT = 'Claims of products in the class Sodium-glucose co-transporter 2 (SGLT2) inhibitors (from the definition of dm:SGLT2Prescriber).',
+      COMMENT = 'Claims of products in the class Sodium-glucose co-transporter 2 (SGLT2) inhibitors (from the definition of dm:SGLT2Prescriber). Covers all prescribers: grouped by specialty, those without a primary specialty form a row whose specialty is NULL; report it as ''no primary specialty'' or leave it out and say so.',
     glp1_claims AS SUM(CASE WHEN prescription_class.class_id = 'GLP1ReceptorAgonist' THEN prescription_class.claims ELSE 0 END)
-      COMMENT = 'Claims of products in the class Glucagon-like peptide-1 (GLP-1) analogues, including dual GIP/GLP-1 agonists (from the definition of dm:GLP1Prescriber).',
+      COMMENT = 'Claims of products in the class Glucagon-like peptide-1 (GLP-1) analogues, including dual GIP/GLP-1 agonists (from the definition of dm:GLP1Prescriber). Covers all prescribers, like sglt2_claims.',
     sglt2_share_vs_glp1 AS SUM(CASE WHEN prescription_class.class_id = 'SGLT2Inhibitor' THEN prescription_class.claims ELSE 0 END) / NULLIF(SUM(CASE WHEN prescription_class.class_id = 'SGLT2Inhibitor' THEN prescription_class.claims ELSE 0 END) + SUM(CASE WHEN prescription_class.class_id = 'GLP1ReceptorAgonist' THEN prescription_class.claims ELSE 0 END), 0)
       COMMENT = 'SGLT2 inhibitor claims as a fraction of SGLT2 inhibitor plus GLP-1 receptor agonist claims (0 to 1).',
     company_claims AS SUM(prescription_class_company.claims)

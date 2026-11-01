@@ -11,8 +11,15 @@ observation graph (ndb-2024, 478k triples) is validated with reasoning off only:
 its shapes look at (no property of a slice or an observation has a sub-property, inverse, chain or domain
 that infers values; qb:observation's range only types the observations).
 
-Usage: .venv/bin/python tests/test_shapes_reasoning.py
+The reasoning-on runs are opt-in (GLP_LIVE_REASONING=1): even split in two, they still made the instance answer
+503 (2026-11-01), and reasoning-on validation is what filled the previous instance's disk. Stardog Cloud Free has
+no backups. scripts/check_local.py covers the same ground locally (OWL 2 RL closure, then SHACL); run the live
+version only after a push, and only when nothing else uses the instance.
+
+Usage: .venv/bin/python tests/test_shapes_reasoning.py                       (reasoning off only)
+       GLP_LIVE_REASONING=1 .venv/bin/python tests/test_shapes_reasoning.py  (also reasoning on)
 """
+import os
 import sys
 import urllib.parse
 from collections import Counter
@@ -41,6 +48,9 @@ def validate_graphs(graphs):
 runs = [("false", "all graphs", f"VALIDATE ALL USING SHAPES GRAPH <{SHAPES_GRAPH}>"),
         ("true", "US data + vocabularies", validate_graphs(all_graphs - JAPAN)),
         ("true", "Japanese products + vocabularies", validate_graphs(all_graphs - US - {G + "ndb-2024"}))]
+if os.environ.get("GLP_LIVE_REASONING") != "1":
+    print("reasoning-on runs skipped (set GLP_LIVE_REASONING=1; scripts/check_local.py checks this locally)")
+    runs = runs[:1]
 failed = False
 for reasoning, scope, query in runs:
     params = {"query": query, "reasoning": reasoning}

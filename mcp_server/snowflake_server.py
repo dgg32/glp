@@ -12,10 +12,14 @@ The Snowflake counterpart of server.py (Stardog). Gives any MCP client three too
 GLP_SF_LAYER=native (default) or osi chooses which views describe_model shows: GLP.SEMANTIC.DIABETES_MARKET and
 JAPAN_MARKET, or their _OSI twins, imported from OSI YAML without synonyms, instructions and verified queries.
 
-Read-only by design, in three layers: only SELECT/WITH/SHOW/DESCRIBE/EXPLAIN pass the statement check, one statement
-per call; the session uses the role SNOWFLAKE_READER_ROLE, which holds only USAGE and SELECT
-(scripts/setup_snowflake_reader.py); and secondary roles are switched off, because a user's DEFAULT_SECONDARY_ROLES
-(ALL) would otherwise add the privileges of every other role it has. The server refuses to start otherwise.
+Read-only by design. The guarantee is the login: with SNOWFLAKE_READER_USER set, the server signs in as a service
+user that holds no role but SNOWFLAKE_READER_ROLE (USAGE, SELECT and REFERENCES only;
+scripts/setup_snowflake_reader.py), so no statement in the session can gain more. Without it, the server signs in
+as SNOWFLAKE_USER with the reader role and secondary roles off; that user also holds the admin role, and Snowflake
+lets any of its sessions take it back (USE ROLE, USE SECONDARY ROLES ALL, accepted without a privilege check), so
+the statement check is then the only layer that holds: only SELECT/WITH/SHOW/DESCRIBE/EXPLAIN pass, one statement
+per call. The session's role and secondary roles are checked at connect time and again before every statement; the
+server refuses to run otherwise.
 
 Run: .venv-snowflake/bin/python mcp_server/snowflake_server.py   (stdio transport)
 """
@@ -115,22 +119,39 @@ def _connection():
         # Deliberately no fallback to SNOWFLAKE_ROLE: that is the admin role of the pipeline.
         raise RuntimeError("Missing in .env: " + ", ".join("SNOWFLAKE_" + k for k in missing)
                            + " (a read-only role is required; see scripts/setup_snowflake_reader.py)")
+    user, key = env["USER"], env["PRIVATE_KEY_PATH"]
+    if os.environ.get("SNOWFLAKE_READER_USER"):  # the service user that holds only the reader role
+        user = os.environ["SNOWFLAKE_READER_USER"]
+        key = os.environ.get("SNOWFLAKE_READER_PRIVATE_KEY_PATH") or key
     con = snowflake.connector.connect(
-        account=env["ACCOUNT"], user=env["USER"], authenticator="SNOWFLAKE_JWT",
-        private_key_file=os.path.expanduser(env["PRIVATE_KEY_PATH"]), role=env["READER_ROLE"],
+        account=env["ACCOUNT"], user=user, authenticator="SNOWFLAKE_JWT",
+        private_key_file=os.path.expanduser(key), role=env["READER_ROLE"],
         warehouse=env["WAREHOUSE"], database=env["DATABASE"],
         session_parameters={"STATEMENT_TIMEOUT_IN_SECONDS": 120, "QUERY_TAG": "glp-mcp"})
-    cur = con.cursor()
-    cur.execute("USE SECONDARY ROLES NONE")
-    role, secondary = cur.execute("SELECT CURRENT_ROLE(), CURRENT_SECONDARY_ROLES()").fetchone()
-    if role != env["READER_ROLE"].upper() or '"roles":""' not in secondary.replace(" ", ""):
+    con.cursor().execute("USE SECONDARY ROLES NONE")
+    try:
+        _check_session(con, env["READER_ROLE"])
+    except RuntimeError:
         con.close()
-        raise RuntimeError(f"Session is not read-only (role {role}, secondary roles {secondary}); refusing to run.")
+        raise
     return con
 
 
+def _check_session(con, reader_role):
+    role, secondary = con.cursor().execute("SELECT CURRENT_ROLE(), CURRENT_SECONDARY_ROLES()").fetchone()
+    if role != reader_role.upper() or '"roles":""' not in secondary.replace(" ", ""):
+        raise RuntimeError(f"Session is not read-only (role {role}, secondary roles {secondary}); refusing to run.")
+
+
+def _cursor():
+    """A cursor on the read-only session, after checking that the session is still read-only."""
+    con = _connection()
+    _check_session(con, os.environ["SNOWFLAKE_READER_ROLE"])
+    return con.cursor()
+
+
 def _rows(sql, params=None):
-    cur = _connection().cursor()
+    cur = _cursor()
     cur.execute(sql, params)
     return [d[0] for d in cur.description], cur.fetchall()
 
@@ -290,7 +311,7 @@ def run_sql(sql: str, limit: int = 200) -> str:
         return f"Rejected: {exc}"
     limit = max(1, min(int(limit), 1000))
     try:
-        cur = _connection().cursor()
+        cur = _cursor()
         cur.execute(sql)
         columns = [d[0] for d in cur.description]
         rows = cur.fetchmany(limit + 1)

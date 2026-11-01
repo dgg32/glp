@@ -127,7 +127,7 @@ obs:622401201/outpatient-external/13
 
 Figure 3. One slice of the RDF Data Cube and the same slice as rows of a Snowflake table. Image by author.
 
-With 4,464 slices, Japan adds about 487,000 triples, and the whole graph holds 734,106. The zeros are kept. They cost about 123,000 triples, but they make the graph lossless: every table can be rebuilt from the graph, and SHACL can check that a prefecture slice has exactly 47 cells. A property graph would face the same size trade-off, and the usual answer there is a list property on the slice node. That saves even more space, but individual cells then can no longer carry a masking flag or be checked one by one.
+With 4,464 slices, Japan adds about 487,000 triples, and the whole graph holds 734,133. The zeros are kept. They cost about 123,000 triples, but they make the graph lossless: every table can be rebuilt from the graph, and SHACL can check that a prefecture slice has exactly 47 cells. A property graph would face the same size trade-off, and the usual answer there is a list property on the slice node. That saves even more space, but individual cells then can no longer carry a masking flag or be checked one by one.
 
 The Data Cube also forced a small ontology decision. The first article's dm:forProduct links a prescription to its product, and its domain is dm:Prescription. Reusing it on slices would have made every slice a prescription under reasoning, since OWL treats a domain as an inference, not as a check. The slices got their own property, dm:aboutProduct, instead.
 
@@ -202,8 +202,8 @@ CREATE OR REPLACE SEMANTIC VIEW GLP.SEMANTIC.JAPAN_MARKET
   METRICS (
     class_market_share AS SUM(national_value.value_yen) / NULLIF(MAX(national_value.class_total_value_yen), 0)
       COMMENT = 'Share (0 to 1) of the class''s national value, for one class at a time. ...', ... )
-  AI_SQL_GENERATION 'Answer in yen (value_yen metrics), never by adding quantities across products. ...'
-  AI_VERIFIED_QUERIES ( jp_class_share_yen AS ( QUESTION 'What share of Japan''s diabetes drug value ...' ... ), ... );
+  ai_sql_generation 'Answer in yen (value_yen metrics), never by adding quantities across products. ...'
+  ai_verified_queries ( jp_class_share_yen AS ( QUESTION 'What share of Japan''s diabetes drug value ...' ... ), ... );
 ```
 
 Each part of the view comes from a part of the graph. Synonyms are the en, ja and zh labels of the ontology terms, 48 of them, so 都道府県 points at the prefecture name. Descriptions are skos:definition texts. Value lists come from the SKOS schemes: the Japanese category names, the 47 prefectures and the company names. The company list also comes from dm:partOfCorporateGroup, so it reads "C.H. Boehringer Sohn AG & Co. KG (also: Nippon Boehringer Ingelheim Co., Ltd., 日本ベーリンガーインゲルハイム, ...)". The OWL defined classes become flags. The generator reads the owl:hasValue of each definition and writes the SQL that a reasoner would have run (Code 6).

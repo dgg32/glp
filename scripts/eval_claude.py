@@ -11,7 +11,7 @@ metric used), the SQL of Claude's run_sql calls. Checks that cannot be read from
 
   ja-specialty   numbers right; the specialty names in Japanese (循環器内科医 and 内科医 written)
   share          numbers right; share right; prepared metric (SGLT2_SHARE_VS_GLP1) used in a query
-  cost           no figure of a parent class (drugs used in diabetes, ...) given; single-ingredient convention;
+  cost           no figure of a parent class (drugs used in diabetes, ...) given; single-ingredient figure shown (not: combined one absent);
                  cost per 30-day fill shown
   top-cost       no parent-class figure; GLP-1 named before the other drug classes
   jp-mounjaro    April 2024 and March 2025 totals written (no per-strength sum check)

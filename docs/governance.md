@@ -136,6 +136,19 @@ The Stardog tests below are for after a release, not for iterating.
 Warnings and info results do not block a load: they describe real properties of the source data,
 not pipeline errors.
 
+### The Snowflake copy
+
+The tables and semantic views in Snowflake are derived from the checked graph, never from the raw data,
+and follow the same rule: check locally, publish once.
+
+| Guarantee | Enforced by |
+|---|---|
+| Only a checked graph is exported | [export_snowflake.py](../scripts/export_snowflake.py) refuses to run unless `check_local.py` passed on exactly these RDF files, and checks its tables against the SPARQL queries before writing `data/snowflake/tables.json` (file hashes, RDF provenance hash) |
+| Only the checked export is loaded | [load_snowflake.py](../scripts/load_snowflake.py) refuses any CSV whose hash differs from `tables.json` |
+| A failed load leaves the old tables | the loader clones each schema (zero-copy) before replacing its tables, verifies row counts and totals, and swaps the clone back on any failure |
+| Every load is logged | `PUBLIC.LOAD_LOG`: time, table, rows, file hash, RDF provenance hash; each table comment names its source graphs and export |
+| The views match the graph | [deploy_semantic_view.py](../scripts/deploy_semantic_view.py) deploys only if the latest `LOAD_LOG` entry carries the manifest's RDF provenance hash, then compares the views' answers, every verified query and `queries/snowflake/*.sql` with the graph's |
+
 ## 4. Versioning
 
 - **Ontology:** semantic versions with `owl:versionIRI`, `owl:versionInfo`, `owl:priorVersion` and
@@ -206,6 +219,11 @@ The conventions a contributor follows when changing the model or adding a source
   SELECT/ASK/CONSTRUCT/DESCRIBE pass its query check, queries go to Stardog's read endpoint, and it
   logs in as a separate user with READ permission only. Its test proves the first layer (`DROP ALL`
   is rejected); the other two are configuration.
+- **Read-only access in Snowflake:** the Snowflake MCP server uses the role `GLP_READER` (USAGE, SELECT,
+  REFERENCES; [setup_snowflake_reader.py](../scripts/setup_snowflake_reader.py)). A role alone is not a
+  boundary: a session can take back any role its user holds (`USE SECONDARY ROLES ALL` needs no
+  privilege), so the server logs in as a service user that holds only `GLP_READER`. The Cortex Analyst
+  evaluation runs the model's SQL on that same session, after the same statement check.
 - **Secrets:** credentials and API keys live only in `.env` (git-ignored). API keys are sent in request
   URLs but never written to the caches.
 

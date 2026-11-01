@@ -1311,3 +1311,552 @@ PY
 | `vocab/therapeutic-class.ttl` | the ATC-based class tree — M3 |
 | `ontology/diabetes-market.ttl` | 0.5.0, 14 `owl:Class`, 4 defined classes — L8, L2 |
 | `shapes/diabetes-market-shapes.ttl` | 0.3.0, 59 rules, 13 node shapes |
+
+---
+
+# Round 4 — the Snowflake semantic layer (2026-11-01)
+
+Fresh round, after the Snowflake extension (tables, semantic views, OSI, Cortex Analyst evaluation,
+the Snowflake MCP server) and the ontology 0.5.2 push. Scope: `scripts/export_snowflake.py`,
+`scripts/load_snowflake.py`, `scripts/build_osi.py`, `scripts/deploy_semantic_view.py`,
+`scripts/eval_analyst.py`, `scripts/eval_claude.py`, `scripts/setup_snowflake_reader.py`,
+`mcp_server/snowflake_server.py`, `semantic/`, `snowflake_extension.md`, `docs/article_2.md`,
+`CLAUDE.md`, `docs/governance.md`.
+
+**13 findings: 2 high, 4 medium, 7 low, plus one incident.** Nothing was fixed in this round.
+
+**Fix status (2026-11-01, later the same day).** H1: reasoning-on runs opt-in (`GLP_LIVE_REASONING=1`).
+H2: Analyst's SQL runs on the MCP server's read-only session, after its statement check. M1, M2: conventions stated
+in the metric descriptions (`semantic/` regenerated, **not yet deployed**); the parity check filters the NULL
+specialty in SQL, explicitly (72 rows, 198,279 / 238,340, checked live). M3, L3, L7: numbers and casing corrected.
+M4: the loader clones each schema first and swaps it back on failure. L1: a reader role that inherits roles is
+refused. L2: governance has a Snowflake section. L4, L5: the check's meaning and the scorer caveat stand next to the
+results (the check key keeps its name, so saved results stay comparable). L6, and the cause of both incidents: the
+reader can log in as a service user that holds only `GLP_READER` (`SNOWFLAKE_READER_USER`), and the session is
+re-checked before every statement; **the user is not created yet**. CLAUDE.md now forbids write probes on live
+databases.
+
+The headline: **the semantic layer is correct and the deployment is verified.** All 27 tables match
+the checked export row for row; all four views reproduce the graph's numbers (0 parity differences,
+every verified query, both plain-SQL files); the generator is deterministic; the OSI round-trip loss
+the hand-off describes is exactly what the live views show. The findings are about the **edges**:
+one test that still takes the live database down, one evaluation harness that runs model-written SQL
+as the account admin, one metric whose convention differs from the published one by 6× for a class,
+and a set of stale counts left behind by the 0.5.2 push.
+
+## Summary
+
+| # | Finding | Severity | Where |
+|---|---|---|---|
+| H1 | The test suite still runs reasoning-on SHACL against the live free-tier instance — it took the instance down (503) again today | high | `tests/test_shapes_reasoning.py` |
+| H2 | The evaluation harness executes the SQL Cortex Analyst returns, as ACCOUNTADMIN, with no read-only guard | high | `scripts/eval_analyst.py` |
+| M1 | The view's `class_cost_per_claim` metric uses a different convention from the published findings; Biguanides comes out 6× apart | medium | `semantic/`, `build_osi.py` |
+| M2 | The view's specialty breakdown carries a NULL-specialty row the graph does not have, and the parity check filters it out | medium | `deploy_semantic_view.py` |
+| M3 | `article_2.md` quotes 734,106 triples; the database holds 734,133 | medium | `docs/article_2.md:130` |
+| M4 | The Snowflake loader is not atomic: it drops all 27 tables, loads, and verifies only at the end | medium | `scripts/load_snowflake.py` |
+| L1 | The reader-role setup script's privilege check cannot see a role-hierarchy grant | low | `setup_snowflake_reader.py` |
+| L2 | `governance.md` does not mention the Snowflake pipeline at all | low | `docs/governance.md` |
+| L3 | Stale counts in `CLAUDE.md` and the hand-off (64 synonyms, 16 tables, 45 fields, 15 metrics) | low | `CLAUDE.md`, `snowflake_extension.md` |
+| L4 | The eval's `single_ingredient` check tests for a number, not for a convention | low | `eval_analyst.py`, `eval_claude.py` |
+| L5 | The Claude scorer was corrected after reading the answers it scores | low | `eval_claude.py` |
+| L6 | The MCP server's docstring says "three layers"; one of them is voided by any statement Snowflake accepts unconditionally | low | `snowflake_server.py` |
+| L7 | `docs/article_2.md` Code 5 shows the AI clauses in upper case; the deployed DDL uses lower case | low | `docs/article_2.md:205` |
+
+---
+
+## Incident — I truncated `GLP.US.PRODUCT` in Snowflake and restored it
+
+This happened during the round, on the live trial account, and it belongs in the record.
+
+**What I did.** Probing whether the `GLP_READER` role could write, I ran a list of write statements
+through a connector session opened with `role=GLP_READER` and `USE SECONDARY ROLES NONE`. The list
+included `USE SECONDARY ROLES ALL` **before** `TRUNCATE TABLE GLP.US.PRODUCT`. Snowflake accepts
+`USE SECONDARY ROLES ALL` with no privilege check at all — it re-activated the user's
+`DEFAULT_SECONDARY_ROLES = ('ALL')`, which carries ACCOUNTADMIN and ORGADMIN — and the TRUNCATE then
+succeeded. `GLP.US.PRODUCT` went from 51 rows to 0.
+
+**How it was restored.** Time Travel, the same way the project's own earlier incident was restored:
+
+```sql
+INSERT INTO GLP.US.PRODUCT
+  SELECT * FROM GLP.US.PRODUCT BEFORE(TIMESTAMP => '2026-11-01 12:30:00'::timestamp);
+```
+
+**Verification.** 51 rows, 51 distinct `PRODUCT_ID`s, the first rows as expected (`alogliptin`,
+`basaglar-kwikpen-u-100`, `bydureon-bcise`); `US.PRESCRIPTION` unchanged at 22,034 rows /
+1,050,891 claims / $644,621,275.38; `JP.QUANTITY` unchanged at 25,939,035,814.92462 units and 36,031
+masked cells. I then compared **all 27 tables** against their checked CSV exports, normalising
+booleans and decimal scale: **0 mismatches**. The scratch table I created for the privilege test
+(`GLP.US.ZZ_PROBE`) was dropped; `GLP.US` holds exactly its 9 tables.
+
+**Why it matters for the code.** The reader role itself is sound — on a scratch table with only
+`SELECT` granted, `TRUNCATE`, `DELETE`, `INSERT`, `CREATE`, `ALTER` and `GRANT` were all refused
+("SQL access control error"), and `SHOW GRANTS TO ROLE GLP_READER` lists only `SELECT` (58),
+`USAGE` (6) and `REFERENCES` (4). The exposure came from re-enabling the secondary roles, which
+Snowflake permits unconditionally. That is L6 below, and it is the same fact that makes H2 matter:
+**anything that connects with the admin role and runs text it did not author is one statement away
+from admin rights.**
+
+---
+
+# High
+
+### H1 — The test suite still runs a reasoning-on SHACL validation against the live free-tier instance, and it took the instance down again today
+
+`tests/test_shapes_reasoning.py:41-43` runs three validations against the **live** Stardog Cloud
+database, two of them with `reasoning=true`:
+
+```python
+runs = [("false", "all graphs", f"VALIDATE ALL USING SHAPES GRAPH <{SHAPES_GRAPH}>"),
+        ("true", "US data + vocabularies", validate_graphs(all_graphs - JAPAN)),
+        ("true", "Japanese products + vocabularies", validate_graphs(all_graphs - US - {G + "ndb-2024"}))]
+```
+
+**Evidence (today).** The test failed with the server-side error
+
+```
+RuntimeError: GET /query -> HTTP 410: {"message":"...OperatorException: Query execution cancelled:
+Execution of query ZOSZmtkB, type: SPARQL has been cancelled", ...}
+```
+
+and immediately afterwards the instance stopped answering altogether:
+
+```
+GET /query        -> HTTP 503 Service Temporarily Unavailable   (4 attempts over 60 s)
+GET /server/status-> HTTP 503 Service Temporarily Unavailable
+```
+
+It recovered on its own after about a minute. The triple counts are unchanged (734,133) and the
+instance answers queries normally now.
+
+**Why it matters.** This is the operation that destroyed the previous instance. `docs/article_2.md:230`:
+
+> During development, the Stardog database was reloaded in full five times, and several validation
+> runs used reasoning on top of the 150,000 observations. On the free tier, this filled the
+> instance's disk. The sixth reload failed with "No space left on device", and from then on every
+> query returned a corruption error. … Stardog Cloud Free has no backups, so the instance had to be
+> recreated.
+
+The project's own rule, in `CLAUDE.md`, is "**Never iterate against Stardog Cloud: rebuild and check
+locally, push once**" — and `scripts/check_local.py` already does the equivalent locally (OWL 2 RL
+closure with `owlrl`, then SHACL again; about ten minutes for everything).
+
+The test's own docstring knows the risk ("the instance answered 503 for minutes afterwards"), and the
+mitigation it applies — splitting the validation in two — is evidently not enough: the split still
+leaves the instance 503ing. Leaving the test in `tests/` means "run the tests" still triggers it.
+
+**Fix.** Make the two reasoning-on runs opt-in — an environment variable (`GLP_REASONING=1`) or a
+flag — and have the default path do the local OWL RL check instead, or point the test at the local
+store. If the live run is kept, it needs a long client timeout (`load_stardog.call` uses 600 s) and a
+note that it must not be run while the instance is in use.
+
+### H2 — The evaluation harness executes the SQL Cortex Analyst returns, as ACCOUNTADMIN, with no read-only guard
+
+`scripts/eval_analyst.py:281`:
+
+```python
+rows = cur.execute(sql).fetchall()
+```
+
+`sql` is whatever statement came back in the REST reply (line 273: `next((c.get("statement", "") for
+c in content if c.get("type") == "sql"), "")`). The cursor comes from `load_snowflake.connect()`
+(`scripts/load_snowflake.py:42-45`), which connects with `role=env["ROLE"]` — `SNOWFLAKE_ROLE`, which
+is **ACCOUNTADMIN** in this trial account. There is no statement check, no read-only role, and no
+`USE SECONDARY ROLES NONE` anywhere in that path.
+
+**Why it matters.** The MCP server treats exactly this as the threat to guard against: it has a
+statement allow-list, a reader role with only `SELECT`/`USAGE`/`REFERENCES`, and it refuses to start
+unless the secondary roles are empty. The evaluation harness has none of the three, and it is the
+path that runs *text produced by a language model*. In practice Analyst returns `SELECT`s, so nothing
+has gone wrong; but the harness would execute a DDL or DML statement verbatim with the account
+admin's rights, on a database with no backups whose whole point is that it can be rebuilt.
+
+**Fix.** Run the returned statement on a separate connection that uses `SNOWFLAKE_READER_ROLE` with
+`USE SECONDARY ROLES NONE`, and refuse anything that is not a `SELECT`/`WITH`/`SHOW`/`DESCRIBE`
+before executing it — the same check `mcp_server/snowflake_server.py` already has, which I tested
+against 25 write vectors and which held every one.
+
+---
+
+# Medium
+
+### M1 — The view's cost metric uses a different convention from the published findings, and Biguanides comes out 6× apart
+
+`semantic/diabetes-market.sql:178`:
+
+```sql
+class_cost_per_claim AS SUM(prescription_class.drug_cost) / NULLIF(SUM(prescription_class.claims), 0)
+```
+
+`prescription_class` has one row per prescription **and class**, so a combination product is counted
+in every class it belongs to. The published query `queries/cost-per-claim-by-class.rq` excludes them
+(`?prod dm:isCombinationProduct false`), and `docs/findings.md` §2 is on that convention.
+
+**Measured live, same question, two ways:**
+
+| Class | graph (`cost-per-claim-by-class.rq`) | view (`class_cost_per_claim`) | delta |
+|---|---:|---:|---:|
+| Biguanides | 9.00 | **55.26** | +46.26 |
+| Insulins and analogues for injection, long-acting | 242.00 | **255.74** | +13.74 |
+| Dipeptidyl peptidase 4 (DPP-4) inhibitors | 919.00 | **927.96** | +8.96 |
+| Sulfonylureas | 9.00 | 9.49 | +0.49 |
+| Thiazolidinediones | 12.00 | 12.02 | +0.02 |
+| Glucagon-like peptide-1 (GLP-1) analogues | 1,339.00 | 1,338.94 | −0.06 |
+| Sodium-glucose co-transporter 2 (SGLT2) inhibitors | 1,097.00 | 1,096.08 | −0.92 |
+
+**The view can express the convention** — one extra predicate reproduces the graph exactly:
+
+```sql
+... METRICS class_cost_per_claim
+WHERE therapeutic_class.is_drug_class = true AND product.is_combination = false
+```
+→ GLP-1 1,339.34 · Insulins 242.24 · TZD 11.72 · Biguanides 9.01 · SGLT2 1,096.75 · DPP-4 918.67 ·
+SU 9.31.
+
+The **verified query** already does this (`semantic/verified-queries.json`:
+`... WHERE therapeutic_class.is_drug_class AND NOT product.is_combination)`), which is why the
+deployment's parity check passes. The **metric** does not, and neither its description nor the view's
+instructions mention the convention.
+
+**Two consequences.** The evaluation's `single_ingredient` check needs the DPP-4 figure 919, which
+the metric cannot produce, so it scores 0/3 for Analyst — the hand-off reports this, but only as
+"combination products included (findings: single-ingredient only), so DPP-4 928 vs 919, SGLT2 1,096
+vs 1,097". **The Biguanides row (9 vs 55) and the Insulins row (242 vs 256) are not mentioned**,
+although Biguanides is by far the largest gap of the seven. And the article's conclusion that "the
+semantic layer is generated, not written a second time, so it cannot drift from the graph"
+(`article_2.md:343`) is true of the *structure* but not of the *conventions*: the same question returns
+a different number through the warehouse than through the graph, by 6× for one class.
+
+**Fix.** Either add the filter to the metric's definition, or say so in the metric's comment
+("includes combination products; for the single-ingredient convention add
+`AND NOT product.is_combination`"), or add a second metric `class_cost_per_claim_single`. And correct
+the hand-off's list of the seven differences.
+
+### M2 — The view's specialty breakdown has a NULL-specialty row the graph does not have, and the parity check filters it out
+
+The graph's `queries/sglt2-vs-glp1-by-specialty.rq` requires a primary specialty
+(`?doc dm:hasPrimarySpecialty/skos:prefLabel ?specialty`), so prescribers without one drop out: **72
+rows, SGLT2 198,279 and GLP-1 238,340 claims**. The semantic view has no such requirement, because
+the metric is a `CASE WHEN` over every prescription:
+
+```
+83 rows = 72 specialties with claims
+        + 10 specialties with zero SGLT2/GLP-1 claims
+        +  1 row whose specialty name is NULL  (407 SGLT2, 493 GLP-1 claims)
+view totals: SGLT2 198,686   GLP-1 238,833
+```
+
+The hand-off discloses the totals ("all-prescriber totals are slightly higher (198,686 SGLT2 vs
+198,279)", `snowflake_extension.md:42`) but not the **NULL row**: a semantic view that returns a row
+whose only dimension is NULL is a hazard for an LLM asked to report a breakdown — it may name it
+"(no specialty)", drop it, or count it in a total.
+
+The parity check does not catch it because it filters the row out:
+
+```python
+got = {name: [int(s), int(g)] for name, s, g in rows if name is not None and (s or g)}
+```
+
+**Fix.** Either give the view the same rule as the query (exclude prescribers without a primary
+specialty from the metric, or dimension them as "no specialty" explicitly and say so), or state in
+the metric's comment that the total covers all prescribers and the graph's covers only those with a
+primary specialty.
+
+### M3 — `article_2.md` quotes 734,106 triples; the database holds 734,133
+
+`docs/article_2.md:130`:
+
+> With 4,464 slices, Japan adds about 487,000 triples, and the whole graph holds 734,106.
+
+**Measured live today**, per graph:
+
+```
+477,662  ndb-2024        9,104  npi-registry        894  substance        529→556  schema
+225,897  cms-partd-2024  8,961  nucc-specialty      757  jp-prefecture    446  therapeutic-class
+  7,732  ndb-products      894  ...                 632  ndb-dimensions   410  provenance
+                                                   117  jp-drug-class    407  shapes
+                                                                329  products   115  drugsfda
+                                                                114  indication
+TOTAL 734,133
+```
+
+The schema graph is **556**, not 529: the ontology 0.5.2 push (2026-10-31, the 薬効分類 → 薬効群
+rename) added 27 triples. The local files agree — the manifest sums to 734,138 and the two schema
+files share 5 triples, so the union is 734,133, exactly what Stardog holds.
+
+The same stale number is in `docs/decisions.md:407` and `japan_extension.md:87` (both are dated
+records of a specific load, so they are history and fine) and in `japan_extension.md:67`, which is
+the budget table of record and should say 734,133.
+
+The article's other triple figures are still right: Japan adds 486,900, the zeros cost ~123,000, the
+flat model would need ~1.15M.
+
+**Fix.** `article_2.md:130` → "734,133"; `japan_extension.md:67` → the measured figures.
+
+### M4 — The Snowflake loader is not atomic
+
+`scripts/load_snowflake.py:102-112` drops every table first, then recreates and loads them one at a
+time; the verification that follows (`:114-126`) is the only check, and its failure path is
+`sys.exit` — the warehouse is left with the new, unverified data and no rollback:
+
+```python
+for t in reversed(tables):
+    run(f"DROP TABLE IF EXISTS {t['name']}")
+...
+if errors:
+    sys.exit("load verification failed:\n  " + "\n  ".join(errors))
+```
+
+A failure between the drops (a network error, a `COPY INTO` that aborts on one row, a warehouse
+suspend) leaves the database with missing or empty tables. The Stardog loader has exactly this
+problem solved — it runs inside a transaction and rolls back (round 1's L14) — and the article's
+governance section leans on the symmetry.
+
+**Fix.** Load into a staging schema and `ALTER TABLE ... SWAP WITH` on success, or at least load
+into shadow tables and rename them after the verification passes.
+
+---
+
+# Low
+
+### L1 — The reader-role setup script's privilege check cannot see a role-hierarchy grant
+
+`scripts/setup_snowflake_reader.py:50-52`:
+
+```python
+privileges = {r[1] for r in cur.execute(f"SHOW GRANTS TO ROLE {role}").fetchall()}
+if privileges - {"USAGE", "SELECT", "REFERENCES"}:
+    sys.exit(f"{role} holds more than USAGE, SELECT and REFERENCES: {sorted(privileges)}")
+```
+
+`SHOW GRANTS TO ROLE` lists **direct** grants only. A `GRANT ROLE ACCOUNTADMIN TO ROLE GLP_READER`
+would appear with the privilege name `USAGE` and a `granted_to` of `ROLE`, so the check would pass
+while the reader role held the account admin's rights.
+
+**It does not today** — I checked the live role: `SHOW GRANTS TO ROLE GLP_READER` returns only
+`SELECT` (58), `USAGE` (6) and `REFERENCES` (4), and the reader role cannot write (every write
+statement was refused on a scratch table). The check just cannot see the case that would break it.
+
+**Fix.** Also inspect `SHOW GRANTS OF ROLE <role>` for rows whose `granted_to` is `ROLE`, and refuse
+if the role has a sub-role.
+
+### L2 — `governance.md` does not mention the Snowflake pipeline
+
+`docs/governance.md` opens with "Every claim below points to the code or file that enforces it" and
+lists the Stardog guarantees — the SHACL gate inside the load transaction, the provenance graph, the
+versioning, the licences. The Snowflake side, which now has its own gate and its own log, is not
+there at all:
+
+- `scripts/export_snowflake.py` refuses to run unless `check_local.py` passed on exactly these files;
+- `scripts/load_snowflake.py` refuses files whose hash differs from the checked export
+  (`load_snowflake.checked_export`) and records every load in `PUBLIC.LOAD_LOG` with the RDF
+  provenance hash;
+- `scripts/deploy_semantic_view.py` refuses to deploy unless Snowflake holds that same export.
+
+None of that is in the governance document, although the article's §3 ("Governance: check locally,
+publish once") now describes exactly this two-target pipeline.
+
+**Fix.** A section for the Snowflake path with the same table format as the rest: gate, log,
+what is verified after the load.
+
+### L3 — Stale counts in `CLAUDE.md` and the hand-off
+
+`CLAUDE.md:49` (the current summary paragraph):
+
+- "exported as **16 tables** (schemas VOCAB, US)" → the export is now **27 tables in three schemas**
+  (VOCAB 12, US 9, JP 6);
+- "from the ontology (**0.5.1**)" → the ontology is **0.5.2**;
+- "OSI loses all **64** synonyms" → the generator now produces **65** (19 en, 23 ja, 23 zh).
+
+`snowflake_extension.md` §Step 2 (dated 2026-10-31, so history) says "45 fields, 8 relationships,
+15 metrics, 64 synonyms (19 en, 22 ja, 23 zh)"; the current generator says **48 fields, 16 metrics,
+65 synonyms (19 en, 23 ja, 23 zh)**. Step 4's "the views have 65 and 48 synonyms" is correct.
+
+The article's "48 of them" (`article_2.md:209`) is correct: `JAPAN_MARKET` has 48 synonyms, and the
+deployed native view has 48 `with synonyms=(...)` clauses — I counted them in the live DDL.
+
+### L4 — The eval's `single_ingredient` check tests for a number, not for a convention
+
+`scripts/eval_analyst.py:235`:
+
+```python
+"single_ingredient": has(numbers(rows), t["cost"]["DPP4Inhibitor"][0]),
+```
+
+The check asks whether the answer **contains the single-ingredient figure (919)**. It does not ask
+whether the answer excludes the combination-product figure (928). An answer that gives both passes
+— which is exactly why Claude scores 3/3 on this check and Analyst 0/3: Claude answers "cost per
+claim with and without combination products". The name of the check overstates what it tests, and
+the results table in `snowflake_extension.md` reads as if the two systems adopt different
+conventions, when in fact one of them says both.
+
+**Fix.** Rename it (`single_ingredient_figure_shown`) or make it test the absence of the combined
+figure, and say in the table what it measures.
+
+### L5 — The Claude scorer was corrected after reading the answers it scores
+
+`snowflake_extension.md` §Step 5 discloses this:
+
+> **Scorer caveat:** the text checks were corrected after reading Claude's US answers (three false
+> negatives: the parent class "Insulins and analogues" equals "Long-acting insulins" in Connecticut;
+> the market average given as context; "$644.6M" read as $645 per claim).
+
+It is honest, and the three corrections are visible in the code
+(`eval_claude.extra_truth`'s `shared()` exclusion and `no_parent_class`'s unit-stripping). But the
+headline of that section — "**Claude passes every check on both layers, OSI included**" — is the
+result of a scorer tuned on the answers it scores, and the summary says so only in a parenthetical
+at the end of the section.
+
+**Fix.** Keep the caveat where the result is stated, or re-score the saved answers with a scorer
+written without looking at them (the `--rescore` flag exists for exactly this, and would make the
+claim defensible).
+
+### L6 — The MCP server's docstring says "three layers"; one of them is voided by any statement Snowflake accepts unconditionally
+
+`mcp_server/snowflake_server.py:15-18`:
+
+> Read-only by design, in three layers: only SELECT/WITH/SHOW/DESCRIBE/EXPLAIN pass the statement
+> check, one statement per call; the session uses the role SNOWFLAKE_READER_ROLE, which holds only
+> USAGE and SELECT …; and secondary roles are switched off … The server refuses to start otherwise.
+
+The role layer is only a layer while the secondary roles stay off, and `USE SECONDARY ROLES ALL` is
+accepted by Snowflake **without any privilege check** — I confirmed it live. So the statement
+allow-list is the layer that actually holds. The allow-list itself is solid: I tested 25 write
+vectors against `_check_read_only` and it refused every one (`DELETE`, `TRUNCATE`, `USE SECONDARY
+ROLES ALL`, `USE ROLE`, `ALTER SESSION`, `CALL`, `COPY INTO`, `CREATE`, `MERGE`, `PUT`, `GRANT`,
+multi-statement, and the string/dollar-quote hiding attempts), while allowing every genuine read.
+
+**Fix.** Say "two layers, and the statement check is the one that holds"; and have the server
+re-check the session's role and secondary roles periodically rather than only at connect time (the
+connection is `lru_cache`d, so the check runs once per process).
+
+### L7 — `article_2.md` Code 5 shows the AI clauses in upper case
+
+`docs/article_2.md:205-206` shows `AI_SQL_GENERATION` and `AI_VERIFIED_QUERIES`; the deployed DDL
+uses `ai_sql_generation` and `ai_verified_queries` (Snowflake's own casing). The article says
+"Excerpts", and SQL keywords are case-insensitive, so this is cosmetic — but a reader who diffs the
+snippet against `GET_DDL` will notice.
+
+---
+
+## What was verified, and how
+
+| Check | Result |
+|---|---|
+| **All 27 Snowflake tables vs their checked CSV exports** | **0 mismatches** (booleans and decimal scale normalised) |
+| `GLP.US.PRODUCT` after the Time Travel restore | 51 rows, 51 distinct ids, claims 22,034 / 1,050,891 / $644,621,275.38 unchanged |
+| `GLP.JP.QUANTITY` | 150,288 rows, 25,939,035,814.92462 units, 36,031 masked — unchanged |
+| Live Stardog `glp`, per-graph counts | 16 graphs, **734,133** triples; instance healthy again after the 503s |
+| Semantic views deployed | `DIABETES_MARKET`, `DIABETES_MARKET_OSI`, `JAPAN_MARKET`, `JAPAN_MARKET_OSI` |
+| Deploy parity, US (both views) | `sglt2-vs-glp1-by-specialty` **0 differ**, `cost-per-claim-by-class` **0 differ** |
+| Deploy parity, verified queries (all four views) | **all match the graph** |
+| Deploy parity, `queries/snowflake/*.sql` | **all match the graph** |
+| The article's "All 225 rows of the seven questions match" | **exactly 225** compared rows (10 + 16 + 10 + 72 + 68 + 47 + 2) |
+| Japan business questions through the view | Tokyo ¥73,497,396,126.91 — the graph's ¥73,497 million, both views |
+| Boehringer's SGLT2 claims through the view | 135,954 / AZ 59,896 / J&J 966 / Merck 13 / generic NULL 1,857 — `findings.md` §4 exactly |
+| SGLT2 vs GLP-1 by specialty through both views | Internal Medicine 62,651 / 76,487 = 45.028%, Endocrinology 30.54%, Cardiovascular 90.46% — the graph's numbers |
+| Synonyms in the deployed views | native US **65**, native JP **48** (counted from the live `GET_DDL`); OSI views: 0 native, 45 / 44 in the opaque OSI extension |
+| OSI round trip | the native views keep `ai_sql_generation` and `ai_verified_queries`; the OSI views keep them only inside `with extension (OSI='…')` — exactly as the hand-off describes |
+| `scripts/build_osi.py` re-run | **byte-identical** to the committed `semantic/` files (git clean) — the generator is deterministic |
+| `GLP_READER` privileges | only `SELECT` (58), `USAGE` (6), `REFERENCES` (4); every write refused on a scratch table |
+| `mcp_server/snowflake_server.py` statement guard | 25 write vectors tested, every one refused |
+| `tests/test_ontology_reasoning.py`, `test_mcp_server.py`, `test_load_gate.py` | pass |
+| `tests/test_shapes_reasoning.py` | **failed today** — see H1 |
+
+## Also checked, and fine
+
+- **The export's parity checks are apples to apples.** `cost-per-claim-by-class.rq` and
+  `sglt2-vs-glp1-by-specialty.rq` both use `skos:broader*` and `dm:hasPrimarySpecialty`, which is
+  exactly what the table side computes from `US.PRODUCT_CLASS` and `US.PRESCRIBER`.
+- **The Data Cube IRI scheme cannot collide.** The slice and observation IRIs omit the route
+  (`slice/<code>/<setting>/<dim>`), but a receipt code is either oral or injection, and
+  `clean_ndb.py:105` fails the build if a code differs between workbooks.
+- **The crosswalk algorithm is monotone.** `full()` in `build_ndb.py` is closed upwards, so the
+  "broadest such C only" rule holds, and the 396 `broadMatch` picks the narrowest class holding all
+  427 products (`BloodGlucoseLowering`, 450 members).
+- **The generator's label-collision warning works.** `dedupe_synonyms` keeps the first owner
+  (metrics, then fields, then datasets) and reports the collision; the ontology 0.5.2 rename
+  (薬効分類 → 薬効群, ATC分類 as an altLabel) is the fix it found, and the views carry 65 and 48
+  synonyms without duplicates.
+- **The OSI YAML validates** against `semantic/schema/osi-0.1.1.schema.json`, and the draft Layer 4
+  ontology against the 0.2.0.dev0 schema, on every build.
+- **`deploy_semantic_view.py` gates on the export.** It refuses to deploy unless
+  `PUBLIC.LOAD_LOG`'s latest `RDF_PROVENANCE` equals the manifest's — the same provenance hash the
+  article's governance story rests on.
+- **`setup_snowflake_reader.py` is rerunnable** and ends with an explicit privilege assertion.
+
+## Suggested order of work
+
+1. **H1** — make the reasoning-on validation opt-in, or drop it from `tests/`. The instance has no
+   backups and this test takes it down; the local OWL RL check already covers the same ground.
+2. **H2** — run the model's SQL on the reader role with the statement check, not as ACCOUNTADMIN.
+3. **M1** — decide the convention for `class_cost_per_claim` (metric, comment or a second metric),
+   and correct the hand-off's list of the seven differences.
+4. **M3** — one number in the article: 734,106 → 734,133.
+5. **M4, M2, L1, L2, L3, L4, L5, L6, L7** — as convenient.
+
+---
+
+## Reproducing the two most important findings
+
+```bash
+cd /Users/dgg32/Documents/glp
+
+# H1: the live validation that takes the instance down (run only when nothing else uses it)
+.venv/bin/python tests/test_shapes_reasoning.py
+.venv/bin/python - <<'PY'
+import sys, urllib.parse; sys.path.insert(0, "scripts")
+from load_stardog import Stardog, settings
+sd = Stardog(settings())
+print(sd.call("/query?" + urllib.parse.urlencode({"query": "SELECT (COUNT(*) AS ?n) WHERE { ?s ?p ?o }"}),
+               method="GET", accept="application/sparql-results+json")[:120])
+PY
+
+# H2: the harness executes the model's SQL as the admin role
+grep -n "role=env\[" scripts/load_snowflake.py
+grep -n "cur.execute(sql)" scripts/eval_analyst.py
+
+# M1: the same question, two conventions
+.venv-snowflake/bin/python - <<'PY'
+import os, warnings, logging
+from dotenv import load_dotenv; load_dotenv(".env")
+import snowflake.connector
+warnings.filterwarnings("ignore")
+env = {k: os.environ.get("SNOWFLAKE_" + k) for k in
+       ("ACCOUNT", "USER", "PRIVATE_KEY_PATH", "ROLE", "WAREHOUSE", "DATABASE")}
+c = snowflake.connector.connect(account=env["ACCOUNT"], user=env["USER"], authenticator="SNOWFLAKE_JWT",
+    private_key_file=os.path.expanduser(env["PRIVATE_KEY_PATH"]), role=env["ROLE"],
+    warehouse=env["WAREHOUSE"], database=env["DATABASE"])
+cur = c.cursor()
+q = """SELECT * FROM SEMANTIC_VIEW(GLP.SEMANTIC.DIABETES_MARKET
+        DIMENSIONS therapeutic_class.class_name METRICS class_cost_per_claim
+        WHERE therapeutic_class.is_drug_class = true{extra})"""
+for label, extra in (("as generated", ""), ("single-ingredient", " AND product.is_combination = false")):
+    print(label)
+    for r in cur.execute(q.format(extra=extra)).fetchall():
+        print("   ", r[0], r[1])
+PY
+```
+
+---
+
+## File index of everything cited
+
+| File | What it is |
+|---|---|
+| `tests/test_shapes_reasoning.py` | the live reasoning-on validation — H1 |
+| `scripts/eval_analyst.py` | the Cortex Analyst harness (runs the model's SQL) — H2, L4 |
+| `scripts/eval_claude.py` | the Claude harness and its text scorer — L4, L5 |
+| `scripts/load_snowflake.py` | the loader and `connect()` (admin role) — H2, M4 |
+| `scripts/setup_snowflake_reader.py` | the read-only role — L1 |
+| `mcp_server/snowflake_server.py` | the read-only MCP server — L6 |
+| `semantic/diabetes-market.sql` | the generated native view (65 synonyms, 16 metrics) — M1, L3 |
+| `semantic/verified-queries.json` | the verified queries — M1 |
+| `scripts/build_osi.py` | the generator (`dedupe_synonyms`, `check_columns`) — L3 |
+| `scripts/deploy_semantic_view.py` | the deployment and the parity checks — M2 |
+| `scripts/export_snowflake.py` | the export and its parity checks |
+| `queries/cost-per-claim-by-class.rq` | the published single-ingredient convention — M1 |
+| `docs/article_2.md` | the article — M3, L7 |
+| `snowflake_extension.md` | the hand-off — L3, L4, L5 |
+| `CLAUDE.md` | the project summary — L3 |
+| `docs/governance.md` | the governance claims — L2 |

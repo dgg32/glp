@@ -500,17 +500,21 @@ def us_metrics(onto, sglt2, glp1):
         ("class_drug_cost", "SUM(prescription_class.drug_cost)", None,
          "Gross drug cost in USD of products in a therapeutic class. Filter or group by one class."),
         ("class_cost_per_claim", "SUM(prescription_class.drug_cost) / NULLIF(SUM(prescription_class.claims), 0)", None,
-         "Gross drug cost per claim in USD within a therapeutic class."),
+         "Gross drug cost per claim in USD within a therapeutic class. Includes combination products, counted in "
+         "every class they belong to; the single-ingredient convention of the published findings adds "
+         "WHERE NOT product.is_combination (Biguanides: 55 USD with combinations, 9 without)."),
         ("class_cost_per_30day_fill",
          "SUM(prescription_class.drug_cost) / NULLIF(SUM(prescription_class.fills_30day), 0)", None,
          "Gross drug cost per 30-day fill in USD within a therapeutic class: compares classes fairly when "
-         "fill lengths differ."),
+         "fill lengths differ. Includes combination products; add WHERE NOT product.is_combination for "
+         "single-ingredient products only."),
         ("sglt2_claims", f"SUM({share.format(c=sglt2)})", None,
          f"Claims of products in the class {onto.g.value(DMTC[sglt2], SKOS.prefLabel)} (from the definition of "
-         "dm:SGLT2Prescriber)."),
+         "dm:SGLT2Prescriber). Covers all prescribers: grouped by specialty, those without a primary specialty "
+         "form a row whose specialty is NULL; report it as 'no primary specialty' or leave it out and say so."),
         ("glp1_claims", f"SUM({share.format(c=glp1)})", None,
          f"Claims of products in the class {onto.g.value(DMTC[glp1], SKOS.prefLabel)}, including dual GIP/GLP-1 "
-         "agonists (from the definition of dm:GLP1Prescriber)."),
+         "agonists (from the definition of dm:GLP1Prescriber). Covers all prescribers, like sglt2_claims."),
         ("sglt2_share_vs_glp1",
          f"SUM({share.format(c=sglt2)}) / NULLIF(SUM({share.format(c=sglt2)}) + SUM({share.format(c=glp1)}), 0)",
          None, "SGLT2 inhibitor claims as a fraction of SGLT2 inhibitor plus GLP-1 receptor agonist claims (0 to 1)."),

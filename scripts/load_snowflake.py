@@ -4,8 +4,11 @@ Loads only what the export checked: every CSV must still have the sha256 recorde
 data/snowflake/tables.json, which export_snowflake.py writes only after its checks passed.
 Then, per table: CREATE OR REPLACE with primary and foreign keys (declared, not enforced by Snowflake),
 PUT to the table stage, COPY INTO (abort on the first bad row). Snowflake commits DDL immediately, so
-there is no all-or-nothing transaction as in load_stardog.py; instead the load is verified afterwards
-(row counts, total claims and cost, total Japanese quantity and masked cells) and stops with an error if anything differs. Rerunnable.
+there is no all-or-nothing transaction as in load_stardog.py; instead each schema is first cloned (zero-copy) to
+<SCHEMA>_PREVIOUS, the load is verified afterwards (row counts, total claims and cost, total Japanese quantity and
+masked cells), and on any failure or interruption the clones are swapped back (the failed load stays in
+<SCHEMA>_PREVIOUS for inspection; rerun setup_snowflake_reader.py, since schema-level grants do not move with a
+swap). On success the clones are dropped. Rerunnable.
 
 Provenance: each table comment names its source graphs and the export it came from, and every load
 appends one row per table to PUBLIC.LOAD_LOG (time, RDF provenance hash, file hash, rows).
@@ -98,6 +101,35 @@ def main():
     run("""CREATE TABLE IF NOT EXISTS PUBLIC.LOAD_LOG (LOADED_AT TIMESTAMP_TZ, TABLE_NAME VARCHAR, ROWS_LOADED NUMBER,
            FILE_SHA256 VARCHAR, RDF_PROVENANCE VARCHAR, EXPORTED_AT VARCHAR)""")
 
+    schemas = sorted({t["name"].split(".")[0] for t in tables})
+    for schema in schemas:
+        run(f"CREATE OR REPLACE SCHEMA {schema}_PREVIOUS CLONE {schema}")
+    try:
+        claims, cost, quantity, masked = load(run, manifest)
+    except BaseException as exc:
+        try:
+            for schema in schemas:
+                run(f"ALTER SCHEMA {schema} SWAP WITH {schema}_PREVIOUS")
+        except Exception as restore_exc:
+            sys.exit(f"load failed ({exc}) and the restore failed too ({restore_exc}); restore by hand: "
+                     + "; ".join(f"ALTER SCHEMA {s} SWAP WITH {s}_PREVIOUS" for s in schemas))
+        sys.exit(f"load failed, previous tables restored ({', '.join(schemas)}; the failed load is in *_PREVIOUS). "
+                 f"Rerun scripts/setup_snowflake_reader.py for the reader role's schema grants.\n  {exc}")
+    for schema in schemas:
+        run(f"DROP SCHEMA {schema}_PREVIOUS")
+
+    cur.executemany("INSERT INTO PUBLIC.LOAD_LOG VALUES (CURRENT_TIMESTAMP(), %s, %s, %s, %s, %s)",
+                    [(t["name"], t["rows"], t["sha256"], manifest["rdf_provenance"], manifest["exported_at"])
+                     for t in tables])
+    con.commit()
+    print(f"verified: {len(tables)} tables, {claims:,} claims, ${cost:,.2f} gross cost; "
+          f"{quantity:,} units dispensed in Japan, {masked:,} masked cells")
+    con.close()
+
+
+def load(run, manifest):
+    """Replace the tables with the export and verify them; raises if anything differs."""
+    tables = manifest["tables"]
     # Drop referencing tables before the tables they point to, then create in dependency order.
     for t in reversed(tables):
         run(f"DROP TABLE IF EXISTS {t['name']}")
@@ -123,15 +155,8 @@ def main():
     if (quantity, masked) != local_jp_totals():
         errors.append(f"JP.QUANTITY totals differ: Snowflake {(quantity, masked)}, export {local_jp_totals()}")
     if errors:
-        sys.exit("load verification failed:\n  " + "\n  ".join(errors))
-
-    cur.executemany("INSERT INTO PUBLIC.LOAD_LOG VALUES (CURRENT_TIMESTAMP(), %s, %s, %s, %s, %s)",
-                    [(t["name"], t["rows"], t["sha256"], manifest["rdf_provenance"], manifest["exported_at"])
-                     for t in tables])
-    con.commit()
-    print(f"verified: {len(tables)} tables, {claims:,} claims, ${cost:,.2f} gross cost; "
-          f"{quantity:,} units dispensed in Japan, {masked:,} masked cells")
-    con.close()
+        raise RuntimeError("load verification failed:\n  " + "\n  ".join(errors))
+    return claims, cost, quantity, masked
 
 
 if __name__ == "__main__":

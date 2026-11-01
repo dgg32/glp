@@ -2,13 +2,17 @@
 
 Each question is asked RUNS times per view through the Cortex Analyst REST API (key-pair JWT, the
 credentials of .env), because Analyst is not deterministic. The SQL it returns is run with the
-connector. Scores are checks against ground truth computed by plain SQL on the loaded tables
+connector, on the MCP server's read-only session (SNOWFLAKE_READER_ROLE, secondary roles off) and only if it
+passes the server's statement check: it is text a model wrote, so it never runs as the admin role of .env.
+Scores are checks against ground truth computed by plain SQL on the loaded tables
 (independent of the semantic views) and the conventions of docs/findings.md:
 
   ja-specialty   「SGLT2阻害薬の処方件数を専門分野別に教えて」  numbers right; specialty names in Japanese
   share          SGLT2 vs GLP-1 share by specialty             numbers right; share right; prepared metric used
-  cost           cost per claim by drug class                  ATC level-4 classes only; single-ingredient
-                                                                 convention; cost per 30-day fill shown
+  cost           cost per claim by drug class                  ATC level-4 classes only; the single-ingredient
+                                                                 figure shown (DPP-4 919; an answer that also
+                                                                 gives the combined 928 passes); cost per
+                                                                 30-day fill shown
   bi-share       Boehringer's share of SGLT2 claims            claims and share right
   glp1-share     company shares of GLP-1 claims                Novo Nordisk share right (class claims as
                                                                  the denominator: Byetta has two holders)
@@ -49,6 +53,8 @@ from cryptography.hazmat.primitives.asymmetric import padding
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from load_snowflake import connect  # noqa: E402  (also loads .env)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "mcp_server"))
+from snowflake_server import _check_read_only, _cursor  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 VIEWS = {"native": "GLP.SEMANTIC.DIABETES_MARKET", "osi": "GLP.SEMANTIC.DIABETES_MARKET_OSI"}
@@ -278,7 +284,8 @@ def main():
                     entry["error"] = reply.get("error", "no SQL returned")
                 else:
                     try:
-                        rows = cur.execute(sql).fetchall()
+                        _check_read_only(sql)
+                        rows = _cursor().execute(sql).fetchall()
                         entry["rows"] = [[str(v) for v in r] for r in rows[:30]]
                         entry["checks"] = score(truth, sql, rows)
                     except Exception as exc:  # the SQL Analyst wrote fails

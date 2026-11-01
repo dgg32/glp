@@ -34,9 +34,12 @@ COST_CLASSES = ["Biguanide", "Sulfonylurea", "Thiazolidinedione", "DPP4Inhibitor
 
 def parity(cur, view, expected):
     """Differences between the view's answers and the graph's, per question (empty lists = parity)."""
+    # The graph's query needs a primary specialty; the view's metrics cover all prescribers, whose unassigned ones
+    # form a NULL-specialty row (documented in the metric descriptions). Compare like with like, explicitly.
     rows = cur.execute(f"""SELECT * FROM SEMANTIC_VIEW({view}
-        DIMENSIONS specialty.specialty_name METRICS sglt2_claims, glp1_claims)""").fetchall()
-    got = {name: [int(s), int(g)] for name, s, g in rows if name is not None and (s or g)}
+        DIMENSIONS specialty.specialty_name METRICS sglt2_claims, glp1_claims
+        WHERE specialty.specialty_name IS NOT NULL)""").fetchall()
+    got = {name: [int(s), int(g)] for name, s, g in rows if s or g}
     want = expected["sglt2-vs-glp1-by-specialty"]
     diff1 = sorted(k for k in got.keys() | want.keys() if got.get(k) != want.get(k))
     classes = ", ".join(f"'{c}'" for c in COST_CLASSES)
