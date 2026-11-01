@@ -290,18 +290,21 @@ GROUP BY ?o ?en ?ja ?zh ?lei"""),
     dict(name="JP.PRODUCT", graphs=["ndb-products"],
          comment="NDB Open Data products at strength level, keyed by receipt code. NHI_PRICE is yen per dispensing "
                  "unit (price list of 2026-09-02). IS_GENERIC follows the reimbursement definition (generics priced "
-                 "like their originator, such as most metformin, are not flagged).",
+                 "like their originator, such as most metformin, are not flagged). PRODUCT_NAME is the name with "
+                 "half-width characters.",
          columns=["PRODUCT_ID VARCHAR NOT NULL", "IRI VARCHAR NOT NULL", "PRODUCT_NAME_JA VARCHAR NOT NULL",
-                  "PRODUCT_NAME VARCHAR", "YJ_CODE VARCHAR NOT NULL", "JP_CLASS_CODE VARCHAR NOT NULL",
+                  "PRODUCT_NAME VARCHAR NOT NULL", "YJ_CODE VARCHAR NOT NULL", "JP_CLASS_CODE VARCHAR NOT NULL",
                   "NHI_PRICE NUMBER(12,2) NOT NULL", "DISPENSING_UNIT VARCHAR NOT NULL", "ROUTE VARCHAR NOT NULL",
                   "IS_GENERIC BOOLEAN NOT NULL", "IS_ORIGINATOR BOOLEAN NOT NULL", "IS_COMBINATION BOOLEAN NOT NULL",
                   "ORGANIZATION_ID VARCHAR"],
          key=["PRODUCT_ID"], refs={"JP_CLASS_CODE": "VOCAB.JP_DRUG_CLASS", "ORGANIZATION_ID": "JP.ORGANIZATION"},
-         query="""SELECT ?p (?p AS ?iri) ?name ?hidden ?yj ?jpc ?price ?unit ?route ?generic ?originator ?combo ?mah WHERE {
+         query="""SELECT ?p (?p AS ?iri) ?name ?plain ?yj ?jpc ?price ?unit ?route ?generic ?originator ?combo ?mah WHERE {
   ?p a dm:MedicinalProduct ; rdfs:label ?name ; dm:yjCode ?yj ; dm:inJapaneseDrugClass ?jpc ; dm:nhiPrice ?price ;
      dm:dispensingUnit ?unit ; dm:routeOfAdministration ?route ; dm:isGeneric ?generic ;
      dm:isOriginator ?originator ; dm:isCombinationProduct ?combo .
+  # build_ndb.py writes the half-width form as skos:hiddenLabel only where it differs from the name
   OPTIONAL { ?p skos:hiddenLabel ?hidden }
+  BIND(COALESCE(?hidden, ?name) AS ?plain)
   OPTIONAL { ?p dm:manufacturedBy ?mah } }"""),
     dict(name="JP.PRODUCT_SUBSTANCE", graphs=["ndb-products"],
          comment="dm:hasActiveSubstance for the Japanese products (many-to-many: combination products have several).",
