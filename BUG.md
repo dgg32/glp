@@ -1327,13 +1327,13 @@ the Snowflake MCP server) and the ontology 0.5.2 push. Scope: `scripts/export_sn
 
 **Fix status (2026-11-01, later the same day).** H1: reasoning-on runs opt-in (`GLP_LIVE_REASONING=1`).
 H2: Analyst's SQL runs on the MCP server's read-only session, after its statement check. M1, M2: conventions stated
-in the metric descriptions (`semantic/` regenerated, **not yet deployed**); the parity check filters the NULL
+in the metric descriptions (`semantic/` regenerated and deployed; all four views match the graph); the parity check filters the NULL
 specialty in SQL, explicitly (72 rows, 198,279 / 238,340, checked live). M3, L3, L7: numbers and casing corrected.
 M4: the loader clones each schema first and swaps it back on failure. L1: a reader role that inherits roles is
 refused. L2: governance has a Snowflake section. L4, L5: the check's meaning and the scorer caveat stand next to the
 results (the check key keeps its name, so saved results stay comparable). L6, and the cause of both incidents: the
 reader can log in as a service user that holds only `GLP_READER` (`SNOWFLAKE_READER_USER`), and the session is
-re-checked before every statement; **the user is not created yet**. CLAUDE.md now forbids write probes on live
+re-checked before every statement; `GLP_READER_SVC` created and verified (`USE ROLE ACCOUNTADMIN` refused). CLAUDE.md now forbids write probes on live
 databases.
 
 The headline: **the semantic layer is correct and the deployment is verified.** All 27 tables match
