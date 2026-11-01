@@ -146,6 +146,67 @@ Article 2 now uses Snowflake as its presentation layer, so the NDB data followed
   sales by Boehringer's total: 78%); the instruction about the top class reworded (native added a top-class
   filter to a drug-class question and got no rows; OSI, without instructions, did not).
 
+## Step 5: Claude through an MCP server instead of Cortex Analyst (2026-11-01)
+`mcp_server/snowflake_server.py` (`.venv-snowflake`) is the Stardog MCP server's pattern over Snowflake:
+`describe_model` (GET_DDL of the semantic view), `resolve_term` (the SKOS labels in `VOCAB.LABEL`, product and company
+names; a Japanese holder resolves to its corporate group), `run_sql` (one read-only statement). `GLP_SF_LAYER=osi`
+makes it describe the `_OSI` views. Test: `tests/test_snowflake_mcp_server.py`.
+
+Read-only role `GLP_READER` (`scripts/setup_snowflake_reader.py`: USAGE, SELECT, and REFERENCES, which GET_DDL of a
+semantic view needs). **Secondary roles:** the user has `DEFAULT_SECONDARY_ROLES = ('ALL')`, so after
+`USE ROLE GLP_READER` the session still held ACCOUNTADMIN's privileges. Found the hard way: a refusal test
+(`DELETE FROM GLP.US.PRODUCT`, a warehouse resize) went through. Restored with Time Travel
+(`INSERT ... SELECT * FROM GLP.US.PRODUCT BEFORE(STATEMENT => ...)`, 51 rows, identical to the checked CSV) and the
+warehouse set back to XS. The server now runs `USE SECONDARY ROLES NONE` and refuses to start unless the secondary
+roles are empty; write probes use statements that change nothing even if allowed (`WHERE 1 = 0`).
+
+`scripts/eval_claude.py <label> [--model us|jp] [--layer native|osi]`: the questions and ground truth of
+`eval_analyst.py`, asked through headless Claude Code (`claude -p`, Opus 5.5) with nothing but this server: no built-in
+tools, no other MCP servers, no settings, a working directory outside the repo (no CLAUDE.md, findings or queries).
+Claude writes prose, so the checks read the answer text (numbers, percentages, 億/million), plus the SQL of its
+run_sql calls for "prepared metric used". `--rescore` scores saved answers again. Results in
+`data/validation/claude-eval-{us,jp}-{native,osi}.json`; the same-day Analyst baseline in
+`analyst-eval-current.json` and `analyst-eval-jp-current.json`.
+
+**Results** (correct runs of 3; Analyst native · Analyst OSI · Claude native · Claude OSI):
+
+| Question | Check | Analyst | Claude |
+|---|---|---|---|
+| 「SGLT2阻害薬の処方件数を専門分野別に教えて」 | numbers | 3/3 · 3/3 | 3/3 · 3/3 |
+| | Japanese specialty names | 3/3 · **0/3** | 3/3 · **3/3** |
+| SGLT2 vs GLP-1 share by specialty | share; prepared metric | 3/3 · 3/3 | 3/3 · 3/3 |
+| Cost per claim by drug class | drug classes only | 3/3 · 3/3 | 3/3 · 3/3 |
+| | single-ingredient convention | **0/3 · 0/3** | **3/3 · 3/3** |
+| | per 30-day fill shown | 3/3 · **0/3** | 3/3 · **3/3** |
+| Boehringer's share of SGLT2 claims | share | 2/3 · 2/3 | 3/3 · 3/3 |
+| Company shares of GLP-1 claims | Novo Nordisk share | 3/3 · 3/3 | 3/3 · 3/3 |
+| 「ベーリンガーのSGLT2阻害薬シェアは？」 | share | 2/3 · 2/3 | 3/3 · 3/3 |
+| Which drug classes cost the most? (held out) | classes only; GLP-1 first | 3/3 · 3/3 | 3/3 · 3/3 |
+| 「東京都で処方された糖尿病治療薬の金額は？」 | value | 3/3 · 3/3 | 3/3 · 3/3 |
+| 「日本ベーリンガーインゲルハイムのSGLT2阻害薬シェアは？」 | share | 3/3 · 3/3 | 3/3 · 3/3 |
+| 「GLP-1受容体作動薬は薬効分類のどこに入っている？」 | 249 and 396 named | 3/3 · 3/3 | 3/3 · 3/3 |
+| | 23 / 2 products counted | 3/3 · 1/3 | 3/3 · 3/3 |
+| 「マンジャロの月別の金額の推移は？」 | monthly totals | 0/3 · 3/3 | 3/3 · 3/3 |
+| 「75歳以上の患者への割合が最も高い薬効群は？」 | glinides; share | 3/3 · 3/3 | 3/3 · 3/3 |
+
+Reading:
+- **Claude passes every check on both layers, OSI included.** The OSI import does not delete synonyms, instructions
+  and verified queries; it keeps them as an opaque `WITH EXTENSION (OSI=...)` JSON block (27 synonym lists, the
+  "fair comparison" instruction, the verified queries). Cortex Analyst ignores that block; for Claude reading GET_DDL
+  it is text. And Claude answers in the question's language unprompted (`specialty_name_ja`), synonyms or not.
+- Claude answers more broadly than one table: cost per claim with and without combination products (hence
+  single-ingredient 3/3), notes on close calls (glinides 48.2% vs α-GIs 47.7%), caveats, the masked-cell limits.
+  Part of the gap is that difference, not wrong Analyst numbers. Analyst's real errors: Boehringer's share computed
+  within the manufacturer group (2 runs), Mounjaro split by strength (native), GLP-1 products not counted (OSI).
+- Claude stayed in the semantic views in 21/21 US and 13/15 Japan runs; the rest read `GLP.JP.PRODUCT` for YJ codes
+  (the GLP-1 category question). Nothing forces it to: Analyst cannot leave the view, Claude only by instruction.
+- Cost: ~6 tool calls, ~20 s and ~$0.21-0.27 API-equivalent per answer (charged to the Claude subscription's
+  usage here); Analyst is one call per question, billed to Snowflake credits.
+- **Scorer caveat:** the text checks were corrected after reading Claude's US answers (three false negatives: the
+  parent class "Insulins and analogues" equals "Long-acting insulins" in Connecticut; the market average given as
+  context; "$644.6M" read as $645 per claim). Every affected answer was read. Analyst is scored on rows, Claude on
+  prose: comparable, not identical.
+
 ## Next
 - Article 2 figures: Snowsight screenshots listed in `docs/article_2.md` (Figures 1, 5, 6, 7).
 - Native-speaker review of the 12 new ja/zh property labels (ontology 0.5.1) and Japanese labels for the remaining 63 NUCC specialties in use (the Japanese answers fall back to English names for them).

@@ -441,3 +441,16 @@ countries share the substance and class vocabularies.
   tree. Ontology 0.5.2: 薬効分類 stays with dm:JapaneseDrugClass (it is the name of the 日本標準商品分類
   categories); dm:TherapeuticClass becomes 薬効群 with skos:altLabel ATC分類 (not the prefLabel: glinides and
   glimins are project classes, so the tree is ATC-based, not pure ATC). The generator reads skos:altLabel too.
+
+## 2026-11-01: Claude through a Snowflake MCP server, compared with Cortex Analyst
+- `mcp_server/snowflake_server.py` repeats the Stardog server's three tools over Snowflake, so the GenAI layer is
+  the same pattern on both back ends. Its term index is the exported SKOS labels (`VOCAB.LABEL`), so term
+  normalization does not depend on Snowflake's synonyms, which the OSI import drops.
+- Read-only by role (`GLP_READER`: USAGE, SELECT, REFERENCES) **and with secondary roles off**: Snowflake's default
+  `DEFAULT_SECONDARY_ROLES = ('ALL')` keeps every other role's privileges active after `USE ROLE`. A refusal test
+  deleted `US.PRODUCT` before this was known; restored by Time Travel. The server refuses to start with any
+  secondary role active. A statement check stays as the first layer, not as the guarantee.
+- Evaluated with headless Claude Code isolated from the repo (`scripts/eval_claude.py`), against a same-day
+  Analyst rerun: Claude passed every check on native and OSI views alike (snowflake_extension.md, Step 5).
+  The OSI loss is a loss for Cortex Analyst, not for an agent that reads GET_DDL, because the import keeps the
+  extensions as opaque text.
