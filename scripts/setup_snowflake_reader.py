@@ -75,7 +75,9 @@ def main():
     if inherited := sorted(r[3] for r in grants if r[2] == "ROLE"):
         sys.exit(f"{role} inherits other roles: {inherited}")
     if reader:
-        roles = sorted(r[1] for r in cur.execute(f"SHOW GRANTS TO USER {reader}").fetchall())
+        cur.execute(f"SHOW GRANTS TO USER {reader}")
+        cols = [d[0] for d in cur.description]
+        roles = sorted(dict(zip(cols, r))["name"] for r in cur.fetchall())
         if roles != [role.upper()]:
             sys.exit(f"{reader} holds roles other than {role}: {roles}")
         print(f"{reader}: holds only {role}")
