@@ -25,9 +25,10 @@
     dcterms:creator "Sixing Huang" ;
     dcterms:created "2026-10-14"^^xsd:date ;
     dcterms:license <https://opensource.org/licenses/MIT> ;
-    owl:versionIRI <https://dgg32.github.io/glp/ontology/0.5.2> ;
-    owl:versionInfo "0.5.2" ;
-    owl:priorVersion <https://dgg32.github.io/glp/ontology/0.5.1> ;
+    owl:versionIRI <https://dgg32.github.io/glp/ontology/0.6.0> ;
+    owl:versionInfo "0.6.0" ;
+    owl:priorVersion <https://dgg32.github.io/glp/ontology/0.5.2> ;
+    skos:changeNote "0.6.0 (2026-11-04): one new axiom, owl:AllDisjointClasses over the 13 asserted classes. Nothing can be, say, both a substance and an indication; before, a typo such as a product whose indication is a substance was absorbed by the range of dm:hasIndication (the substance was inferred to be an indication). Now it makes the data inconsistent, and scripts/check_local.py fails on it. No asserted individual had two of these types, so query results are unchanged."@en ;
     skos:changeNote "0.5.2 (2026-10-31): labels only, no axiom changes. dm:TherapeuticClass is now 薬効群@ja (altLabel ATC分類@ja), because 薬効分類 is the name of the Japanese classification and stays with dm:JapaneseDrugClass alone. Both classes had 薬効分類, so a synonym generated from the labels could point at only one of them."@en ;
     skos:changeNote "0.5.1 (2026-10-31): labels only, no axiom changes. Japanese and Chinese labels for the US data properties (dm:totalClaims 処方件数, dm:totalDrugCost, dm:city, ...), so the Snowflake semantic view generated from the ontology has synonyms in all three languages. Curated, pending native-speaker review."@en ;
     skos:changeNote "0.5.0 (2026-10-25): Japan (NDB Open Data). Added dm:QuantitySlice (an RDF Data Cube slice) with dm:aboutProduct, dm:careSetting and dm:totalQuantity, the observation dimensions dm:prefecture, dm:month and dm:sexAgeGroup, the measure dm:quantity and the SDMX confidentiality attribute for masked cells; Japanese product attributes (dm:yjCode, dm:receiptCode, dm:nhiPrice, dm:dispensingUnit, dm:isGeneric, dm:isOriginator, dm:routeOfAdministration, dm:inJapaneseDrugClass); dm:partOfCorporateGroup; concept classes dm:Prefecture, dm:SexAgeGroup, dm:CareSetting, dm:JapaneseDrugClass; defined classes dm:SGLT2Product and dm:GLP1Product. dm:MedicinalProduct and dm:Organization now cover Japanese products and marketing authorization holders. No change to existing axioms."@en ;
@@ -112,6 +113,20 @@ dm:JapaneseDrugClass a owl:Class ;
     rdfs:label "Japanese therapeutic category"@en , "薬効分類"@ja , "日本药效分类"@zh ;
     skos:definition "A three-digit therapeutic category of the Japan Standard Commodity Classification (薬効分類), as used by the NHI price list and NDB Open Data, e.g. 396 糖尿病用剤."@en ;
     rdfs:comment "Not the same tree as ATC: GLP-1 receptor agonists are filed under 249 (other hormone preparations). The SKOS mapping properties in vocab/jp-drug-class.ttl relate the two."@en .
+
+# --- Disjointness: no individual belongs to two of these classes (0.6.0) ---
+# Without it, OWL never rejects data: a wrong link is absorbed by domain and range inference.
+# With it, OWL 2 RL rule cax-adc turns such a link into an inconsistency. Subclasses inherit it
+# (an SGLT2 product can be no substance); superclasses do not conflict (an indication stays a
+# TherapeuticIndication).
+
+[] a owl:AllDisjointClasses ;
+    rdfs:comment "Things in the world that never coincide: a person, a claim aggregate, a product, a substance, a disease, a company, a table row, and the concepts of six separate classifications."@en ;
+    owl:members (
+        dm:HealthcareProfessional dm:Prescription dm:MedicinalProduct dm:Substance dm:Indication
+        dm:Organization dm:QuantitySlice dm:TherapeuticClass dm:Specialty dm:Prefecture
+        dm:SexAgeGroup dm:CareSetting dm:JapaneseDrugClass
+    ) .
 
 # --- Defined classes: membership is inferred by the reasoner, never asserted ---
 

@@ -170,6 +170,37 @@ dms:QuantitySliceShape a sh:NodeShape ;
 
 The first rule is the Japanese twin of the CMS rule from the first article, with "exactly one of these" expressed by sh:xone. The second compares each slice with its national total. It is a SHACL-SPARQL rule, because core SHACL cannot sum across nodes. Other new rules require 47 cells per prefecture slice, 12 per month slice and 42 per sex and age slice, a YJ code (Japan's 12-digit drug code) for every Japanese product and exactly one country identifier per product: a CMS generic name in the US or a YJ code in Japan. The shapes moved to version 0.3.0 with 59 rules. A test file of deliberately broken records shows that all 59 can fire, and the real data passes with zero violations.
 
+### 1.7 OWL: the one error a reasoner reports
+
+The first article called OWL the blueprint and SHACL the building inspector, and it warned that the two can disagree once reasoning is switched on. Adding a second country made one such disagreement concrete. The build now writes links for 561 products instead of 51, and a mistake in one of them can turn a wrong link into a new fact.
+
+Take a product whose indication link points at a substance by mistake. The property dm:hasIndication has the range dm:Indication. A reasoner does not read a range as a check but as a rule: whatever the property points at is an indication. So it concludes that empagliflozin is an indication, and through the IDMP-O superclass a therapeutic indication as well. Nothing is reported. The SHACL rule that a product's indications must be of type dm:Indication catches the mistake only with reasoning off. With reasoning on, the rule passes, because the reasoner has just supplied the missing type.
+
+A reasoner reports exactly one kind of error: a contradiction. A contradiction needs an axiom that rules something out, and up to version 0.5 the ontology had none. Nothing in it said that a substance cannot also be an indication, and under the open-world assumption, what is not ruled out is possible. Version 0.6.0 adds a single axiom that declares the 13 asserted classes pairwise disjoint (Code 5). Subclasses inherit it, so an SGLT2 product can never be a substance either. Superclasses are unaffected, so an indication remains a TherapeuticIndication of IDMP-O. With the axiom in place, the mistaken link makes the substance a member of two disjoint classes. OWL 2 RL names this rule cax-adc, and it ends in an inconsistency instead of a new fact.
+
+```c
+# Code 5. The disjointness axiom of ontology 0.6.0, and a wrong link it turns into an error
+[] a owl:AllDisjointClasses ;
+    owl:members (
+        dm:HealthcareProfessional dm:Prescription dm:MedicinalProduct dm:Substance dm:Indication
+        dm:Organization dm:QuantitySlice dm:TherapeuticClass dm:Specialty dm:Prefecture
+        dm:SexAgeGroup dm:CareSetting dm:JapaneseDrugClass
+    ) .
+
+# Test data: indication and substance swapped
+t:swappedProduct dm:hasIndication t:substanceAsIndication .
+t:substanceAsIndication a dm:Substance .
+
+# owlrl after the OWL 2 RL closure:
+# "Disjoint classes dm:Substance and dm:Indication have a common individual t:substanceAsIndication"
+```
+
+Wiring the axiom into the local checks exposed a gap. The Python reasoner owlrl does not raise an exception when it meets a contradiction. It writes the message into the graph as a triple and carries on. The local check ran owlrl and then counted only SHACL violations, so an inconsistent graph would have passed. The check now reads those messages back and fails on any of them. As with the SHACL rules, a test file proves that the axiom can fire. It holds one correct record and four wrong links: indication and substance swapped, a disease as an active substance, a product as its own manufacturer, and a substance typed as an SGLT2 product. Exactly those four are reported, and the correct record is not. With the axiom removed, none is reported. The real data passes. The OWL 2 RL closure of the 256,092 triples outside the NDB cells grows to 457,280 triples without a single contradiction, and SHACL still finds zero violations afterwards.
+
+Disjointness is reserved for things that can never coincide in the world: a person and a claim, a product and a company, a prefecture and an age band. Data-quality rules stay in SHACL, for a practical reason. Logically, an inconsistent graph entails every statement, so a reasoner cannot answer queries over it until the contradiction is fixed. SHACL reports each problem as a separate result and remains the gate inside the load transaction. Neo4j has no counterpart to either half of this. A relationship type has no range, so a HAS_INDICATION relationship to a :Substance node is stored as written, and nothing is concluded from it or held against it.
+
+<!-- Author notes: ontology 0.6.0 pushed to Stardog 2026-11-04 (incremental: schema graph 586 triples + provenance; SHACL gate 0 violations; validate.py 0 violations, 17 warnings, 130 info). Snowflake semantic views redeployed from 0.6.0 the same day (only the version string in their comments changed; all parity checks OK). The disjointness was tested with owlrl locally, not with Stardog's own consistency check. -->
+
 ## 2. From the graph to Snowflake
 
 ### 2.1 Tables as projections of the graph
@@ -190,10 +221,10 @@ The export checks keys, foreign keys and row counts before it writes anything. I
 
 ### 2.2 A semantic view generated from the ontology
 
-A Snowflake semantic view describes tables in business terms: logical tables, relationships, dimensions, facts and metrics, each with a description and optional synonyms. Cortex Analyst reads it to turn a question into SQL. Nobody writes the view for this project by hand. A script generates it from the ontology and the vocabularies (Code 5). The only hand-written parts are the mapping of columns to ontology terms and a paragraph of instructions.
+A Snowflake semantic view describes tables in business terms: logical tables, relationships, dimensions, facts and metrics, each with a description and optional synonyms. Cortex Analyst reads it to turn a question into SQL. Nobody writes the view for this project by hand. A script generates it from the ontology and the vocabularies (Code 6). The only hand-written parts are the mapping of columns to ontology terms and a paragraph of instructions.
 
 ```c
--- Code 5. Excerpts of the generated semantic view GLP.SEMANTIC.JAPAN_MARKET
+-- Code 6. Excerpts of the generated semantic view GLP.SEMANTIC.JAPAN_MARKET
 CREATE OR REPLACE SEMANTIC VIEW GLP.SEMANTIC.JAPAN_MARKET
   TABLES ( national_value AS GLP.SEMANTIC.SV_JP_NATIONAL_VALUE ..., product AS ..., prefecture AS ... )
   RELATIONSHIPS ( prefecture_value_to_prefecture AS prefecture_value (PREFECTURE_CODE) REFERENCES prefecture (PREFECTURE_CODE), ... )
@@ -212,10 +243,10 @@ CREATE OR REPLACE SEMANTIC VIEW GLP.SEMANTIC.JAPAN_MARKET
   ai_verified_queries ( jp_class_share_yen AS ( QUESTION 'What share of Japan''s diabetes drug value ...' ... ), ... );
 ```
 
-Each part of the view comes from a part of the graph. Synonyms are the en, ja and zh labels of the ontology terms, 48 of them, so 都道府県 points at the prefecture name. Descriptions are skos:definition texts. Value lists come from the SKOS schemes: the Japanese category names, the 47 prefectures and the company names. The company list also comes from dm:partOfCorporateGroup, so it reads "C.H. Boehringer Sohn AG & Co. KG (also: Nippon Boehringer Ingelheim Co., Ltd., 日本ベーリンガーインゲルハイム, ...)". The OWL defined classes become flags. The generator reads the owl:hasValue of each definition and writes the SQL that a reasoner would have run (Code 6).
+Each part of the view comes from a part of the graph. Synonyms are the en, ja and zh labels of the ontology terms, 48 of them, so 都道府県 points at the prefecture name. Descriptions are skos:definition texts. Value lists come from the SKOS schemes: the Japanese category names, the 47 prefectures and the company names. The company list also comes from dm:partOfCorporateGroup, so it reads "C.H. Boehringer Sohn AG & Co. KG (also: Nippon Boehringer Ingelheim Co., Ltd., 日本ベーリンガーインゲルハイム, ...)". The OWL defined classes become flags. The generator reads the owl:hasValue of each definition and writes the SQL that a reasoner would have run (Code 7).
 
 ```c
--- Code 6. dm:GLP1Product and dm:SGLT2Product compiled into SQL (generated)
+-- Code 7. dm:GLP1Product and dm:SGLT2Product compiled into SQL (generated)
 SELECT pc.PRODUCT_ID,
        BOOLOR_AGG(pc.CLASS_ID = 'GLP1ReceptorAgonist') AS IS_GLP1_PRODUCT,
        BOOLOR_AGG(pc.CLASS_ID = 'SGLT2Inhibitor')      AS IS_SGLT2_PRODUCT
@@ -235,7 +266,7 @@ The governance design from the first article carried over unchanged. The NDB dat
 
 The Japanese build also produced an incident, and it changed the process. During development, the Stardog database was reloaded in full five times, and several validation runs used reasoning on top of the 150,000 observations. On the free tier, this filled the instance's disk. The sixth reload failed with "No space left on device", and from then on every query returned a corruption error. The database could neither be read nor dropped. Stardog Cloud Free has no backups, so the instance had to be recreated.
 
-Recovery took one load of two and a half minutes, because every graph in the database is rebuilt from files in the repository. Provenance and reproducibility, which sound like paperwork, turned out to be the disaster recovery plan. The development loop changed as well. All checks now run on the local machine first: the triple budget, the full SHACL contract with pySHACL, the test that every rule can fire, an OWL 2 RL closure with owlrl followed by SHACL again, and every business query on the embedded store pyoxigraph. These take about ten minutes. Downstream systems receive only what passed. The Stardog loader refuses files that have not passed the local check, and it rewrites only the graphs whose content hash differs. The Snowflake export refuses to run on unchecked files, and the Snowflake loader refuses files that changed after the export.
+Recovery took one load of two and a half minutes, because every graph in the database is rebuilt from files in the repository. Provenance and reproducibility, which sound like paperwork, turned out to be the disaster recovery plan. The development loop changed as well. All checks now run on the local machine first: the triple budget, the full SHACL contract with pySHACL, the test that every rule can fire, the disjointness test from section 1.7, an OWL 2 RL closure with owlrl that must find no contradiction, followed by SHACL again, and every business query on the embedded store pyoxigraph. These take about ten minutes. Downstream systems receive only what passed. The Stardog loader refuses files that have not passed the local check, and it rewrites only the graphs whose content hash differs. The Snowflake export refuses to run on unchecked files, and the Snowflake loader refuses files that changed after the export.
 
 <!-- Figure 4: pipeline diagram. NDB / CMS / RxNorm / UMLS → build RDF → local checks (pySHACL 59 rules, owlrl, pyoxigraph queries) → (a) Stardog (SPARQL, MCP server) and (b) export → Snowflake VOCAB / US / JP → generated semantic views → Cortex Analyst. Parity checks as dashed arrows back to the graph results. -->
 ![](figure4.png)
@@ -248,10 +279,10 @@ The checks on the Snowflake side caught a problem of their own. The first table 
 
 ### 4.1 Japan and Connecticut side by side
 
-Because both countries share the class tree, one SQL query compares the two datasets (Code 7, Figure 5). Each class's share is computed within its own country: yen at NHI list prices for Japan and gross US dollars for Connecticut. The comparison uses single-ingredient products, so each product counts in exactly one class. Each country's total is its top class, which every product reaches once.
+Because both countries share the class tree, one SQL query compares the two datasets (Code 8, Figure 5). Each class's share is computed within its own country: yen at NHI list prices for Japan and gross US dollars for Connecticut. The comparison uses single-ingredient products, so each product counts in exactly one class. Each country's total is its top class, which every product reaches once.
 
 ```c
--- Code 7. Japan vs Connecticut through the shared class tree, shortened (queries/snowflake/jp-vs-connecticut-class-mix.sql)
+-- Code 8. Japan vs Connecticut through the shared class tree, shortened (queries/snowflake/jp-vs-connecticut-class-mix.sql)
 WITH value AS (
   SELECT 'Japan' AS COUNTRY, pc.CLASS_ID, t.TOTAL_QUANTITY * p.NHI_PRICE AS VALUE
   FROM GLP.JP.NATIONAL_TOTAL t JOIN GLP.JP.PRODUCT p ON ... JOIN GLP.JP.PRODUCT_CLASS pc ON ...

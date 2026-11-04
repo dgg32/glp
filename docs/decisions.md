@@ -454,3 +454,22 @@ countries share the substance and class vocabularies.
   Analyst rerun: Claude passed every check on native and OSI views alike (snowflake_extension.md, Step 5).
   The OSI loss is a loss for Cortex Analyst, not for an agent that reads GET_DDL, because the import keeps the
   extensions as opaque text.
+
+## 2026-11-04: Disjoint classes, so OWL can reject a wrong link (ontology 0.6.0)
+- Before 0.6.0 the reasoner could not reject anything: a product whose dm:hasIndication pointed at a substance
+  made the substance an indication (range inference) and, through IDMP-O, a TherapeuticIndication. SHACL's
+  `sh:class dm:Indication` caught it only with reasoning off; with reasoning on, the range supplied the type.
+- One axiom, `owl:AllDisjointClasses` over the 13 asserted classes (not the defined classes, which inherit it;
+  not IDMP-O or SKOS superclasses, which an individual legitimately shares). Checked first: no asserted
+  individual had two of these types.
+- owlrl reports an inconsistency as `[] a err:ErrorMessage ; err:error "..."` triples and does not raise, and
+  `check_local.py` only counted SHACL violations after the closure, so before this change an inconsistency
+  would have passed silently. The reasoning step now fails on any error message, and a new `consistency` step
+  proves the rule fires on `tests/owl/inconsistent-examples.ttl` (exactly the four `t:mustClash` individuals,
+  not the correct record). With the axiom removed, 0 errors: the test depends on the axiom.
+- Disjointness only for things that can never coincide in the world. Data-quality rules stay in SHACL: an
+  inconsistent graph entails everything, so it is a poor error report, and SHACL remains the load gate.
+- Pushed 2026-11-04: Stardog reloaded only the schema graph (556 -> 586 triples) and provenance; gate and
+  validate.py 0 violations. Snowflake semantic views regenerated and redeployed (only the version string in
+  their comments changed); all parity checks OK.
+

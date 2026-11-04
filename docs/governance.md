@@ -118,7 +118,7 @@ is present or flagged as suppressed, and more.
 **Check locally, publish once** (since 2026-10-25, after repeated full reloads and reasoning-on
 validations filled Stardog Cloud Free's disk and corrupted the database):
 [check_local.py](../scripts/check_local.py) runs the triple budget, the full SHACL contract (pyshacl),
-the rule-coverage test, SHACL after an OWL 2 RL closure, and every query (on pyoxigraph) on this
+the rule-coverage test, the disjointness test, an OWL 2 RL closure (no inconsistency, then SHACL again), and every query (on pyoxigraph) on this
 machine. [load_stardog.py](../scripts/load_stardog.py) refuses files that have not passed it, and
 rewrites only the graphs whose content hash differs from the one in Stardog's provenance graph.
 The Stardog tests below are for after a release, not for iterating.
@@ -130,6 +130,7 @@ The Stardog tests below are for after a release, not for iterating.
 | The gate really blocks | [tests/test_load_gate.py](../tests/test_load_gate.py) adds an invalid prescription in a transaction; the gate reports 7 violations and the rollback leaves nothing behind |
 | Every rule can fire | `check_local.py` (locally) and [tests/test_shapes_stardog.py](../tests/test_shapes_stardog.py) (in Stardog): planted errors trigger 59 of 59 rules |
 | OWL and SHACL agree | `check_local.py` validates after an OWL 2 RL closure of everything except the NDB observations (whose shapes no inference touches); 0 violations, so no shape relies on facts the reasoner would contradict. [tests/test_shapes_reasoning.py](../tests/test_shapes_reasoning.py) does the same in Stardog, but too heavy for Cloud Free with the NDB data |
+| Wrong links are inconsistencies, not new facts | Ontology 0.6.0 declares 13 classes `owl:AllDisjointClasses`, so a link whose range or domain gives an individual a second, disjoint type (a substance as an indication) is a contradiction. owlrl does not raise on it but writes `err:ErrorMessage` triples; `check_local.py` reads them back and fails. It also proves the rule fires: [tests/owl/inconsistent-examples.ttl](../tests/owl/inconsistent-examples.ttl) has four wrong links, and exactly those four must be reported |
 | Warnings are visible | [validate.py](../scripts/validate.py) writes [validation-report.md](validation-report.md): currently 0 violations, 17 warnings (13 prescribers missing from the NPI Registry, 3 zero-cost rows, Byetta's two application holders), 130 info |
 | What was loaded is what was built | the loader compares the triple count of every graph in Stardog with the local files |
 

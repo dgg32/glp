@@ -29,6 +29,8 @@ print("Mounjaro substances:", [s.split("/")[-1] for s in g.objects(D.Mounjaro, D
 print("tirzepatide classes:", sorted(c.split("/")[-1] for c in g.objects(D.tirzepatide, DM.inTherapeuticClass)))
 
 types = {dr: set(g.objects(D[dr], RDF.type)) for dr in ("drA", "drB", "drC")}
+errors = list(g.objects(None, Namespace("http://www.daml.org/2002/03/agents/agent-ont#").error))
+assert not errors, f"owlrl found inconsistencies (ontology 0.6.0 disjointness): {errors}"
 assert (D.drA, DM.writes, D.rx1) in g, "writes should be inferred from prescribedBy"
 assert DM.SGLT2Prescriber in types["drA"], "combination product should make drA an SGLT2 prescriber"
 assert DM.GLP1Prescriber in types["drB"], "IDMP-O role chain + SKOS roll-up should make drB a GLP-1 prescriber"

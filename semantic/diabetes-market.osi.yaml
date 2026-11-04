@@ -3,7 +3,7 @@
 version: 0.1.1
 semantic_model:
 - name: DIABETES_MARKET_OSI
-  description: "Type 2 diabetes drug prescribing, generated from the diabetes-market ontology 0.5.2. Medicare Part\
+  description: "Type 2 diabetes drug prescribing, generated from the diabetes-market ontology 0.6.0. Medicare Part\
     \ D, Connecticut, data year 2024: mostly people aged 65 and over. Counts are claims (fills and refills), not\
     \ patients. CMS omits prescriber/product rows with fewer than 11 claims. Costs are gross, before rebates. Prescribers\
     \ are pseudonyms; report aggregates only."

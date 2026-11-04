@@ -7,9 +7,17 @@ to need the server runs here instead, on the files of data/rdf/manifest.csv:
   1. budget     total triples below the Cloud Free limit of 1M edges, with a safety margin
   2. contract   SHACL validation of all graphs (pyshacl, incl. SHACL-SPARQL): 0 violations
   3. coverage   every rule of the shapes fires on tests/shacl/broken-examples.ttl
-  4. reasoning  SHACL again after an OWL 2 RL closure (owlrl) of everything except the NDB
-                observations: 0 violations, so no shape breaks under the ontology's inferences
-  5. queries    every query in queries/ runs on the local store (scripts/run_queries.py --local)
+  4. consistency  the disjointness axiom fires: after an OWL 2 RL closure of the ontology and
+                tests/owl/inconsistent-examples.ttl, owlrl reports exactly the individuals marked
+                t:mustClash as inconsistent, and nothing else
+  5. reasoning  an OWL 2 RL closure (owlrl) of everything except the NDB observations: no
+                inconsistency, then SHACL again: 0 violations, so no shape breaks under the
+                ontology's inferences
+  6. queries    every query in queries/ runs on the local store (scripts/run_queries.py --local)
+
+owlrl does not raise on an inconsistency. It writes each one into the graph as
+[] a err:ErrorMessage ; err:error "Disjoint classes ... have a common individual ..." and carries on,
+so the reasoning and consistency checks read those triples back.
 
 If all pass, data/validation/local-check.json records the hash of data/rdf/provenance.ttl (new with
 every build), and scripts/load_stardog.py pushes only files with that hash.
@@ -36,6 +44,9 @@ from load_stardog import LOCAL_CHECK, provenance_digest  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SH = Namespace("http://www.w3.org/ns/shacl#")
+ERR = Namespace("http://www.daml.org/2002/03/agents/agent-ont#")  # where owlrl writes its error messages
+TEST = Namespace("https://dgg32.github.io/glp/test/")
+ONTOLOGY = ["ontology/diabetes-market.ttl", "ontology/imports/idmp-o-1.4.0-extract.ttl"]
 SHAPES = ROOT / "shapes" / "diabetes-market-shapes.ttl"
 EDGE_LIMIT, MARGIN = 1_000_000, 50_000
 # The NDB observations: validated without reasoning only (no inference touches what their shapes check).
@@ -58,6 +69,11 @@ def violations(data, shapes):
     from pyshacl import validate
     _, report, _ = validate(data, shacl_graph=shapes, inference="none", advanced=True, allow_warnings=True)
     return Counter(str(report.value(r, SH.resultMessage)) for r in report.subjects(SH.resultSeverity, SH.Violation))
+
+
+def inconsistencies(g):
+    """The error messages owlrl left in g after a closure (inconsistencies such as cax-dw/cax-adc)."""
+    return sorted(str(m) for m in g.objects(None, ERR.error))
 
 
 def step(name, fn):
@@ -92,13 +108,33 @@ def main():
         return not missing, f"{len(expected & fired)} of {len(expected)} rules fired" + \
             ("; did not fire: " + " | ".join(missing) if missing else "")
 
+    def consistency():
+        import owlrl
+        from rdflib import Literal
+        g = load(ONTOLOGY)
+        g.parse(ROOT / "tests" / "owl" / "inconsistent-examples.ttl")
+        expected = {str(s) for s in g.subjects(TEST.mustClash, Literal(True))}
+        owlrl.DeductiveClosure(owlrl.OWLRL_Semantics).expand(g)
+        errors = inconsistencies(g)
+        # owlrl's message ends with the individual: "Disjoint classes A and B have a common individual X"
+        clashed = {m.rsplit(" ", 1)[-1] for m in errors if m.startswith("Disjoint classes")}
+        other = [m for m in errors if not m.startswith("Disjoint classes")]
+        missing, extra = sorted(expected - clashed), sorted(clashed - expected)
+        ok = not missing and not extra and not other
+        return ok, f"{len(expected & clashed)} of {len(expected)} wrong links reported inconsistent" + \
+            ("; not reported: " + ", ".join(missing) if missing else "") + \
+            ("; reported but correct: " + ", ".join(extra) if extra else "") + \
+            ("; other errors: " + " | ".join(other[:3]) if other else "")
+
     def reasoning():
         import owlrl
         g = load([f for f in data_files if f != OBSERVATIONS])
         n = len(g)
         owlrl.DeductiveClosure(owlrl.OWLRL_Semantics).expand(g)
+        errors = inconsistencies(g)
         v = violations(g, shapes)
-        return not v, f"{n:,} triples, {len(g):,} after OWL 2 RL closure; " + \
+        return not v and not errors, f"{n:,} triples, {len(g):,} after OWL 2 RL closure; " + \
+            (f"{len(errors)} inconsistencies: " + " | ".join(errors[:3]) + "; " if errors else "consistent; ") + \
             ("; ".join(f"{k} x {m}" for m, k in v.most_common(5)) or "0 violations")
 
     def queries():
@@ -107,9 +143,10 @@ def main():
         failed = [l for l in r.stdout.splitlines() if "FAILED" in l]
         return r.returncode == 0, "; ".join(failed) or "all queries ran (data/validation/query-results-local.md)"
 
-    checks = [("budget", budget), ("contract", contract), ("coverage", coverage), ("queries", queries)]
+    checks = [("budget", budget), ("contract", contract), ("coverage", coverage), ("consistency", consistency),
+              ("queries", queries)]
     if "--skip-reasoning" not in sys.argv:
-        checks.insert(3, ("reasoning", reasoning))
+        checks.insert(4, ("reasoning", reasoning))
     for name, fn in checks:
         results[name] = step(name, fn)
     passed = all(results.values())

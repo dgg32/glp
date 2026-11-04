@@ -1,7 +1,7 @@
 version: 0.1.1
 semantic_model:
   - name: JAPAN_MARKET
-    description: "Diabetes drugs dispensed in Japan, generated from the diabetes-market ontology 0.5.2. NDB Open Data, 11th release: FY2024 (April 2024 - March 2025), all of Japan, all ages. Quantities are dispensed tablets, pens or kits, not patients or prescriptions, and cannot be added across products; values are quantity times the NHI price (price list of 2026-09-02), in yen. Cells below 1,000 (oral) or 400 (injection) are masked. The prefecture is where the claim was issued. No prescribers or specialties exist for Japan."
+    description: "Diabetes drugs dispensed in Japan, generated from the diabetes-market ontology 0.6.0. NDB Open Data, 11th release: FY2024 (April 2024 - March 2025), all of Japan, all ages. Quantities are dispensed tablets, pens or kits, not patients or prescriptions, and cannot be added across products; values are quantity times the NHI price (price list of 2026-09-02), in yen. Cells below 1,000 (oral) or 400 (injection) are masked. The prefecture is where the claim was issued. No prescribers or specialties exist for Japan."
     datasets:
       - name: CARE_SETTING
         source: GLP.SEMANTIC.SV_JP_CARE_SETTING

@@ -1,0 +1,37 @@
+# Made-up data for the disjointness axiom of ontology 0.6.0 (owl:AllDisjointClasses).
+# Every individual marked t:mustClash true must be reported as inconsistent after an OWL 2 RL
+# closure (rule cax-adc); every other individual must not. scripts/check_local.py checks both.
+# None of the wrong links below is wrong in the eyes of OWL without the axiom: the ranges and
+# domains just add a second type to the individual.
+@prefix dm:   <https://dgg32.github.io/glp/ontology#> .
+@prefix t:    <https://dgg32.github.io/glp/test/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# --- a correct record: must stay consistent ---
+t:product a dm:MedicinalProduct ;
+    dm:hasActiveSubstance t:substance ;
+    dm:hasIndication t:disease ;
+    dm:manufacturedBy t:company .
+t:substance a dm:Substance .
+t:disease a dm:Indication .
+t:company a dm:Organization .
+
+# --- wrong links: each one gives an individual a second, disjoint type ---
+
+# Indication and substance swapped: the range of dm:hasIndication makes the substance an indication.
+t:swappedProduct a dm:MedicinalProduct ;
+    dm:hasIndication t:substanceAsIndication .
+t:substanceAsIndication a dm:Substance ; t:mustClash true .
+
+# The product itself entered as its manufacturer: the range of dm:manufacturedBy makes it a company.
+t:selfMadeProduct a dm:MedicinalProduct ;
+    dm:manufacturedBy t:selfMadeProduct ;
+    t:mustClash true .
+
+# A disease entered as the active substance: an indication inferred to be a substance.
+t:diseaseProduct a dm:MedicinalProduct ;
+    dm:hasActiveSubstance t:diseaseAsSubstance .
+t:diseaseAsSubstance a dm:Indication ; t:mustClash true .
+
+# Subclasses inherit the axiom: a substance typed as an SGLT2 product (a subclass of dm:MedicinalProduct).
+t:substanceAsProduct a dm:Substance , dm:SGLT2Product ; t:mustClash true .
