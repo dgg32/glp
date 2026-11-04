@@ -1,18 +1,24 @@
 ---
-title: "Adding Japan to a Diabetes Drug Knowledge Graph and Serving It in Snowflake"
-subtitle: "One graph, two countries: a computed 薬効分類–ATC crosswalk, masked cells as data, and OWL definitions compiled into a Snowflake semantic view"
+title: "Compiling a Diabetes Drug Market Knowledge Graph into a Snowflake Semantic View"
+subtitle: "One graph, two countries: the same answers in SPARQL, SQL and plain Japanese"
 status: draft
 ---
 <!-- Draft of article 2, rewritten 2026-10-31 with Snowflake as the presentation layer. Sources: HANDOFF_article2.md, docs/findings.md §6–10, docs/decisions.md, snowflake_extension.md, data/snowflake/tables.json (graph results), data/validation/semantic-view-check.json (Snowflake parity) and data/validation/analyst-eval-jp-final.json (Cortex Analyst). Every number below is taken from those files. Lines in HTML comments are notes for the author and are not part of the article. -->
 
-# Adding Japan to a Diabetes Drug Knowledge Graph and Serving It in Snowflake
+# Compiling a Diabetes Drug Market Knowledge Graph into a Snowflake Semantic View
 
-## One graph, two countries: a computed 薬効分類–ATC crosswalk, masked cells as data, and OWL definitions compiled into a Snowflake semantic view
+## One graph, two countries: the same answers in SPARQL, SQL and plain Japanese
 
 <!-- Figure 1: Snowsight, Cortex Analyst on GLP.SEMANTIC.JAPAN_MARKET answering 「日本ベーリンガーインゲルハイムのSGLT2阻害薬シェアは？」 with the company table (C.H. Boehringer Sohn AG & Co. KG 37.5%, AstraZeneca 32.2%, ...). -->
 ![](figure1.png)
 
 Figure 1. Cortex Analyst in Snowflake answers a Japanese question about Japanese data through a semantic view generated from the ontology. Image by author.
+
+The same medicine can look entirely different depending on where you buy it. Take Jardiance, a popular diabetes medication sold in both the US and Japan. American health databases list it as a single product and track how many prescriptions are filled. Japanese databases list it under its local name, create a separate entry for each tablet strength, and count individual pills. To make matters worse, both countries group their medicines using completely different classification systems.
+
+This creates a massive headache for drug manufacturers and health researchers. Before they can compare cross-border data, someone has to manually match every name, dose, and metric. It’s slow, tedious work—and it gets redone from scratch for every new project. The exact same issue trips up AI assistants. If you ask an AI to compare Jardiance usage in the US and Japan, it has to guess which records belong together. It might miss one of the Japanese doses entirely, or make the fatal flaw of comparing US prescription counts directly against Japanese tablet counts. Either way, it delivers the wrong answer with absolute confidence.
+
+This is where a knowledge graph comes in. By creating a single, universal entry for each medicine, a knowledge graph links every regional name, dose, and metric back to a shared node. Instead of guessing, both humans and AI assistants can instantly run accurate, apples-to-apples comparisons.
 
 The [previous article](https://medium.com/@dgg32/building-a-governed-diabetes-prescription-knowledge-graph-in-rdf-75667d126ee2) built an RDF knowledge graph from Medicare Part D claims for diabetes drugs in Connecticut. SKOS named the drugs in English, Japanese and Chinese, an OWL ontology aligned to IDMP-O defined the concepts and rules, and SHACL checked the data before it entered the database. That article explained the three standards. This one puts them to the test that matters most: a second dataset from another country.
 
@@ -20,7 +26,7 @@ Shared vocabularies earn their keep only when a second source arrives. With one 
 
 The second change concerns where the graph is used. Commercial data in pharma mostly lives in data warehouses, and analysts query it with SQL and BI tools, not with SPARQL. A knowledge graph that stays in a graph database next to the warehouse remains a side project. So this article also moves the presentation layer to Snowflake. The RDF graph stays the single source of truth: it is built and validated on the local machine, then exported to Snowflake as tables. A script generates a Snowflake semantic view from the OWL ontology and the SKOS labels, and Cortex Analyst, Snowflake's natural-language-to-SQL service, answers questions in Japanese on top of it (Figure 1).
 
-The article adds Japan's NDB Open Data for fiscal year 2024 to the graph. Both countries share one substance and drug class vocabulary, so a single SQL query can compare the two markets. A computed crosswalk links Japan's classification to ATC, an RDF Data Cube holds 150,288 table cells, and 59 SHACL rules check the result. In Snowflake, seven business questions and two cross-country queries return the graph's numbers row for row. The code is in the same GitHub repository as before.
+The article adds Japan's NDB Open Data for fiscal year 2024 to the graph. Both countries share one substance and drug class vocabulary, so a single SQL query can compare Connecticut and Japan. A computed crosswalk links Japan's classification to ATC, an RDF Data Cube holds 150,288 table cells, and 59 SHACL rules check the result. In Snowflake, seven business questions and two cross-country queries return the graph's numbers row for row. The code is in the same GitHub repository as before.
 
 ## [GitHub - dgg32/glp](https://github.com/dgg32/glp)
 
@@ -32,7 +38,7 @@ The Ministry of Health, Labour and Welfare (MHLW) publishes [NDB Open Data](http
 
 The prescription tables list each product at strength level, such as ジャディアンス錠10mg and ジャディアンス錠25mg as separate rows. For each product they give the dispensed quantity by prefecture, by month or by sex and five-year age band, in three care settings: outpatient prescriptions filled at a community pharmacy (院外), outpatient drugs dispensed at the clinic or hospital (院内) and inpatient use (入院). The three breakdowns are never crossed, so there is no prefecture by age table. This project takes every antidiabetic in category 396, every insulin and the GLP-1 and dual GIP/GLP-1 drugs filed under category 249: 510 products, 286 of them generics. The tables carry each product's NHI (National Health Insurance) price, and the NHI price list adds its ingredient and marketing authorization holder.
 
-NDB also lacks several things that the Connecticut graph relies on. It has no prescribers, no specialties, no claims and no patient counts. The story of the first article, such as cardiologists writing 91% of their SGLT2 and GLP-1 claims for an SGLT2 inhibitor, cannot be repeated for Japan. The model shifts from doctors to products and regions. A quantity is also not a prescription. One tablet of metformin and one Ozempic pen, which lasts about four weeks, are both counted as one. Quantities therefore cannot be added across products. This article compares products in yen instead: quantity times the NHI price. MHLW updates the release in place. On 2 September 2026 it refreshed the prices, drug codes and generic flags in the prescription tables, so the values are fiscal year 2024 volumes at September 2026 prices.
+NDB also lacks several things that the Connecticut graph relies on. It has no prescribers, no specialties, no claims and no patient counts. The story of the first article, such as cardiologists writing 91% of their SGLT2 (sodium-glucose co-transporter 2) and GLP-1 claims for an SGLT2 inhibitor, cannot be repeated for Japan. The model shifts from doctors to products and regions. A quantity is also not a prescription. One tablet of metformin and one Ozempic pen, which lasts about four weeks, are both counted as one. Quantities therefore cannot be added across products. This article compares products in yen instead: quantity times the NHI price. MHLW updates the release in place. On 2 September 2026 it refreshed the prices, drug codes and generic flags in the prescription tables, so the values are fiscal year 2024 volumes at September 2026 prices.
 
 ### 1.2 SKOS: a crosswalk between two classifications
 
@@ -77,7 +83,7 @@ The SHACL rule for substances changed accordingly. It used to say "a substance h
 
 ### 1.4 OWL: defined classes and one company in two countries
 
-The ontology moved to version 0.5 and gained one new structure, explained in the next section, and two new defined classes. dm:GLP1Product is any medicinal product with an active substance in the GLP-1 class or a narrower one (Code 2). dm:SGLT2Product works the same way for SGLT2 (sodium-glucose co-transporter 2) inhibitors.
+The ontology moved to version 0.5 and gained one new structure, explained in the next section, and two new defined classes. dm:GLP1Product is any medicinal product with an active substance in the GLP-1 class or a narrower one (Code 2). dm:SGLT2Product works the same way for SGLT2 inhibitors.
 
 ```c
 # Code 2. OWL definition of the GLP1Product class
@@ -242,7 +248,7 @@ The checks on the Snowflake side caught a problem of their own. The first table 
 
 ### 4.1 Japan and Connecticut side by side
 
-Because both countries share the class tree, one SQL query compares the two markets (Code 7, Figure 5). Each class's share is computed within its own country: yen at NHI list prices for Japan and gross US dollars for Connecticut. The comparison uses single-ingredient products, so each product counts in exactly one class. Each country's total is its top class, which every product reaches once.
+Because both countries share the class tree, one SQL query compares the two datasets (Code 7, Figure 5). Each class's share is computed within its own country: yen at NHI list prices for Japan and gross US dollars for Connecticut. The comparison uses single-ingredient products, so each product counts in exactly one class. Each country's total is its top class, which every product reaches once.
 
 ```c
 -- Code 7. Japan vs Connecticut through the shared class tree, shortened (queries/snowflake/jp-vs-connecticut-class-mix.sql)
@@ -338,7 +344,7 @@ The MCP server from the first article answers the same kind of question over SPA
 
 ## Conclusion
 
-This project added a second country to a diabetes drug knowledge graph and moved its presentation into Snowflake. Japan's NDB Open Data differs from Medicare in almost every respect: a different classification, a different unit, different masking and no prescribers. Still, the graph absorbed it without a single change to the Connecticut results. The shared substance and class vocabulary made the two markets comparable in one query, a computed SKOS crosswalk bridged the two classifications, a defined OWL class found every GLP-1 product in both countries, and an RDF Data Cube kept the data within the free tier's budget.
+This project added a second country to a diabetes drug knowledge graph and moved its presentation into Snowflake. Japan's NDB Open Data differs from Medicare in almost every respect: a different classification, a different unit, different masking and no prescribers. Still, the graph absorbed it without a single change to the Connecticut results. The shared substance and class vocabulary made the two datasets comparable in one query, a computed SKOS crosswalk bridged the two classifications, a defined OWL class found every GLP-1 product in both countries, and an RDF Data Cube kept the data within the free tier's budget.
 
 In my view, the second dataset is where RDF's standards pay off, and the warehouse is where they reach their users. With one source, SKOS mappings, defined classes and SHACL rules look like extra work. With two, they keep the sources apart where they differ and joined where they agree. Exported to Snowflake, the same artifacts do a second job: SKOS labels become synonyms and value lists, definitions become descriptions, OWL restrictions become SQL flags and the SPARQL query catalog becomes the verified queries and the test suite of the semantic view. The semantic layer is generated, not written a second time, so it cannot drift from the graph. The generator even found a flaw in the ontology. Two classes, the ATC-based therapeutic class and the Japanese category, shared the Japanese label 薬効分類, and a synonym can point at only one of them. In the Japan view, it pointed at the wrong one. The fix was a label change in the ontology: 薬効分類 now names only the Japanese classification, and the ATC-based tree is 薬効群, with ATC分類 as an alternative label.
 
