@@ -21,6 +21,10 @@ Checks before anything is written to tables.json (scripts/load_snowflake.py load
                results go into tables.json as the expectations for scripts/deploy_semantic_view.py, together
                with the results of every queries/jp-*.rq (checked in Snowflake, through the semantic views)
 
+Lineage: tables.json records the content hash of every named graph read (graph_hashes) and the graphs
+of each table; data/snowflake/provenance.ttl describes each table as a PROV-O entity derived from those
+graphs (scripts/provenance.py build_gold), so wasDerivedFrom+ runs from a table down to the bronze sources.
+
 Privacy: as in data/rdf, no names and no NPIs; prescribers are the HMAC pseudonyms of build_rdf.py.
 data/snowflake/ is gitignored for the same reason as data/rdf/ (re-identifiable by joining with CMS).
 
@@ -499,8 +503,13 @@ def main():
         sys.exit("export failed, nothing written to tables.json:\n  " + "\n  ".join(errors))
 
     OUT.mkdir(parents=True, exist_ok=True)
+    import provenance
+    hashes = provenance.graph_hashes()
     manifest = {"exported_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
-                "rdf_provenance": provenance_digest(), "parity": parity, "tables": []}
+                "rdf_provenance": provenance_digest(), "parity": parity,
+                "graph_hashes": {BASE + "graph/" + g: hashes[BASE + "graph/" + g]
+                                 for g in sorted({g for t in TABLES for g in t["graphs"]})},
+                "tables": []}
     for t in TABLES:
         path = OUT / f"{t['name']}.csv"
         with open(path, "w", newline="", encoding="utf-8") as f:
@@ -510,8 +519,11 @@ def main():
         manifest["tables"].append({
             "name": t["name"], "file": path.name, "rows": len(data[t["name"]]),
             "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "columns": t["columns"], "key": t["key"],
-            "refs": t["refs"], "comment": t["comment"] + " Source: " + ", ".join(BASE + "graph/" + g for g in t["graphs"])})
+            "refs": t["refs"], "graphs": [BASE + "graph/" + g for g in t["graphs"]],
+            "comment": t["comment"] + " Source: " + ", ".join(BASE + "graph/" + g for g in t["graphs"])})
     (OUT / "tables.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False))
+    # Gold-layer lineage (table -> named graphs -> ... -> bronze), separate from data/rdf/provenance.ttl
+    provenance.build_gold(manifest).serialize(OUT / "provenance.ttl", format="turtle")
     print(f"all checks passed; parity on {", ".join(f"{q} ({len(r)} rows)" for q, r in parity.items())}; "
           f"wrote {OUT.relative_to(ROOT)}/tables.json (with the graph results as expectations for the semantic view)")
 

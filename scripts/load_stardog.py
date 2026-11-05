@@ -4,7 +4,9 @@ Reads data/rdf/manifest.csv (written by build_rdf.py) and the STARDOG_* settings
 Push only what passed locally: the script refuses to run unless scripts/check_local.py validated
 exactly these files (data/validation/local-check.json holds the hash of data/rdf/provenance.ttl,
 which changes with every build). Incremental: only graphs whose content hash differs from the one in
-Stardog's provenance graph are rewritten, plus the provenance graph itself; --full rewrites all.
+Stardog's provenance graph are rewritten, plus the provenance graph itself, which is also rewritten
+alone when only it changed (the lineage of the intermediate files can change while no graph does);
+--full rewrites all.
 (Stardog Cloud Free ran out of disk on 2026-10-25 after repeated full reloads of 734k triples.)
 Everything happens in one transaction: each changed graph is cleared and reloaded, so a rerun
 replaces the data instead of duplicating it, and a failure leaves the database unchanged.
@@ -28,6 +30,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from rdflib import Graph, Namespace
+from rdflib.compare import isomorphic
 
 ROOT = Path(__file__).resolve().parent.parent
 BATCH = 50_000  # triples per HTTP request
@@ -97,6 +100,12 @@ class Stardog:
                          accept="application/sparql-results+json")
         return {b["g"]["value"]: b["h"]["value"] for b in json.loads(body)["results"]["bindings"]}
 
+    def graph(self, graph_iri):
+        """The content of one named graph in Stardog."""
+        q = f"CONSTRUCT {{ ?s ?p ?o }} WHERE {{ GRAPH <{graph_iri}> {{ ?s ?p ?o }} }}"
+        body = self.call("/query?" + urllib.parse.urlencode({"query": q}), method="GET", accept="application/n-triples")
+        return Graph().parse(data=body, format="nt")
+
     def count_per_graph(self):
         q = "SELECT ?g (COUNT(*) AS ?n) WHERE { GRAPH ?g { ?s ?p ?o } } GROUP BY ?g"
         body = self.call("/query?" + urllib.parse.urlencode({"query": q}), method="GET",
@@ -129,12 +138,14 @@ def main():
     local, remote = local_hashes(), ({} if full else sd.remote_hashes())
     changed = [g for g in files_by_graph if g != PROVENANCE_GRAPH and local.get(g) != remote.get(g)]
     stale = sorted(set(sd.count_per_graph()) - set(files_by_graph))
-    if not changed and not stale:
+    lineage_changed = full or not isomorphic(Graph().parse(ROOT / "data" / "rdf" / "provenance.ttl"),
+                                             sd.graph(PROVENANCE_GRAPH))
+    if not changed and not stale and not lineage_changed:
         print("Stardog is up to date: every graph's content hash matches; nothing to load")
         return
     changed.append(PROVENANCE_GRAPH)  # records the new hashes
     print(f"{len(changed) - 1} of {len(files_by_graph) - 1} graphs changed: "
-          + ", ".join(g.rsplit("/graph/", 1)[-1] for g in changed[:-1]))
+          + (", ".join(g.rsplit("/graph/", 1)[-1] for g in changed[:-1]) or "only the lineage in provenance"))
     if stale:
         print("graphs in Stardog but not in the manifest (dropped in this transaction): " + ", ".join(stale))
     if dry_run:

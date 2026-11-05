@@ -7,6 +7,8 @@
 @prefix qb:   <http://purl.org/linked-data/cube#> .
 @prefix sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> .
 @prefix sdmx-code: <http://purl.org/linked-data/sdmx/2009/code#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 
 # --- vocabulary ---
 t:scheme a skos:ConceptScheme .
@@ -127,3 +129,9 @@ t:bothCell dm:prefecture t:pref ; dm:quantity -1.0 ;                 # negative,
     sdmx-attribute:confStatus sdmx-code:confStatus-C .
 t:noDimensionCell dm:quantity 1500.0 .                                # no prefecture, month or sex-age band
 t:neitherCell dm:prefecture t:pref ; dm:month "2024-04"^^xsd:gYearMonth .  # no value, not masked, two dimensions
+
+# --- lineage ---
+t:derivedFromUnhashed prov:wasDerivedFrom <https://dgg32.github.io/glp/data/curated/test-unhashed.csv> .  # input without a hash
+t:derivedFromOrphan prov:wasDerivedFrom <https://dgg32.github.io/glp/data/generated/test-orphan.csv> .
+<https://dgg32.github.io/glp/data/generated/test-orphan.csv>                                         # hashed, but no inputs, no script
+    dcterms:identifier "sha256:0000000000000000000000000000000000000000000000000000000000000000" .

@@ -1,0 +1,42 @@
+# Where does US.PRESCRIPTION come from? Its full lineage, gold -> silver -> bronze, walked with prov:wasDerivedFrom+: every entity with its hash, the step that generated it and when, ordered from the top of the chain down.
+# The gold layer (Snowflake tables) is described in data/snowflake/provenance.ttl, which is not loaded into Stardog; there the walk starts at the named graph.
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?layer ?entity ?hash ?generatedBy ?time ?release ?derivedFrom
+WHERE {
+  {
+    SELECT ?node (COUNT(DISTINCT ?below) AS ?depth) WHERE {
+      { <https://dgg32.github.io/glp/data/snowflake/US.PRESCRIPTION> prov:wasDerivedFrom* ?node }
+      UNION
+      { <https://dgg32.github.io/glp/graph/cms-partd-2024> prov:wasDerivedFrom* ?node }
+      OPTIONAL { ?node prov:wasDerivedFrom+ ?below }
+    } GROUP BY ?node
+  }
+  FILTER EXISTS { ?node dcterms:identifier ?any }
+  OPTIONAL { ?node rdfs:label ?label FILTER (lang(?label) = "" || lang(?label) = "en") }
+  OPTIONAL { ?node dcterms:identifier ?id }
+  OPTIONAL { ?node dcterms:hasVersion ?release }
+  OPTIONAL { ?node prov:generatedAtTime ?generatedAt }
+  OPTIONAL {
+    ?node prov:wasGeneratedBy ?act .
+    OPTIONAL { ?act rdfs:label ?actLabel FILTER (lang(?actLabel) = "" || lang(?actLabel) = "en") }
+    OPTIONAL { ?act prov:startedAtTime ?start }
+    OPTIONAL { ?act prov:endedAtTime ?end }
+  }
+  OPTIONAL {
+    SELECT ?node (GROUP_CONCAT(DISTINCT ?inLabel; separator=" | ") AS ?derivedFrom) WHERE {
+      ?node prov:wasDerivedFrom ?in .
+      ?in rdfs:label ?inLabel FILTER (lang(?inLabel) = "" || lang(?inLabel) = "en")
+    } GROUP BY ?node
+  }
+  BIND (IF(STRSTARTS(STR(?node), "https://dgg32.github.io/glp/data/snowflake/"), "gold",
+        IF(STRSTARTS(STR(?node), "https://dgg32.github.io/glp/data/source/"), "bronze",
+        IF(STRSTARTS(STR(?node), "https://dgg32.github.io/glp/data/curated/"), "curated", "silver"))) AS ?layer)
+  BIND (COALESCE(?label, STR(?node)) AS ?entity)
+  BIND (SUBSTR(STR(?id), 8, 12) AS ?hash)
+  BIND (IF(!BOUND(?actLabel), "hand-curated", IF(STRSTARTS(STR(?actLabel), "retrieval of "), "retrieval", STR(?actLabel))) AS ?generatedBy)
+  BIND (IF(BOUND(?start), CONCAT(SUBSTR(STR(?start), 1, 16), " - ", SUBSTR(STR(?end), 1, 16)),
+           SUBSTR(STR(COALESCE(?generatedAt, ?end)), 1, 16)) AS ?time)
+}
+ORDER BY DESC(?depth) ?layer ?entity

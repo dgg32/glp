@@ -10,6 +10,7 @@
 @prefix qb:   <http://purl.org/linked-data/cube#> .
 @prefix sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> .
 @prefix sdmx-code: <http://purl.org/linked-data/sdmx/2009/code#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
 
 # The modeling contract for the Diabetes Drug Market knowledge graph.
 # OWL says what the data means and lets the reasoner add facts (open world);
@@ -18,16 +19,19 @@
 
 <https://dgg32.github.io/glp/shapes> a owl:Ontology ;
     dcterms:title "SHACL shapes for the Diabetes Drug Market knowledge graph"@en ;
-    owl:versionIRI <https://dgg32.github.io/glp/shapes/0.3.0> ;
-    owl:versionInfo "0.3.0" ;
-    owl:priorVersion <https://dgg32.github.io/glp/shapes/0.2.0> ;
+    owl:versionIRI <https://dgg32.github.io/glp/shapes/0.4.0> ;
+    owl:versionInfo "0.4.0" ;
+    owl:priorVersion <https://dgg32.github.io/glp/shapes/0.3.0> ;
+    skos:changeNote "0.4.0 (2026-11-05): lineage. Every input of a derivation in the project's own namespaces (source snapshot, curated or generated file, named graph) carries a sha256 content hash, and every generated intermediate records what it was derived from and the script run that generated it. Inputs outside the project (web pages a concept scheme cites) are not checked."@en ;
     skos:changeNote "0.3.0 (2026-10-25): Japan (NDB Open Data). A substance needs RxNorm or, where RxNorm does not have it, UMLS. A product needs exactly one of a CMS generic name (US) and a YJ code (Japan). New shapes for Japanese products, quantity slices and their observations: masked XOR value for cells and totals, the masking threshold, completeness (47 prefectures, 12 months, 42 sex-age bands per slice) and the sum of the cells against the national total."@en ;
     skos:changeNote "0.2.0 (2026-10-20): the substance class rule no longer uses sh:maxCount 1, which the ontology's property chain broke under reasoning. It is split into 'A substance needs a therapeutic class.' (sh:minCount 1) and a SPARQL constraint that counts only the most specific classes, so the shapes give the same result with reasoning off and on. 38 rules (was 37)."@en ;
     owl:imports <https://dgg32.github.io/glp/ontology> ;
     sh:declare [ sh:prefix "dm" ; sh:namespace "https://dgg32.github.io/glp/ontology#"^^xsd:anyURI ] ,
                [ sh:prefix "skos" ; sh:namespace "http://www.w3.org/2004/02/skos/core#"^^xsd:anyURI ] ,
                [ sh:prefix "qb" ; sh:namespace "http://purl.org/linked-data/cube#"^^xsd:anyURI ] ,
-               [ sh:prefix "sdmx-attribute" ; sh:namespace "http://purl.org/linked-data/sdmx/2009/attribute#"^^xsd:anyURI ] .
+               [ sh:prefix "sdmx-attribute" ; sh:namespace "http://purl.org/linked-data/sdmx/2009/attribute#"^^xsd:anyURI ] ,
+               [ sh:prefix "prov" ; sh:namespace "http://www.w3.org/ns/prov#"^^xsd:anyURI ] ,
+               [ sh:prefix "dcterms" ; sh:namespace "http://purl.org/dc/terms/"^^xsd:anyURI ] .
 
 #################################################################
 #  Vocabularies (SKOS)
@@ -429,3 +433,32 @@ dms:PrescriptionShape a sh:NodeShape ;
         [ sh:path dm:beneficiaryCountSuppressed ; sh:hasValue true ]
     ) ;
     sh:message "Either the beneficiary count is present or it is flagged as suppressed (exactly one of the two)." .
+
+# --- Lineage (0.4.0): the bronze -> silver -> gold chain of the provenance graph is complete and hashed ---
+
+dms:LineageHashShape a sh:NodeShape ;
+    sh:name "lineage: hashed inputs" ;
+    sh:targetSubjectsOf prov:wasDerivedFrom ;
+    sh:sparql [
+        sh:message "A lineage input (source snapshot, curated or generated file, named graph) has no sha256 content hash." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this ?value WHERE {
+              $this prov:wasDerivedFrom ?value .
+              FILTER (STRSTARTS(STR(?value), "https://dgg32.github.io/glp/data/")
+                      || STRSTARTS(STR(?value), "https://dgg32.github.io/glp/graph/"))
+              FILTER NOT EXISTS { ?value dcterms:identifier ?h FILTER (REGEX(STR(?h), "^sha256:[0-9a-f]{64}$")) }
+            }""" ] .
+
+dms:IntermediateShape a sh:NodeShape ;
+    sh:name "lineage: generated intermediate" ;
+    sh:targetObjectsOf prov:wasDerivedFrom ;
+    sh:sparql [
+        sh:message "A generated intermediate needs the inputs it was derived from and the script run that generated it." ;
+        sh:prefixes <https://dgg32.github.io/glp/shapes> ;
+        sh:select """
+            SELECT $this WHERE {
+              FILTER (STRSTARTS(STR($this), "https://dgg32.github.io/glp/data/generated/"))
+              FILTER (NOT EXISTS { $this prov:wasDerivedFrom ?input }
+                      || NOT EXISTS { $this prov:wasGeneratedBy/rdfs:label ?script })
+            }""" ] .
