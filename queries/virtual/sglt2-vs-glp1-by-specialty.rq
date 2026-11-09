@@ -1,0 +1,42 @@
+# Virtual-graph version of queries/sglt2-vs-glp1-by-specialty.rq: same question, over the Stardog virtual graph
+# snowflake_glp (mapping/glp.r2rml.ttl over the Snowflake tables). Expected results: the original's, in
+# data/snowflake/tables.json (parity).
+# Three rewrites, all forced by Stardog 12.2.1's translation into SQL:
+#  - skos:broader* with two variable ends cannot be translated, so the ancestors come from
+#    skos:broaderTransitive, i.e. the closure table VOCAB.CLASS_ANCESTOR;
+#  - "the class itself OR an ancestor" as a UNION made Stardog push the GROUP BY into SQL grouped by each
+#    branch's own label column (every specialty came back up to four times). So the roll-up is a LEFT JOIN
+#    instead: the substance's class, or the one of its ancestors that is a target class. This is exact here
+#    because no class has both target classes among its ancestors-or-self.
+#  - integer / integer is a decimal in SPARQL, but Stardog typed the pushed expression as an integer and
+#    dropped the scale of decimal literals (1000.0 became 1000; 30.5 came back as 30), so one operand is cast
+#    to xsd:double, as in the Japan queries.
+# SGLT2 vs GLP-1 claims by prescriber primary specialty (Connecticut, Medicare Part D 2024). Tirzepatide
+# (dual GIP/GLP-1) counts as GLP-1, and combination products count for every class they contain.
+# sglt2SharePct = SGLT2 claims as a percentage of SGLT2 + GLP-1 claims.
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX dm:   <https://dgg32.github.io/glp/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dmtc: <https://dgg32.github.io/glp/vocab/therapeutic-class/>
+
+SELECT ?specialty ?prescribers ?sglt2Claims ?glp1Claims
+       (ROUND(1000 * xsd:double(?sglt2Claims) / (?sglt2Claims + ?glp1Claims)) / 10 AS ?sglt2SharePct)
+FROM <virtual://snowflake_glp>
+WHERE {
+  { SELECT ?specialty
+           (COUNT(DISTINCT ?doc) AS ?prescribers)
+           (SUM(IF(?cls = dmtc:SGLT2Inhibitor, ?claims, 0)) AS ?sglt2Claims)
+           (SUM(IF(?cls = dmtc:GLP1ReceptorAgonist, ?claims, 0)) AS ?glp1Claims)
+    WHERE {
+      ?rx dm:prescribedBy ?doc ; dm:forProduct ?prod ; dm:totalClaims ?claims .
+      ?prod dm:hasActiveSubstance ?sub .
+      ?sub dm:inTherapeuticClass ?c .
+      OPTIONAL { ?c skos:broaderTransitive ?anc . FILTER(?anc IN (dmtc:SGLT2Inhibitor, dmtc:GLP1ReceptorAgonist)) }
+      BIND(IF(?c IN (dmtc:SGLT2Inhibitor, dmtc:GLP1ReceptorAgonist), ?c, ?anc) AS ?cls)
+      FILTER(BOUND(?cls))
+      ?doc dm:hasPrimarySpecialty/skos:prefLabel ?specialty .
+      FILTER(lang(?specialty) = "en")
+    }
+    GROUP BY ?specialty }
+}
+ORDER BY DESC(?sglt2Claims + ?glp1Claims)

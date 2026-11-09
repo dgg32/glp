@@ -1,0 +1,1482 @@
+# Generated from glp.r2rml.ttl by scripts/r2rml_to_sms2.py; edit the R2RML file, not this one.
+
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dm: <https://dgg32.github.io/glp/ontology#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#>
+PREFIX sdmx-code: <http://purl.org/linked-data/sdmx/2009/code#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#CareSetting>
+FROM SQL {
+  SELECT CARE_SETTING_ID AS "id", BROADER_CARE_SETTING_ID AS "broader", DEFINITION_EN AS "definition" FROM GLP.VOCAB.CARE_SETTING
+}
+TO {
+  ?subject a skos:Concept .
+  ?subject a dm:CareSetting .
+  ?subject skos:inScheme <https://dgg32.github.io/glp/vocab/care-setting> .
+  ?subject skos:broader ?o2 .
+  ?subject skos:definition ?o3 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{broader}") AS ?o2)
+  BIND(strlang(?definition, "en") AS ?o3)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#CareSettingAltLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'care_setting' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#CareSettingAltLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'care_setting' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#CareSettingAltLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'care_setting' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#CareSettingPrefLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'care_setting' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#CareSettingPrefLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'care_setting' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#CareSettingPrefLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'care_setting' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#CareSettingTop>
+FROM SQL {
+  SELECT CARE_SETTING_ID AS "id" FROM GLP.VOCAB.CARE_SETTING WHERE BROADER_CARE_SETTING_ID IS NULL
+}
+TO {
+  ?subject skos:topConceptOf <https://dgg32.github.io/glp/vocab/care-setting> .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{id}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#Indication>
+FROM SQL {
+  SELECT INDICATION_ID AS "id" FROM GLP.VOCAB.INDICATION
+}
+TO {
+  ?subject a skos:Concept .
+  ?subject a dm:Indication .
+  ?subject skos:inScheme <https://dgg32.github.io/glp/vocab/indication> .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/indication/{id}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#IndicationAltLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'indication' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/indication/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#IndicationAltLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'indication' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/indication/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#IndicationAltLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'indication' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/indication/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#IndicationPrefLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'indication' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/indication/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#IndicationPrefLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'indication' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/indication/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#IndicationPrefLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'indication' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/indication/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#IndicationTop>
+FROM SQL {
+  SELECT INDICATION_ID AS "id" FROM GLP.VOCAB.INDICATION
+}
+TO {
+  ?subject skos:topConceptOf <https://dgg32.github.io/glp/vocab/indication> .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/indication/{id}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClass>
+FROM SQL {
+  SELECT JP_CLASS_CODE AS "id", BROADER_JP_CLASS_CODE AS "broader", JP_CLASS_CODE AS "notation" FROM GLP.VOCAB.JP_DRUG_CLASS
+}
+TO {
+  ?subject a skos:Concept .
+  ?subject a dm:JapaneseDrugClass .
+  ?subject skos:inScheme <https://dgg32.github.io/glp/vocab/jp-drug-class> .
+  ?subject skos:broader ?o2 .
+  ?subject skos:notation ?notation .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{broader}") AS ?o2)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassAltLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'jp_drug_class' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassAltLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'jp_drug_class' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassAltLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'jp_drug_class' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassBroadMatch>
+FROM SQL {
+  SELECT JP_CLASS_CODE AS "id", CLASS_ID AS "class_id" FROM GLP.VOCAB.JP_CLASS_MATCH WHERE MATCH_TYPE = 'broad'
+}
+TO {
+  ?subject skos:broadMatch ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{class_id}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassExactMatch>
+FROM SQL {
+  SELECT JP_CLASS_CODE AS "id", CLASS_ID AS "class_id" FROM GLP.VOCAB.JP_CLASS_MATCH WHERE MATCH_TYPE = 'exact'
+}
+TO {
+  ?subject skos:exactMatch ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{class_id}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassNarrowMatch>
+FROM SQL {
+  SELECT JP_CLASS_CODE AS "id", CLASS_ID AS "class_id" FROM GLP.VOCAB.JP_CLASS_MATCH WHERE MATCH_TYPE = 'narrow'
+}
+TO {
+  ?subject skos:narrowMatch ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{class_id}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassPrefLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'jp_drug_class' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassPrefLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'jp_drug_class' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassPrefLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'jp_drug_class' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassRelatedMatch>
+FROM SQL {
+  SELECT JP_CLASS_CODE AS "id", CLASS_ID AS "class_id" FROM GLP.VOCAB.JP_CLASS_MATCH WHERE MATCH_TYPE = 'related'
+}
+TO {
+  ?subject skos:relatedMatch ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{class_id}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpDrugClassTop>
+FROM SQL {
+  SELECT JP_CLASS_CODE AS "id" FROM GLP.VOCAB.JP_DRUG_CLASS WHERE BROADER_JP_CLASS_CODE IS NULL
+}
+TO {
+  ?subject skos:topConceptOf <https://dgg32.github.io/glp/vocab/jp-drug-class> .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{id}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpOrganization>
+FROM SQL {
+  SELECT ORGANIZATION_ID AS "id", NAME_EN AS "en", NAME_JA AS "ja", CORPORATE_GROUP_ID AS "grp" FROM GLP.JP.ORGANIZATION
+}
+TO {
+  ?subject a dm:Organization .
+  ?subject rdfs:label ?o1 .
+  ?subject rdfs:label ?o2 .
+  ?subject dm:partOfCorporateGroup ?o3 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/organization/jp/{id}") AS ?subject)
+  BIND(strlang(?en, "en") AS ?o1)
+  BIND(strlang(?ja, "ja") AS ?o2)
+  BIND(template("https://dgg32.github.io/glp/data/organization/{grp}") AS ?o3)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpProduct>
+FROM SQL {
+  SELECT PRODUCT_ID AS "id", PRODUCT_NAME_JA AS "name", CASE WHEN PRODUCT_NAME <> PRODUCT_NAME_JA THEN PRODUCT_NAME ELSE NULL END AS "hidden", YJ_CODE AS "yj", JP_CLASS_CODE AS "jp_class", NHI_PRICE AS "price", DISPENSING_UNIT AS "unit", ROUTE AS "route", CASE WHEN IS_GENERIC THEN 'true' ELSE 'false' END AS "generic", CASE WHEN IS_ORIGINATOR THEN 'true' ELSE 'false' END AS "originator", CASE WHEN IS_COMBINATION THEN 'true' ELSE 'false' END AS "combination", ORGANIZATION_ID AS "organization_id" FROM GLP.JP.PRODUCT
+}
+TO {
+  ?subject a dm:MedicinalProduct .
+  ?subject rdfs:label ?o1 .
+  ?subject skos:hiddenLabel ?o2 .
+  ?subject dm:receiptCode ?id .
+  ?subject dm:yjCode ?yj .
+  ?subject dm:inJapaneseDrugClass ?o5 .
+  ?subject dm:nhiPrice ?o6 .
+  ?subject dm:dispensingUnit ?unit .
+  ?subject dm:routeOfAdministration ?route .
+  ?subject dm:isGeneric ?o9 .
+  ?subject dm:isOriginator ?o10 .
+  ?subject dm:isCombinationProduct ?o11 .
+  ?subject dm:manufacturedBy ?o12 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/product/jp/{id}") AS ?subject)
+  BIND(strlang(?name, "ja") AS ?o1)
+  BIND(strlang(?hidden, "ja") AS ?o2)
+  BIND(template("https://dgg32.github.io/glp/vocab/jp-drug-class/{jp_class}") AS ?o5)
+  BIND(strdt(?price, xsd:decimal) AS ?o6)
+  BIND(strdt(?generic, xsd:boolean) AS ?o9)
+  BIND(strdt(?originator, xsd:boolean) AS ?o10)
+  BIND(strdt(?combination, xsd:boolean) AS ?o11)
+  BIND(template("https://dgg32.github.io/glp/data/organization/jp/{organization_id}") AS ?o12)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#JpProductSubstance>
+FROM SQL {
+  SELECT PRODUCT_ID AS "id", SUBSTANCE_ID AS "substance_id" FROM GLP.JP.PRODUCT_SUBSTANCE
+}
+TO {
+  ?subject dm:hasActiveSubstance ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/product/jp/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{substance_id}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#MonthObservation>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", CELL AS "cell", CELL AS "dim", QUANTITY AS "quantity" FROM GLP.JP.QUANTITY WHERE BREAKDOWN = 'month'
+}
+TO {
+  ?subject dm:month ?o1 .
+  ?subject dm:quantity ?o2 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/obs/{product_id}/{setting}/{cell}") AS ?subject)
+  BIND(strdt(?dim, xsd:gYearMonth) AS ?o1)
+  BIND(strdt(?quantity, xsd:decimal) AS ?o2)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#MonthSlice>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", TOTAL_QUANTITY AS "total" FROM GLP.JP.NATIONAL_TOTAL
+}
+TO {
+  ?subject a dm:QuantitySlice .
+  ?subject qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/month> .
+  ?subject dm:aboutProduct ?o2 .
+  ?subject dm:careSetting ?o3 .
+  ?subject dm:totalQuantity ?o4 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/slice/{product_id}/{setting}/month") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/data/product/jp/{product_id}") AS ?o2)
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{setting}") AS ?o3)
+  BIND(strdt(?total, xsd:decimal) AS ?o4)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#MonthSliceMasked>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting" FROM GLP.JP.NATIONAL_TOTAL WHERE IS_MASKED
+}
+TO {
+  ?subject sdmx-attribute:confStatus sdmx-code:confStatus-C .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/slice/{product_id}/{setting}/month") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#MonthSliceObservation>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", CELL AS "cell" FROM GLP.JP.QUANTITY WHERE BREAKDOWN = 'month'
+}
+TO {
+  ?subject qb:observation ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/slice/{product_id}/{setting}/month") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/obs/{product_id}/{setting}/{cell}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#ObservationMasked>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", CELL AS "cell" FROM GLP.JP.QUANTITY WHERE IS_MASKED
+}
+TO {
+  ?subject sdmx-attribute:confStatus sdmx-code:confStatus-C .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/obs/{product_id}/{setting}/{cell}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#Prefecture>
+FROM SQL {
+  SELECT PREFECTURE_CODE AS "id", PREFECTURE_CODE AS "notation", ISO_CODE AS "iso_code", WIKIDATA_ID AS "wikidata_id" FROM GLP.VOCAB.PREFECTURE
+}
+TO {
+  ?subject a skos:Concept .
+  ?subject a dm:Prefecture .
+  ?subject skos:inScheme <https://dgg32.github.io/glp/vocab/prefecture> .
+  ?subject skos:notation ?notation .
+  ?subject dcterms:identifier ?iso_code .
+  ?subject skos:exactMatch ?o4 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/prefecture/{id}") AS ?subject)
+  BIND(template("http://www.wikidata.org/entity/{wikidata_id}") AS ?o4)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefectureAltLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'prefecture' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/prefecture/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefectureAltLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'prefecture' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/prefecture/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefectureAltLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'prefecture' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/prefecture/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefectureObservation>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", CELL AS "cell", PREFECTURE_CODE AS "dim", QUANTITY AS "quantity" FROM GLP.JP.QUANTITY WHERE BREAKDOWN = 'prefecture'
+}
+TO {
+  ?subject dm:prefecture ?o1 .
+  ?subject dm:quantity ?o2 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/obs/{product_id}/{setting}/{cell}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/prefecture/{dim}") AS ?o1)
+  BIND(strdt(?quantity, xsd:decimal) AS ?o2)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefecturePrefLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'prefecture' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/prefecture/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefecturePrefLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'prefecture' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/prefecture/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefecturePrefLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'prefecture' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/prefecture/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefectureSlice>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", TOTAL_QUANTITY AS "total" FROM GLP.JP.NATIONAL_TOTAL
+}
+TO {
+  ?subject a dm:QuantitySlice .
+  ?subject qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/prefecture> .
+  ?subject dm:aboutProduct ?o2 .
+  ?subject dm:careSetting ?o3 .
+  ?subject dm:totalQuantity ?o4 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/slice/{product_id}/{setting}/prefecture") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/data/product/jp/{product_id}") AS ?o2)
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{setting}") AS ?o3)
+  BIND(strdt(?total, xsd:decimal) AS ?o4)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefectureSliceMasked>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting" FROM GLP.JP.NATIONAL_TOTAL WHERE IS_MASKED
+}
+TO {
+  ?subject sdmx-attribute:confStatus sdmx-code:confStatus-C .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/slice/{product_id}/{setting}/prefecture") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefectureSliceObservation>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", CELL AS "cell" FROM GLP.JP.QUANTITY WHERE BREAKDOWN = 'prefecture'
+}
+TO {
+  ?subject qb:observation ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/slice/{product_id}/{setting}/prefecture") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/obs/{product_id}/{setting}/{cell}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrefectureTop>
+FROM SQL {
+  SELECT PREFECTURE_CODE AS "id" FROM GLP.VOCAB.PREFECTURE
+}
+TO {
+  ?subject skos:topConceptOf <https://dgg32.github.io/glp/vocab/prefecture> .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/prefecture/{id}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#Prescriber>
+FROM SQL {
+  SELECT PRESCRIBER_ID AS "id", CMS_PRESCRIBER_TYPE AS "type", CITY AS "city", STATE AS "state", PRIMARY_SPECIALTY_CODE AS "primary" FROM GLP.US.PRESCRIBER
+}
+TO {
+  ?subject a dm:HealthcareProfessional .
+  ?subject dm:pseudonymousId ?id .
+  ?subject dm:cmsPrescriberType ?type .
+  ?subject dm:city ?city .
+  ?subject dm:state ?state .
+  ?subject dm:hasPrimarySpecialty ?o5 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/hcp/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{primary}") AS ?o5)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#PrescriberSpecialty>
+FROM SQL {
+  SELECT PRESCRIBER_ID AS "id", SPECIALTY_CODE AS "specialty" FROM GLP.US.PRESCRIBER_SPECIALTY
+}
+TO {
+  ?subject dm:hasSpecialty ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/hcp/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{specialty}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#Prescription>
+FROM SQL {
+  SELECT DATA_YEAR AS "year", PRESCRIBER_ID AS "prescriber_id", PRODUCT_ID AS "product_id", TOTAL_CLAIMS AS "claims", TOTAL_30DAY_FILLS AS "fills", CAST(TOTAL_DAY_SUPPLY AS VARCHAR) AS "supply", TOTAL_DRUG_COST AS "cost", CAST(TOTAL_BENEFICIARIES AS VARCHAR) AS "benes", CASE WHEN BENEFICIARIES_SUPPRESSED THEN 'true' ELSE 'false' END AS "suppressed" FROM GLP.US.PRESCRIPTION
+}
+TO {
+  ?subject a dm:Prescription .
+  ?subject dm:prescribedBy ?o1 .
+  ?subject dm:forProduct ?o2 .
+  ?subject dm:dataYear ?o3 .
+  ?subject dm:totalClaims ?o4 .
+  ?subject dm:total30DayFills ?o5 .
+  ?subject dm:totalDaySupply ?o6 .
+  ?subject dm:totalDrugCost ?o7 .
+  ?subject dm:totalBeneficiaries ?o8 .
+  ?subject dm:beneficiaryCountSuppressed ?o9 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/rx/{year}/{prescriber_id}/{product_id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/data/hcp/{prescriber_id}") AS ?o1)
+  BIND(template("https://dgg32.github.io/glp/data/product/{product_id}") AS ?o2)
+  BIND(strdt(?year, xsd:gYear) AS ?o3)
+  BIND(strdt(?claims, xsd:integer) AS ?o4)
+  BIND(strdt(?fills, xsd:decimal) AS ?o5)
+  BIND(strdt(?supply, xsd:integer) AS ?o6)
+  BIND(strdt(?cost, xsd:decimal) AS ?o7)
+  BIND(strdt(?benes, xsd:integer) AS ?o8)
+  BIND(strdt(?suppressed, xsd:boolean) AS ?o9)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeGroup>
+FROM SQL {
+  SELECT SEX_AGE_CODE AS "id", SEX AS "broader", CASE WHEN MIN_AGE IS NULL THEN NULL ELSE SEX_AGE_CODE END AS "notation", CAST(MIN_AGE AS VARCHAR) AS "min_age" FROM GLP.VOCAB.SEX_AGE_GROUP
+}
+TO {
+  ?subject a skos:Concept .
+  ?subject a dm:SexAgeGroup .
+  ?subject skos:inScheme <https://dgg32.github.io/glp/vocab/sex-age> .
+  ?subject skos:broader ?o2 .
+  ?subject skos:notation ?notation .
+  ?subject dm:minAge ?o4 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{broader}") AS ?o2)
+  BIND(strdt(?min_age, xsd:integer) AS ?o4)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeGroupAltLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'sex_age_group' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeGroupAltLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'sex_age_group' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeGroupAltLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'sex_age_group' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeGroupPrefLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'sex_age_group' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeGroupPrefLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'sex_age_group' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeGroupPrefLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'sex_age_group' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeGroupTop>
+FROM SQL {
+  SELECT SEX_AGE_CODE AS "id" FROM GLP.VOCAB.SEX_AGE_GROUP WHERE SEX IS NULL
+}
+TO {
+  ?subject skos:topConceptOf <https://dgg32.github.io/glp/vocab/sex-age> .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{id}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeObservation>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", CELL AS "cell", SEX_AGE_CODE AS "dim", QUANTITY AS "quantity" FROM GLP.JP.QUANTITY WHERE BREAKDOWN = 'sex-age'
+}
+TO {
+  ?subject dm:sexAgeGroup ?o1 .
+  ?subject dm:quantity ?o2 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/obs/{product_id}/{setting}/{cell}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/sex-age/{dim}") AS ?o1)
+  BIND(strdt(?quantity, xsd:decimal) AS ?o2)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeSlice>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", TOTAL_QUANTITY AS "total" FROM GLP.JP.NATIONAL_TOTAL
+}
+TO {
+  ?subject a dm:QuantitySlice .
+  ?subject qb:sliceStructure <https://dgg32.github.io/glp/data/ndb/key/sex-age> .
+  ?subject dm:aboutProduct ?o2 .
+  ?subject dm:careSetting ?o3 .
+  ?subject dm:totalQuantity ?o4 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/slice/{product_id}/{setting}/sex-age") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/data/product/jp/{product_id}") AS ?o2)
+  BIND(template("https://dgg32.github.io/glp/vocab/care-setting/{setting}") AS ?o3)
+  BIND(strdt(?total, xsd:decimal) AS ?o4)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeSliceMasked>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting" FROM GLP.JP.NATIONAL_TOTAL WHERE IS_MASKED
+}
+TO {
+  ?subject sdmx-attribute:confStatus sdmx-code:confStatus-C .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/slice/{product_id}/{setting}/sex-age") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SexAgeSliceObservation>
+FROM SQL {
+  SELECT PRODUCT_ID AS "product_id", CARE_SETTING_ID AS "setting", CELL AS "cell" FROM GLP.JP.QUANTITY WHERE BREAKDOWN = 'sex-age'
+}
+TO {
+  ?subject qb:observation ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/slice/{product_id}/{setting}/sex-age") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/data/ndb/11/obs/{product_id}/{setting}/{cell}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#Specialty>
+FROM SQL {
+  SELECT SPECIALTY_CODE AS "id", BROADER_SPECIALTY_CODE AS "broader", CASE WHEN SPECIALTY_CODE LIKE 'grouping-%' OR SPECIALTY_CODE LIKE 'classification-%' THEN NULL ELSE SPECIALTY_CODE END AS "notation", DEFINITION_EN AS "definition" FROM GLP.VOCAB.SPECIALTY
+}
+TO {
+  ?subject a skos:Concept .
+  ?subject a dm:Specialty .
+  ?subject skos:inScheme <https://dgg32.github.io/glp/vocab/specialty> .
+  ?subject skos:broader ?o2 .
+  ?subject skos:notation ?notation .
+  ?subject skos:definition ?o4 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{broader}") AS ?o2)
+  BIND(strlang(?definition, "en") AS ?o4)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SpecialtyAltLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'specialty' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SpecialtyAltLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'specialty' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SpecialtyAltLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'specialty' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SpecialtyAncestor>
+FROM SQL {
+  SELECT SPECIALTY_CODE AS "id", ANCESTOR_SPECIALTY_CODE AS "ancestor" FROM GLP.VOCAB.SPECIALTY_ANCESTOR WHERE SPECIALTY_CODE <> ANCESTOR_SPECIALTY_CODE
+}
+TO {
+  ?subject skos:broaderTransitive ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{ancestor}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SpecialtyPrefLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'specialty' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SpecialtyPrefLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'specialty' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SpecialtyPrefLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'specialty' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SpecialtyTop>
+FROM SQL {
+  SELECT SPECIALTY_CODE AS "id" FROM GLP.VOCAB.SPECIALTY WHERE BROADER_SPECIALTY_CODE IS NULL
+}
+TO {
+  ?subject skos:topConceptOf <https://dgg32.github.io/glp/vocab/specialty> .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/specialty/{id}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#Substance>
+FROM SQL {
+  SELECT SUBSTANCE_ID AS "id", CLASS_ID AS "class_id" FROM GLP.VOCAB.SUBSTANCE
+}
+TO {
+  ?subject a skos:Concept .
+  ?subject a dm:Substance .
+  ?subject skos:inScheme <https://dgg32.github.io/glp/vocab/substance> .
+  ?subject dm:inTherapeuticClass ?o2 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{class_id}") AS ?o2)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SubstanceAltLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'substance' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SubstanceAltLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'substance' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SubstanceAltLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'substance' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SubstanceHiddenLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'substance' AND LABEL_TYPE = 'hidden' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject skos:hiddenLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SubstanceHiddenLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'substance' AND LABEL_TYPE = 'hidden' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject skos:hiddenLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SubstancePrefLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'substance' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SubstancePrefLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'substance' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SubstancePrefLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'substance' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#SubstanceTop>
+FROM SQL {
+  SELECT SUBSTANCE_ID AS "id" FROM GLP.VOCAB.SUBSTANCE
+}
+TO {
+  ?subject skos:topConceptOf <https://dgg32.github.io/glp/vocab/substance> .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{id}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#TherapeuticClass>
+FROM SQL {
+  SELECT CLASS_ID AS "id", BROADER_CLASS_ID AS "broader", NOTATION AS "notation", DEFINITION_EN AS "definition", NOTATION AS "atc" FROM GLP.VOCAB.THERAPEUTIC_CLASS
+}
+TO {
+  ?subject a skos:Concept .
+  ?subject a dm:TherapeuticClass .
+  ?subject skos:exactMatch ?o1 .
+  ?subject skos:inScheme <https://dgg32.github.io/glp/vocab/therapeutic-class> .
+  ?subject skos:broader ?o3 .
+  ?subject skos:notation ?notation .
+  ?subject skos:definition ?o5 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{id}") AS ?subject)
+  BIND(template("http://purl.bioontology.org/ontology/ATC/{atc}") AS ?o1)
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{broader}") AS ?o3)
+  BIND(strlang(?definition, "en") AS ?o5)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#TherapeuticClassAltLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'therapeutic_class' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#TherapeuticClassAltLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'therapeutic_class' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#TherapeuticClassAltLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'therapeutic_class' AND LABEL_TYPE = 'alt' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject skos:altLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#TherapeuticClassAncestor>
+FROM SQL {
+  SELECT CLASS_ID AS "id", ANCESTOR_CLASS_ID AS "ancestor" FROM GLP.VOCAB.CLASS_ANCESTOR WHERE CLASS_ID <> ANCESTOR_CLASS_ID
+}
+TO {
+  ?subject skos:broaderTransitive ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{ancestor}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#TherapeuticClassPrefLabelEn>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'therapeutic_class' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'en'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{id}") AS ?subject)
+  BIND(strlang(?label, "en") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#TherapeuticClassPrefLabelJa>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'therapeutic_class' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{id}") AS ?subject)
+  BIND(strlang(?label, "ja") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#TherapeuticClassPrefLabelZh>
+FROM SQL {
+  SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL WHERE CONCEPT_KIND = 'therapeutic_class' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'zh'
+}
+TO {
+  ?subject rdfs:label ?o1 .
+  ?subject skos:prefLabel ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{id}") AS ?subject)
+  BIND(strlang(?label, "zh") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#TherapeuticClassTop>
+FROM SQL {
+  SELECT CLASS_ID AS "id" FROM GLP.VOCAB.THERAPEUTIC_CLASS WHERE BROADER_CLASS_ID IS NULL
+}
+TO {
+  ?subject skos:topConceptOf <https://dgg32.github.io/glp/vocab/therapeutic-class> .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/vocab/therapeutic-class/{id}") AS ?subject)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#UsOrganization>
+FROM SQL {
+  SELECT ORGANIZATION_ID AS "id", NAME_EN AS "en", NAME_JA AS "ja", NAME_ZH AS "zh", LEI AS "lei" FROM GLP.US.ORGANIZATION
+}
+TO {
+  ?subject a dm:Organization .
+  ?subject rdfs:label ?o1 .
+  ?subject rdfs:label ?o2 .
+  ?subject rdfs:label ?o3 .
+  ?subject dcterms:identifier ?lei .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/organization/{id}") AS ?subject)
+  BIND(strlang(?en, "en") AS ?o1)
+  BIND(strlang(?ja, "ja") AS ?o2)
+  BIND(strlang(?zh, "zh") AS ?o3)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#UsProduct>
+FROM SQL {
+  SELECT PRODUCT_ID AS "id", BRAND_NAME AS "brand", CMS_GENERIC_NAME AS "generic", CASE WHEN IS_COMBINATION THEN 'true' ELSE 'false' END AS "combination" FROM GLP.US.PRODUCT
+}
+TO {
+  ?subject a dm:MedicinalProduct .
+  ?subject rdfs:label ?o1 .
+  ?subject dm:cmsGenericName ?generic .
+  ?subject dm:isCombinationProduct ?o3 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/product/{id}") AS ?subject)
+  BIND(strlang(?brand, "en") AS ?o1)
+  BIND(strdt(?combination, xsd:boolean) AS ?o3)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#UsProductIndication>
+FROM SQL {
+  SELECT PRODUCT_ID AS "id", INDICATION_ID AS "indication_id" FROM GLP.US.PRODUCT_INDICATION
+}
+TO {
+  ?subject dm:hasIndication ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/product/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/indication/{indication_id}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#UsProductManufacturer>
+FROM SQL {
+  SELECT PRODUCT_ID AS "id", ORGANIZATION_ID AS "organization_id" FROM GLP.US.PRODUCT_MANUFACTURER
+}
+TO {
+  ?subject dm:manufacturedBy ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/product/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/data/organization/{organization_id}") AS ?o1)
+}
+
+;
+
+MAPPING <https://dgg32.github.io/glp/mapping/glp#UsProductSubstance>
+FROM SQL {
+  SELECT PRODUCT_ID AS "id", SUBSTANCE_ID AS "substance_id" FROM GLP.US.PRODUCT_SUBSTANCE
+}
+TO {
+  ?subject dm:hasActiveSubstance ?o1 .
+}
+WHERE {
+  BIND(template("https://dgg32.github.io/glp/data/product/{id}") AS ?subject)
+  BIND(template("https://dgg32.github.io/glp/vocab/substance/{substance_id}") AS ?o1)
+}

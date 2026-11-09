@@ -26,7 +26,7 @@ Shared vocabularies earn their keep only when a second source arrives. With one 
 
 The second change concerns where the graph is used. Commercial data in pharma mostly lives in data warehouses, and analysts query it with SQL and BI tools, not with SPARQL. A knowledge graph that stays in a graph database next to the warehouse remains a side project. So this article also moves the presentation layer to Snowflake. The RDF graph stays the single source of truth: it is built and validated on the local machine, then exported to Snowflake as tables. A script generates a Snowflake semantic view from the OWL ontology and the SKOS labels, and Cortex Analyst, Snowflake's natural-language-to-SQL service, answers questions in Japanese on top of it (Figure 1).
 
-The article adds Japan's NDB Open Data for fiscal year 2024 to the graph. Both countries share one substance and drug class vocabulary, so a single SQL query can compare Connecticut and Japan. A computed crosswalk links Japan's classification to ATC, an RDF Data Cube holds 150,288 table cells, and 59 SHACL rules check the result. In Snowflake, seven business questions and two cross-country queries return the graph's numbers row for row. The code is in the same GitHub repository as before.
+The article adds Japan's NDB Open Data for fiscal year 2024 to the graph. Both countries share one substance and drug class vocabulary, so a single SQL query can compare Connecticut and Japan. A computed crosswalk links Japan's classification to ATC, an RDF Data Cube holds 150,288 table cells, and 59 SHACL rules check the result. In Snowflake, seven business questions and two cross-country queries return the graph's numbers row for row. A Stardog virtual graph closes the loop and reads the Snowflake tables back as the same knowledge graph, with a standard R2RML mapping and no copied triples. The code is in the same GitHub repository as before.
 
 ## [GitHub - dgg32/glp](https://github.com/dgg32/glp)
 
@@ -260,6 +260,64 @@ The business questions of the SPARQL catalog (queries/jp-*.rq) become seven veri
 
 The same model is also deployed through OSI (Open Semantic Interchange, now Apache Ossie), the vendor-neutral YAML format for semantic models. Snowflake builds a semantic view from OSI YAML with one procedure call. The OSI-built view gives the same numbers, but it loses all 48 synonyms, the instructions and the verified queries, because OSI 0.1.1 has no place for them that Snowflake reads. The next article looks at that gap in detail.
 
+### 2.3 The way back: SPARQL over the Snowflake tables
+
+The export copies the graph into tables. A virtual graph goes the other way without copying anything. A mapping declares how rows become triples, and the graph database translates each SPARQL query into SQL at query time and sends it to the warehouse. Stardog calls this a virtual graph, and Stardog Cloud Free includes it. One mapping turns 25 of the 27 Snowflake tables back into the knowledge graph: the SKOS vocabularies, the Medicare Part D claims and the NDB Data Cube, 727,728 triples in all, with none of them stored in Stardog. The two tables left out, US.PRODUCT_CLASS and JP.PRODUCT_CLASS, hold the materialized path from product to class, which the graph already expresses through substances and classes.
+
+The mapping is written in R2RML, the W3C standard for mapping relational data to RDF (Code 8). Each triples map pairs an SQL query with templates for subjects and objects. The IRIs are rebuilt from the ID columns, because the export kept the local part of every IRI, and the same template on both sides of a link lets Stardog push the join down to Snowflake. Two details of the standard shape the file. R2RML sets a language tag only as a constant, so the labels need one triples map per vocabulary, language and label type. And skos:broaderTransitive comes from CLASS_ANCESTOR and SPECIALTY_ANCESTOR, the closure tables of section 2.1, so the virtual graph answers class roll-ups without a reasoner. The result is 96 triples maps. A short script generates them from a table-by-table specification, and the R2RML file stays the artifact that the engines read.
+
+```turtle
+# Code 8. One of the 96 triples maps (mapping/glp.r2rml.ttl), and a query over the virtual graph
+map:TherapeuticClassPrefLabelJa a rr:TriplesMap ;
+    rr:logicalTable [ rr:sqlQuery """SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL
+        WHERE CONCEPT_KIND = 'therapeutic_class' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'""" ] ;
+    rr:subjectMap [ rr:template "https://dgg32.github.io/glp/vocab/therapeutic-class/{id}" ] ;
+    rr:predicateObjectMap [ rr:predicate skos:prefLabel , rdfs:label ;
+        rr:objectMap [ rr:column "label" ; rr:language "ja" ] ] .
+
+SELECT ?ancestor ?ja WHERE {
+  GRAPH <virtual://snowflake_glp> {
+    ?c skos:prefLabel "SGLT2阻害薬"@ja ; skos:broaderTransitive ?ancestor .
+    ?ancestor skos:prefLabel ?ja . FILTER(lang(?ja) = "ja")
+  }
+}
+# → 血糖降下薬（インスリンを除く）, 糖尿病治療薬
+```
+
+The rule of section 3, check locally and publish once, applies to mappings too. Before the mapping reached Stardog, Morph-KGC, a Python R2RML engine, ran it against Snowflake, and the result was compared triple by triple with the Turtle files the tables were exported from. Stardog Studio then received the same mapping, converted by a script into Stardog's own mapping syntax, SMS2, because Studio parsed every uploaded mapping as SMS2. The engines and the source files agree on every triple (Table 2). Stardog returns 13 triples more than Morph-KGC, for a reason explained below.
+
+| Part of the graph | Turtle files | Morph-KGC over Snowflake | Stardog virtual graph |
+|---|---|---|---|
+| SKOS vocabularies (schema VOCAB) | 12,025 | 12,025 | |
+| Medicare Part D, Connecticut (schema US) | 235,408 | 235,408 | |
+| NDB Open Data as a Data Cube (schema JP) | 480,295 | 480,295 | |
+| Total | 727,728 | 727,728 | 727,741 |
+
+Table 2. Triples of the knowledge graph, from the source files and from the two mapping engines over the Snowflake tables. Numbers are compared by value. The vocabulary count includes the 1,562 skos:broaderTransitive triples of the closure tables. Stardog was counted in total only, with one COUNT over the whole virtual graph; its 13 extra triples are the NUCC "None" definitions.
+
+The comparison also lists what the tables do not carry: 6,594 triples. Most are the records of the concept schemes, the dataset and its slice keys (4,686). The rest are inverse skos:narrower links, editorial notes, the substance cross-references that the export stores as "|"-separated lists, the indication of the Japanese products, and alternative company names. None of them is used by a business query. The check found one more thing. Thirteen deactivated NUCC codes carry the definition "None", the placeholder of the NUCC file itself, which the graph copied as text. Morph-KGC reads that text as a missing value, so only Stardog returns these 13 triples.
+
+Each engine stumbled over a different detail of the same SQL. The Snowflake driver behind Morph-KGC returns column names in lower case and the JDBC driver behind Stardog in upper case, so every column carries a quoted lower-case alias that both understand. Morph-KGC turned SQL NULLs into the string "None" until it was told to treat that string as missing, and it fails on a NULL in an integer column, so the three nullable integer columns are cast to text in SQL and typed by the mapping. Booleans become the strings 'true' and 'false' for the same reason. Stardog parses the SQL itself before sending it on and treats LANGUAGE as a reserved word, which Snowflake accepts unquoted. A Stardog data source sees only the default schema of its connection until the other schemas are listed in its options. And an R2RML template percent-encodes its values, so a prescription IRI, whose ID contains slashes, is rebuilt from its three parts. None of this appears in the results, but the cross-check of two engines against the source files found every one of these problems before a query depended on them.
+
+Correct triples are not yet correct answers, because Stardog translates every query into SQL, and the translation has limits of its own. The two business queries tested on the virtual graph return the graph's numbers, row for row: the class shares in Japan (11 rows, 60 seconds over 150,288 cells in Snowflake) and the SGLT2 and GLP-1 claims by specialty in Connecticut (72 rows, 2 seconds). Both needed rewriting first, and each rewrite answers a limit of the translation (Table 3). Stardog refuses skos:broader* when both ends are variables, so the class roll-up uses skos:broaderTransitive from the closure table, the same table the semantic view relies on. Written as a UNION of "the class itself" and "an ancestor", the roll-up made Stardog push the GROUP BY into SQL with one column per branch, and every specialty came back up to four times; a LEFT JOIN avoids the UNION. And the share of SGLT2 claims came back as 30 instead of 30.5: the query plan typed the result as xsd:integer and turned the literal 1000.0 into 1000, so SPARQL's decimal division became SQL's integer division until one operand was cast to xsd:double.
+
+| What failed over the virtual graph | Symptom | Rewrite |
+|---|---|---|
+| skos:broader* with two variable ends | query refused | skos:broaderTransitive (closure table) |
+| UNION under an aggregate pushed to SQL | each group returned up to four times | LEFT JOIN (OPTIONAL and BIND) |
+| integer division typed as integer | 30 instead of 30.5 | cast one operand to xsd:double |
+| COUNT(*) without the subject | 1,345 instead of 4,035, silently | use the subject, e.g. COUNT(DISTINCT ?s) |
+
+Table 3. Limits of Stardog 12.2.1's translation of SPARQL into SQL found with the business queries. The mapping is correct in every case; the rewritten queries are in queries/virtual/.
+
+The last row is the most dangerous, because nothing signals it. The Japanese national totals appear on three slices per product, one for each breakdown, so three triples maps read the same column of the same table with different subjects. Counting the totals without using the subject returned 1,345 instead of 4,035. The query plan showed why: Stardog dropped the unused subjects, saw three identical scans, and sent a single SQL query. As soon as the subject took part in the query, the answer was 4,035. The business queries always name the slice structure, so their results are not affected. A virtual graph is only as correct as the engine's rewriting into SQL, and an independent reference, here the materialized graph and its stored results, is what makes such an error visible.
+
+The connection follows the same rule as the MCP server of the first article: it may read, never write. Stardog logs in to Snowflake as a dedicated user that holds a single role with USAGE, SELECT and REFERENCES only. The virtual graph therefore cannot change the tables it reads, whatever SQL it generates.
+
+The three routes from the graph to its users now sit side by side. Stardog stores the triples and reasons over them. The semantic view compiles the ontology into SQL ahead of time, so OWL definitions and skos:broader* become materialized columns and tables. The virtual graph keeps the data in the warehouse and translates SPARQL on demand, but it relies on the same materialized tables wherever the warehouse cannot follow the graph's logic. The mapping is the reusable part: the same R2RML file runs in Morph-KGC, in Stardog and, in principle, in any other R2RML engine such as the open-source Ontop.
+
+<!-- Author notes (2026-11-07/08): virtual graph snowflake_glp in Stardog database `snowflake`, data source `snowflake` (recreated 2026-11-08 with glp.sms; SQL Schemas GLP.VOCAB,GLP.US,GLP.JP; JDBC URL with schema=VOCAB), Snowflake user GLP_STARDOG (LEGACY_SERVICE, password) holding only GLP_READER. Mapping: mapping/glp.r2rml.ttl generated by scripts/build_mapping.py (96 triples maps), mapping/glp.sms generated by scripts/r2rml_to_sms2.py, checked by scripts/check_mapping.py (2026-11-08: identical, 727,728 triples, Morph-KGC ~4 min). The 2026-11-07 proof of concept (vocabulary only, 391 triples, Code 8 query 2 results in 990 ms) used the earlier mapping/vocab.r2rml.ttl. Stardog results 2026-11-08: triple count 727,741 (= 727,728 + 13 NUCC "None" definitions); COUNT(*)/SUM over ?s dm:totalQuantity ?q without ?s → 1,345 (optimizer collapses three maps, Show Plan saved), COUNT(DISTINCT ?s) → 4,035; skos:broader* with two variable ends → "Cannot translate an unconstrained zero-or-more property path"; queries/virtual/jp-class-share-yen.rq (broaderTransitive rewrite) → all 11 rows identical to tables.json, 59.5 s; queries/virtual/sglt2-vs-glp1-by-specialty.rq: UNION version → SQL error, and without the share column 164 rows (GROUP BY pushed per UNION branch); LEFT JOIN rewrite → 72 rows, all claims as in tables.json, 1.96 s, but shares truncated to integers (30 for 30.5; plan: ?sglt2SharePct ^^xsd:integer, 1000.0 → 1000); decimal literals did not help, xsd:double cast did → all 72 rows identical incl. shares, 2.3 s. TODO: (1) rerun the Code 8 query on the full mapping; the other 8 business queries are not yet run on the virtual graph (Table 3 covers two); (2) Show Plan screenshot as a figure (would renumber Figures 5–7); (3) the reasoning queries need the ontology in the `snowflake` database. Caveat not in the text: in the trial account PUBLIC holds SNOWFLAKE_LEARNING_ROLE (CREATE SCHEMA on SNOWFLAKE_LEARNING_DB), so GLP_STARDOG can USE ROLE it; revoke before claiming strict read-only, or qualify the sentence. Studio ignored mappings.syntax=R2RML; whether the HTTP API honours it was not tested. Stardog server version 12.2.1. -->
+
 ## 3. Governance: check locally, publish once
 
 The governance design from the first article carried over unchanged. The NDB data sits in its own named graphs, graph:ndb-2024 for the cells and graph:ndb-products for the products, each with a PROV-O record of its source release, build time, triple count and content hash. The SHACL rules still run inside the load transaction, so a single violation rolls back the whole load.
@@ -279,10 +337,10 @@ The checks on the Snowflake side caught a problem of their own. The first table 
 
 ### 4.1 Japan and Connecticut side by side
 
-Because both countries share the class tree, one SQL query compares the two datasets (Code 8, Figure 5). Each class's share is computed within its own country: yen at NHI list prices for Japan and gross US dollars for Connecticut. The comparison uses single-ingredient products, so each product counts in exactly one class. Each country's total is its top class, which every product reaches once.
+Because both countries share the class tree, one SQL query compares the two datasets (Code 9, Figure 5). Each class's share is computed within its own country: yen at NHI list prices for Japan and gross US dollars for Connecticut. The comparison uses single-ingredient products, so each product counts in exactly one class. Each country's total is its top class, which every product reaches once.
 
 ```c
--- Code 8. Japan vs Connecticut through the shared class tree, shortened (queries/snowflake/jp-vs-connecticut-class-mix.sql)
+-- Code 9. Japan vs Connecticut through the shared class tree, shortened (queries/snowflake/jp-vs-connecticut-class-mix.sql)
 WITH value AS (
   SELECT 'Japan' AS COUNTRY, pc.CLASS_ID, t.TOTAL_QUANTITY * p.NHI_PRICE AS VALUE
   FROM GLP.JP.NATIONAL_TOTAL t JOIN GLP.JP.PRODUCT p ON ... JOIN GLP.JP.PRODUCT_CLASS pc ON ...
@@ -309,7 +367,7 @@ FROM GLP.VOCAB.THERAPEUTIC_CLASS c LEFT JOIN share s ON s.CLASS_ID = c.CLASS_ID 
 | α-glucosidase inhibitors, glimins, glinides | 3.5% | —* |
 | Sulfonylureas, thiazolidinediones | 1.2% | 0.1% |
 
-Table 2. Share of diabetes drug value by class, single-ingredient products. Japan: NDB Open Data FY2024. Connecticut: Medicare Part D 2024. *Not in the 32 drugs of the Connecticut subset.
+Table 4. Share of diabetes drug value by class, single-ingredient products. Japan: NDB Open Data FY2024. Connecticut: Medicare Part D 2024. *Not in the 32 drugs of the Connecticut subset.
 
 <!-- Figure 5: Snowsight worksheet with queries/snowflake/jp-vs-connecticut-class-mix.sql and its result (CLASS_NAME, CLASS_NAME_JA, JAPAN_PCT, CONNECTICUT_PCT). -->
 ![](figure5.png)
@@ -349,7 +407,7 @@ Metformin seems to defy the trend, with a generic share of 0.2% throughout the y
 
 ### 4.5 Cortex Analyst in Japanese
 
-Cortex Analyst answers questions about the semantic view in natural language and shows the SQL it ran. Five Japanese questions, worded differently from the verified queries, went through its REST API three times each, on the native view and on the OSI-built view. A script ran the returned SQL and scored the result against plain SQL on the tables (Table 3).
+Cortex Analyst answers questions about the semantic view in natural language and shows the SQL it ran. Five Japanese questions, worded differently from the verified queries, went through its REST API three times each, on the native view and on the OSI-built view. A script ran the returned SQL and scored the result against plain SQL on the tables (Table 5).
 
 | Question | Check | Native | OSI |
 |---|---|---:|---:|
@@ -360,7 +418,7 @@ Cortex Analyst answers questions about the semantic view in natural language and
 | マンジャロの月別の金額の推移は？ | ¥1.1 billion in April, ¥4.5 billion in March | 1/3 | 3/3 |
 | 75歳以上の患者への割合が最も高い薬効群は？ | glinides, 48.2% | 3/3 | 3/3 |
 
-Table 3. Correct answers out of three runs per view, after the fixes described below. Native: the generated semantic view. OSI: the same model deployed through OSI YAML.
+Table 5. Correct answers out of three runs per view, after the fixes described below. Native: the generated semantic view. OSI: the same model deployed through OSI YAML.
 
 <!-- Figure 7: Snowsight, Cortex Analyst answering 「マンジャロの月別の金額の推移は？」 with a line chart. -->
 ![](figure7.png)
@@ -377,7 +435,7 @@ The MCP server from the first article answers the same kind of question over SPA
 
 This project added a second country to a diabetes drug knowledge graph and moved its presentation into Snowflake. Japan's NDB Open Data differs from Medicare in almost every respect: a different classification, a different unit, different masking and no prescribers. Still, the graph absorbed it without a single change to the Connecticut results. The shared substance and class vocabulary made the two datasets comparable in one query, a computed SKOS crosswalk bridged the two classifications, a defined OWL class found every GLP-1 product in both countries, and an RDF Data Cube kept the data within the free tier's budget.
 
-In my view, the second dataset is where RDF's standards pay off, and the warehouse is where they reach their users. With one source, SKOS mappings, defined classes and SHACL rules look like extra work. With two, they keep the sources apart where they differ and joined where they agree. Exported to Snowflake, the same artifacts do a second job: SKOS labels become synonyms and value lists, definitions become descriptions, OWL restrictions become SQL flags and the SPARQL query catalog becomes the verified queries and the test suite of the semantic view. The semantic layer is generated, not written a second time, so it cannot drift from the graph. The generator even found a flaw in the ontology. Two classes, the ATC-based therapeutic class and the Japanese category, shared the Japanese label 薬効分類, and a synonym can point at only one of them. In the Japan view, it pointed at the wrong one. The fix was a label change in the ontology: 薬効分類 now names only the Japanese classification, and the ATC-based tree is 薬効群, with ATC分類 as an alternative label.
+In my view, the second dataset is where RDF's standards pay off, and the warehouse is where they reach their users. With one source, SKOS mappings, defined classes and SHACL rules look like extra work. With two, they keep the sources apart where they differ and joined where they agree. Exported to Snowflake, the same artifacts do a second job: SKOS labels become synonyms and value lists, definitions become descriptions, OWL restrictions become SQL flags and the SPARQL query catalog becomes the verified queries and the test suite of the semantic view. The semantic layer is generated, not written a second time, so it cannot drift from the graph. The way back is standardized as well: one R2RML mapping turns the tables into the same 727,728 triples in two different engines. The generator even found a flaw in the ontology. Two classes, the ATC-based therapeutic class and the Japanese category, shared the Japanese label 薬効分類, and a synonym can point at only one of them. In the Japan view, it pointed at the wrong one. The fix was a label change in the ontology: 薬効分類 now names only the Japanese classification, and the ATC-based tree is 薬効群, with ATC分類 as an alternative label.
 
 The costs remain. The Data Cube slices and the SHACL-SPARQL rules are hard to read, and the free tier's limits shaped the model more than any modeling principle did. A semantic view cannot express skos:broader* or an OWL definition directly, so both are materialized and must be regenerated when the graph changes. Cortex Analyst still needs tests, and its mistakes came from missing knowledge in the model rather than from the language. The incident showed that a cloud database is no place for development iterations, and that a graph rebuilt from version-controlled files recovers in minutes.
 
