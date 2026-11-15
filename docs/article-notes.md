@@ -110,3 +110,26 @@ graphs are better as the traversal-and-analytics engine. Many pharma setups use 
 neosemantics (n10s) bridges RDF into Neo4j. For the article, an honest framing is that you'd keep
 the semantic model and the SHACL contract in RDF and project into Neo4j or LadybugDB when you need
 algorithms. That's a credible position for a Neo4j Ninja applying for a semantic role.
+
+## Upper ontologies: BFO, DOLCE and where IDMP-O stands
+
+*Recorded 2026-11-15. Possible aside for the OWL section; details in `docs/decisions.md` (2026-11-15).*
+
+- **Bridge from Neo4j.** POLE+O (Person, Object, Location, Event, Organization) is an informal upper ontology.
+  BFO (ISO/IEC 21838-2, realist, the base of the OBO Foundry ontologies such as ChEBI and DRON, with CCO for
+  social things) and DOLCE (ISO/IEC 21838-3, descriptive, lightweight OWL version DUL) make such categories
+  formal. Both separate things that persist through time (Person, Object, Location, Organization) from things that
+  happen in time (Event), linked only by participation. POLE draws that line by convention; an upper ontology
+  states it as an axiom a reasoner can check.
+- **Mapping.** Person → BFO object / CCO Person, DOLCE agentive physical object. Location → BFO site or spatial
+  region, DOLCE place. Event → BFO process, DOLCE perdurant/event. Organization → CCO Organization, DUL
+  Organization. Being a prescriber is a role a person holds, not a kind of person, in both.
+- **IDMP-O uses neither.** Its top layer is OMG Commons, the shared base spun out of FIBO: 21 of its 22 imports
+  are Commons modules, and there is no BFO or DOLCE IRI in the 1.4.0 file. Commons is a third, pragmatic option,
+  record-oriented and close to POLE+O in spirit, without the formal split between persisting things and events.
+- **The finding worth showing.** In IDMP-O a `MedicinalProduct` is a subclass of `ProductSpecification` and so of
+  `cmns-doc:Specification`: a description of a product, not the tablets. BFO/CCO would call it an information
+  content entity and DOLCE a description, so IDMP-O makes the same cut an upper ontology would force, in
+  different vocabulary.
+- **The same cut in this model.** A CMS row (`dm:Prescription`) is not a prescribing event but a record about
+  many dispensing events in one year. Commons already has `cmns-doc:Record` for that.

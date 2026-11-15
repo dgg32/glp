@@ -517,3 +517,22 @@ countries share the substance and class vocabularies.
   `deploy_semantic_view.py`): all 27 CSVs byte-identical, `tables.json` now carries `graph_hashes` and the
   current `rdf_provenance`, the table comments name the new export, and all four semantic views match the graph.
   The whole chain, gold to bronze, is now in time order.
+
+## 2026-11-15: No upper ontology; IDMP-O and OMG Commons are the top of the stack
+
+Checked IDMP-O 1.4.0 (`data/raw/idmp-o/IDMP-O/1.4.0/IdentificationOfMedicinalProductsOntology.rdf`) for a
+foundational ontology. It has none: its 22 `owl:imports` are 21 OMG Commons modules plus OMG LCC (language
+codes), and there is no reference to BFO, DOLCE/DUL, CCO or gist. The only OBO IRIs are 27 ChEBI annotations, not
+superclasses. IDMP-O's classes hang directly under Commons classes, most often `cmns-cls:Classifier` (96),
+`cmns-doc:Specification` (21), `CodeElement` (17), `ContextualName` (15) and `Identifier` (14). The 1.8.0 release
+notes (members only) call Commons and LCC its "external foundational ontologies".
+
+Decision: `dm:` does not align to BFO or DOLCE either. It aligns to IDMP-O and, where IDMP-O stops, to Commons
+(`cmns-org:Organization`, `cmns-rlcmp:isPlayedBy`), as before. Adding BFO would mean mapping two upper layers at
+once, with no source that does it for us.
+
+Noted for a later ontology version: IDMP-O makes `MedicinalProduct` and `Substance` subclasses of
+`ProductSpecification` → `cmns-doc:Specification` (descriptions, not physical stuff). `dm:Prescription` has no
+superclass, and it is a record about many dispensing events rather than an event; `cmns-doc:Record` (already used
+by IDMP-O) is the candidate. Not checked: whether Commons itself aligns to an upper ontology (its modules are
+imported by URL and are not in the local clone).
