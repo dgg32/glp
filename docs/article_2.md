@@ -14,15 +14,13 @@ status: draft
 
 Figure 1. Cortex Analyst in Snowflake answers a Japanese question about Japanese data through a semantic view generated from the ontology. Image by author.
 
-Many governments publish statistics on medicines. These numbers serve many parties. Health agencies use them to monitor the nation's health and its drug spending, drug companies analyse them for market trends and competitors, and researchers study how doctors treat a disease. But comparing them across countries is difficult, because every country collects them in its own way, through its own health insurance and its own list of approved medicines. The US government publishes how many prescriptions each doctor in the Medicare program wrote for each drug. Japan's national health insurance publishes how many tablets, pens and vials of each medicine were dispensed, broken down by prefecture, month and age group. The difference shows even in a single medicine. Jardiance, a popular diabetes drug sold in both countries, is one product in the US data, but in Japan it appears under its Japanese name, with a separate entry for each tablet strength. The two countries also group their medicines under completely different classification systems.
+Many governments publish statistics on medicines. Health agencies use them to monitor the nation's health and its drug spending, drug companies analyze them for market trends and competitors, and researchers study how doctors treat a disease. But comparing them across countries is difficult, because every country collects them differently. The US government publishes how many prescriptions each doctor in the Medicare program wrote for each drug. Japan's national health insurance publishes how many tablets, pens and vials of each medicine were dispensed in each prefecture, month and age group. Jardiance, for example, is one product in the US data, but in Japan it appears under its Japanese name, once for each tablet strength. The two countries also group their medicines under completely different classification systems.
 
-It’s slow and tedious for data analysts to manually match every name, dose, and metric. And it gets redone from scratch for every new project. The exact same issue trips up AI assistants. Asked to compare Jardiance usage in the US and Japan, an AI has to guess which records belong together. It might miss one of the Japanese doses entirely, or make the fatal flaw of comparing US prescription counts directly against Japanese tablet counts.
+It's slow and tedious for data analysts to manually match every name, dose, and metric in every project. The exact same issue trips up AI assistants. Asked to compare Jardiance usage in the US and Japan, an AI has to guess which records belong together. It might miss one of the Japanese doses entirely, or make the fatal flaw of comparing US prescription counts directly against Japanese tablet counts.
 
-This is where a knowledge graph comes in. By creating a single, universal entry for each medicine, a knowledge graph links every regional name, dose, and metric back to a shared node. Instead of guessing, both humans and AI assistants can instantly run accurate, apples-to-apples comparisons.
+This is where an RDF knowledge graph comes in. In RDF, every medicine has a global identifier called an IRI. The US and Japanese records of a medicine link to this one shared entry, with its names in each language attached. A W3C vocabulary called SKOS links that entry to public code systems, such as the WHO's ATC classification and the Japanese therapeutic categories. SKOS also arranges drug classes in a hierarchy, so empagliflozin rolls up to the SGLT2 inhibitors and on to all antidiabetic drugs. Furthermore, it states how closely two classification systems match. Finally, the graph records what each number counts, so no one adds US prescriptions to Japanese tablets.
 
-The [previous article](https://medium.com/@dgg32/building-a-governed-diabetes-prescription-knowledge-graph-in-rdf-75667d126ee2) built an RDF knowledge graph from Medicare Part D claims for diabetes drugs in Connecticut. SKOS named the drugs in English, Japanese and Chinese, an OWL ontology aligned to IDMP-O defined the concepts and rules, and SHACL checked the data before it entered the database. 
-
-This article tests these standards with a second dataset, Japan's NDB Open Data for fiscal year 2024. Coming from another authority, it makes a shared vocabulary essential, because Japan describes the same drugs differently: it uses its own drug classification and drug codes, and some of its diabetes drugs are not in the US drug dictionary at all. The graph has to absorb all of these differences. The article also changes where the graph is used. Commercial data in pharma mostly lives in data warehouses, and analysts query it with SQL and BI tools, not with SPARQL, so a knowledge graph that stays in a graph database remains a side project. In this project, the graph is exported to Snowflake as tables, and the RDF graph remains the single source of truth. There, Cortex Analyst, Snowflake's natural-language-to-SQL service, answers questions in Japanese (Figure 1), and the SQL results match the graph's numbers row for row. Finally, a Stardog virtual graph reads the Snowflake tables back as the same knowledge graph. The code is in the same GitHub repository as before.
+My previous article built such a graph from Medicare Part D claims for diabetes drugs in Connecticut, with an OWL ontology for the concepts and SHACL rules that check the data, and loaded it into Stardog, an RDF graph database. This article builds on it with a second dataset, Japan’s NDB Open Data for fiscal year 2024. The graph now has to absorb Japan’s own drug codes and classification, and even drugs missing from the US drug dictionary. In addition, the article exports the graph into Snowflake as tables, because pharma analysts usually work in data warehouses like Snowflake and use SQL, not SPARQL. The RDF graph, however, remains the master copy. In Snowflake, the natural-language-to-SQL service Cortex Analyst answers questions in Japanese, and its SQL results match the graph’s numbers row for row. Finally, a Stardog virtual graph reads the Snowflake tables back as the same knowledge graph (Figure 1). The code is in the same GitHub repository as before.
 
 ## [GitHub - dgg32/glp](https://github.com/dgg32/glp)
 
@@ -30,24 +28,22 @@ This article tests these standards with a second dataset, Japan's NDB Open Data 
 
 ### 1.1 Data
 
-The Ministry of Health, Labour and Welfare (MHLW) publishes [NDB Open Data](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177182.html), aggregate tables from the National Database of Health Insurance Claims. NDB covers almost every insured patient in Japan. The [11th release](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177221_00017.html), first published in June 2026, covers fiscal year 2024 (April 2024 to March 2025).
+The Ministry of Health, Labour and Welfare (MHLW) publishes [NDB Open Data](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177182.html), aggregate tables from Japan's national database of health insurance claims. NDB covers almost every insured patient in Japan. This article uses the [11th release](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177221_00017.html), which covers fiscal year 2024 (April 2024 to March 2025).
 
-The prescription tables list each product at strength level, such as Jardiance Tablets 10 mg (ジャディアンス錠10mg) and 25 mg (ジャディアンス錠25mg) as separate rows. For each product they give the dispensed quantity by prefecture, by month or by sex and five-year age band, in three care settings: outpatient prescriptions filled at a community pharmacy (院外), outpatient drugs dispensed at the clinic or hospital (院内) and inpatient use (入院). Each breakdown is a separate table: there are figures for Osaka and for women aged 70–74, but none for women aged 70–74 in Osaka. This project takes all 510 diabetes drug products into account, of which 286 are generics. Most are antidiabetics in Japanese drug category 396. The GLP-1 (glucagon-like peptide-1) and dual GIP/GLP-1 drugs are filed under category 249, together with some insulins. The tables carry each product's NHI (National Health Insurance) price, and the NHI price list adds its ingredient and marketing authorization holder.
+The tables list each product at strength level, such as Jardiance Tablets 10 mg (ジャディアンス錠10mg). For each product, they give the dispensed quantity by prefecture, by month and by sex and age band. Each breakdown is a separate table. So there are figures for Osaka and for women aged 70–74, but none for women aged 70–74 in Osaka. In total, the project covers 510 diabetes drug products, together with their NHI (National Health Insurance) prices and manufacturers.
 
-NDB also lacks several things that the Connecticut graph relies on. It has no prescribers, no specialties, no claims and no patient counts. The analyses of the first article, such as cardiologists writing 91% of their SGLT2 (sodium-glucose co-transporter 2) and GLP-1 claims for an SGLT2 inhibitor, cannot be repeated for Japan. The model shifts from doctors to products and regions. A quantity is also not a prescription. One tablet of metformin and one Ozempic pen, which lasts about four weeks, are both counted as one. Quantities therefore cannot be added across products. This article compares products in yen instead: quantity times the NHI price. MHLW revises a release without giving it a new version: on 2 September 2026 it replaced the files of the 11th release with updated prices, drug codes and generic flags. The values are fiscal year 2024 volumes at September 2026 prices.
+NDB also lacks several things that the Connecticut graph relies on. It has no prescribers, no specialties and no patient counts, so the doctor-level analyses of the first article cannot be repeated for Japan. In addition, NDB counts dispensed units, such as tablets and pens, not prescriptions. One metformin tablet covers part of a day, while one Ozempic pen covers about four weeks. Yet NDB counts each as one unit. Quantities therefore cannot be added across products. This article compares products in yen instead, that is, quantity times the NHI price.
 
 ### 1.2 SKOS: a crosswalk between two classifications
 
-Japan classifies its drugs under the therapeutic category (薬効分類) of the Japan Standard Commodity Classification, not under the WHO’s ATC. The Japanese system is a tree of three-digit codes. Category 396 (糖尿病用剤, antidiabetic agents) holds the tablets and most insulin combinations. Category 249 (その他のホルモン剤, other hormone preparations) holds the GLP-1 drugs, including the oral semaglutide tablet Rybelsus, and some insulins. The exceptions are Xultophy and Soliqua, pens that combine insulin with a GLP-1 drug: they are filed under 396. So no Japanese category equals “GLP-1 drugs”: a query for category 249 misses Xultophy and Soliqua and returns insulins as well.
+In the previous article, SKOS provided multilingual labels and the drug class hierarchy. In this project, it also has to bridge two classification systems. Japan does not file its drugs under the WHO's ATC but under its own therapeutic categories (薬効分類). The two systems do not line up. Most GLP-1 drugs, for example, sit in category 249, “other hormone preparations”, together with some insulins. Two GLP-1 combination pens, however, sit in category 396, “antidiabetic agents”. So no Japanese category equals “GLP-1 drugs”.
 
-SKOS has a set of mapping properties for exactly this situation. skos:exactMatch says that two concepts are interchangeable, skos:narrowMatch that the other concept is narrower, skos:broadMatch that it is broader and skos:relatedMatch that the two overlap without either containing the other. The Japanese category tree becomes its own concept scheme, and every category links to the ATC-based class tree from the first article with these properties (Figure 2).
+SKOS has mapping properties for exactly this situation. They state whether a concept in one scheme is the same as, broader than, narrower than or merely related to a concept in another. A script links each Japanese category to the ATC-based classes by counting how many products they share (Figure 2, Code 1). Each link also records the counts behind it. The crosswalk can therefore be checked against the data, and it is recomputed with every new release.
 
 <!-- Figure 2: diagram of the crosswalk. Left: 3 → 39 → 396, 2 → 24 → 249. Right: A10 → A10B → classes, A10A → insulins. Arrows labelled narrowMatch / relatedMatch / broadMatch. -->
 ![](figure2.png)
 
 Figure 2. The crosswalk between Japan's 薬効分類 and the ATC-based class tree. Image by author.
-
-The crosswalk is computed, not written by hand. Every Japanese product has both a category and an active substance with an ATC class, so a script counts, for each pair of category and class, how many of the class's products sit in that category. If all of them do, the category gets skos:narrowMatch to the class. If only some do, it gets skos:relatedMatch. Each link carries the count that justifies it (Code 1).
 
 ```c
 # Code 1. The crosswalk on category 249, shortened
@@ -63,23 +59,13 @@ jpc:249 a skos:Concept , dm:JapaneseDrugClass ;
         "relatedMatch GLP1ReceptorAgonist: 23 of the 25 products containing a substance of GLP1ReceptorAgonist are filed under 249."@en .
 ```
 
-The result says that all six tirzepatide products are in 249, while 23 of the 25 GLP-1 products are in 249 and the other two in 396. Nothing is claimed about category 249 as a whole, which also holds other hormone preparations that are out of scope. Category 396 gets skos:broadMatch to *blood glucose lowering drugs, excluding insulins* (A10B), since all 427 products in 396 belong to A10B, but only 427 of the 450 A10B products are in 396. The other 23 are the GLP-1 products in 249. A hand-written crosswalk would only record someone's judgement. Here every link carries the product counts behind it in its editorial note, so it can be checked against the data, and the build recomputes it whenever a new release adds products. In Snowflake, the crosswalk becomes the table VOCAB.JP_CLASS_MATCH, with one row per link and the editorial note as its evidence column.
+The class tree itself grew as well. Japan treats some drug groups as classes of their own, while ATC lumps them together under “other”. The project therefore added classes for them. In addition, a few substances are sold only in Japan and have no ATC code at all. Each was assigned by hand to an existing class, with the reason recorded.
 
-The ATC tree itself also needed new branches. ATC puts several drugs under A10BX "other blood glucose lowering drugs". In Japan, two groups among them count as drug classes of their own. The first is the glinides: repaglinide, nateglinide and mitiglinide. The second is the glimins, with a single member, imeglimin. Neither group has an ATC class code. Both became project classes, Glinides and Glimins, directly below A10B, next to the SGLT2 and DPP-4 inhibitors. Four substances have no ATC code at all: glyclopyramide, tofogliflozin, trelagliptin and omarigliptin. Each got a curated class with a recorded reason. No US substance changed class.
+Three more vocabularies arrived with Japanese data: the 47 prefectures, the care settings and the sex and age bands. Each became a small SKOS scheme with labels in three languages. Because they use the same properties as the drug classes, the same code later turns all of them into Snowflake tables.
 
-Two more vocabularies arrived with Japan. The 47 prefectures form a SKOS scheme with their JIS codes as skos:notation, Wikidata links and labels in three languages, such as 東京都, Tokyo and 东京都 for prefecture 13. The care settings and the 42 sex and age bands form a third. In a property graph, these would be Prefecture nodes with a name_ja property. In SKOS they use the same properties as the drug classes, so one generator turns all of them into Snowflake tables and semantic view synonyms with the same code.
+### 1.3 OWL: defined classes and one company in two countries
 
-### 1.3 Substances that RxNorm does not know
-
-RxNorm is an American dictionary. It lists the drugs approved in the US, so 12 of the 47 substances in the Japanese data are missing from it. These include teneligliptin, ipragliflozin and imeglimin, all developed in Japan. The graph identifies them by their concept ID in the UMLS (Unified Medical Language System) instead, which includes drugs from other countries, and finds their ATC codes through UMLS's ATC source. Their Wikidata entries, and with them extra Japanese and Chinese labels, are found through Wikidata's UMLS property (P2892).
-
-The Japanese names also come in more than one spelling. The NHI price list names the salt, so the price list says テネリグリプチン臭化水素酸塩水和物 where the concept is called テネリグリプチン. The product names in NDB use full-width characters, such as ジャディアンス錠１０ｍｇ. The salt names and the half-width spellings go into skos:hiddenLabel, a SKOS label that search can match but that is never displayed. Name lookup finds the right concept from any of them.
-
-The SHACL rule for substances changed accordingly. It used to say "a substance has an RxNorm link". It now says "a substance has an RxNorm link, or a UMLS link when RxNorm does not have it". The first article argued that SHACL rules are the modeling contract. A second country tests that claim, and the rule changed in one place, with a version note, rather than in scattered application code.
-
-### 1.4 OWL: defined classes and one company in two countries
-
-The ontology moved to version 0.5 and gained one new structure, explained in the next section, and two new defined classes. dm:GLP1Product is any medicinal product with an active substance in the GLP-1 class or a narrower one (Code 2). dm:SGLT2Product works the same way for SGLT2 inhibitors.
+The first article defined GLP-1 and SGLT2 prescribers. Japan has no prescribers, so the ontology now defines the same classes for products: dm:GLP1Product and dm:SGLT2Product. A defined class states the conditions for membership instead of listing its members (Code 2).
 
 ```c
 # Code 2. OWL definition of the GLP1Product class
@@ -99,15 +85,15 @@ dm:GLP1Product a owl:Class ;
     ] .
 ```
 
-The definition never mentions 249 or 396. It describes what a GLP-1 product is, and whatever evaluates it works out which products qualify. In a triple store, that is the reasoner. In Snowflake, which has no reasoner, the generator reads the restriction and compiles it into SQL (section 2.2). Either way, the answer is 37 products: 23 Japanese products in 249, the 2 combination pens in 396 and 12 US products (Figure 6 in section 4). In the Neo4j drug_atc graph, the same question is a variable-length match over (:Substance)-[:BELONGS_TO]->(:ATC) relationships, repeated in every query that needs it. Here the rule lives in the ontology once.
+Code 2 shows one of the real strengths of OWL. The definition never lists a single product. It only says what a GLP-1 product is: a product that contains an active substance from the GLP-1 class. The reasoner finds every product that qualifies, including the two combination pens in category 396, which a category-based query would miss. Moreover, new products are classified as soon as they enter the graph. The rule is written once in the ontology instead of in any query or program, and every query benefits from it. Even Snowflake reuses it, as section 2.2 shows. In a Neo4j graph, in contrast, the rule lives in the application code. It has to be repeated in every query, and each copy can drift from the others.
 
-Companies needed a link across the border as well. In the US data, a product's manufacturer is the application holder at the FDA, grouped by its GLEIF (Global Legal Entity Identifier Foundation) parent. In Japan, the marketing authorization holder is usually a local subsidiary, such as 日本ベーリンガーインゲルハイム (Nippon Boehringer Ingelheim). The new property dm:partOfCorporateGroup links each Japanese subsidiary of the seven groups already in the graph to the same parent company IRI as the US holder. A query for Boehringer Ingelheim's products therefore finds Jardiance in Connecticut and ジャディアンス錠10mg in Japan through one IRI. The co-promotion agreements between Boehringer Ingelheim and Eli Lilly are a commercial fact that no public dataset records, so the graph does not show them.
+Companies needed a link across the border as well. In Japan, a drug is usually sold by a local subsidiary, such as 日本ベーリンガーインゲルハイム (Nippon Boehringer Ingelheim). A new property links each subsidiary to its parent company. A query for Boehringer Ingelheim therefore finds its products in both countries.
 
-### 1.5 An RDF Data Cube
+### 1.4 An RDF Data Cube
 
-The NDB tables have 150,288 cells for the 510 products: 73,313 values, 40,944 zeros and 36,031 masked cells. The graph still has to fit Stardog Cloud Free, which keeps serving it over SPARQL for the MCP server from the first article. Stardog Cloud Free allows one million edges per database, and the Connecticut data with the shared vocabularies already uses about 247,000. A flat model, with every cell a node that names its product, setting, dimension, value and type, needs about six triples per cell. That comes to about 1.15 million triples in total, which does not fit.
+The NDB tables have about 150,000 cells. Stored naively, they would push the graph to about 1.15 million triples. That exceeds the one-million-edge limit of Stardog Cloud Free, which also has to hold the Connecticut data.
 
-The W3C's [RDF Data Cube](https://www.w3.org/TR/vocab-data-cube/) vocabulary solves this with slices. A slice fixes the values that all its cells share: one product, one care setting and one breakdown. Each cell then needs only three triples: the link from the slice, the dimension value and either the quantity or a masking flag. The prefecture breakdown of ジャディアンス錠10mg in community pharmacies, for example, is one slice with 47 cells. Tokyo's cell says that 29,567,498.75 tablets were dispensed there (Code 3).
+The W3C’s RDF Data Cube vocabulary solves this with slices. A slice holds what all its cells share, such as the product and the breakdown. Each cell then only needs to store its own prefecture, month or age band, and its quantity (Code 3, Figure 3). With this design, Japan adds about 487,000 triples, and the whole graph fits in Stardog Cloud Free.
 
 ```c
 # Code 3. One slice and one of its 47 observations, shortened
@@ -129,98 +115,18 @@ obs:622401201/outpatient-external/13
 
 Figure 3. One slice of the RDF Data Cube and the same slice as rows of a Snowflake table. Image by author.
 
-With 4,464 slices, Japan adds about 487,000 triples, and the whole graph holds 734,133. The zeros are kept. They cost about 123,000 triples, but they make the graph lossless: every table can be rebuilt from the graph, and SHACL can check that a prefecture slice has exactly 47 cells. A property graph would face the same size trade-off, and the usual answer there is a list property on the slice node. That saves even more space, but individual cells then can no longer carry a masking flag or be checked one by one.
-
-The Data Cube also forced a small ontology decision. The first article's dm:forProduct links a prescription to its product, and its domain is dm:Prescription. Reusing it on slices would have made every slice a prescription under reasoning, since OWL treats a domain as an inference, not as a check. The slices got their own property, dm:aboutProduct, instead.
-
-### 1.6 SHACL: masked cells and totals
-
-NDB masks every cell below 1,000 in the oral tables and below 400 in the injection tables, and shows a dash instead. When a single cell in a row is masked, the next smallest cells are masked as well, so that the masked value cannot be recovered by subtraction. The CMS data in the first article had a similar rule, and the graph handled it with a suppression flag. For Japan, the graph uses an existing standard: the SDMX confidentiality attribute sdmx-attribute:confStatus with the value sdmx-code:confStatus-C, the code for confidential data used by statistical offices. The files do not say whether a cell was masked as small or to protect another cell, so the general code is the honest choice.
-
-Before writing the rules, the masking logic was checked against the data. Every one of the 1,378 slices without a masked cell sums exactly to its national total. No slice sums to more than its total. And every unmasked cell is either zero or at least the masking threshold. These facts became SHACL rules (Code 4).
-
-```c
-# Code 4. SHACL rules for the NDB observations and slices, shortened
-dms:ObservationShape a sh:NodeShape ;
-    sh:targetObjectsOf qb:observation ;
-    # A value is present OR the cell is flagged masked, never both, never neither.
-    sh:xone (
-        [ sh:path dm:quantity ; sh:minCount 1 ]
-        [ sh:path sdmx-attribute:confStatus ; sh:hasValue sdmx-code:confStatus-C ]
-    ) .
-
-dms:QuantitySliceShape a sh:NodeShape ;
-    sh:targetClass dm:QuantitySlice ;
-    sh:sparql [
-        sh:message "The cells add up to more than the national total, or, with no cell masked, not to the total." ;
-        sh:select """
-            SELECT $this (?sum AS ?value) WHERE {
-              { SELECT $this (SUM(?q) AS ?sum) (COUNT(?m) AS ?masked) WHERE {
-                  $this qb:observation ?o .
-                  OPTIONAL { ?o dm:quantity ?q } OPTIONAL { ?o sdmx-attribute:confStatus ?m }
-                } GROUP BY $this }
-              $this dm:totalQuantity ?total .
-              FILTER (?sum > ?total + 0.01 || (?masked = 0 && ABS(?sum - ?total) > 0.01))
-            }""" ] .
-```
-
-The first rule is the Japanese twin of the CMS rule from the first article, with "exactly one of these" expressed by sh:xone. The second compares each slice with its national total. It is a SHACL-SPARQL rule, because core SHACL cannot sum across nodes. Other new rules require 47 cells per prefecture slice, 12 per month slice and 42 per sex and age slice, a YJ code (Japan's 12-digit drug code) for every Japanese product and exactly one country identifier per product: a CMS generic name in the US or a YJ code in Japan. The shapes moved to version 0.3.0 with 59 rules. A test file of deliberately broken records shows that all 59 can fire, and the real data passes with zero violations.
-
-### 1.7 OWL: the one error a reasoner reports
-
-The first article called OWL the blueprint and SHACL the building inspector, and it warned that the two can disagree once reasoning is switched on. Adding a second country made one such disagreement concrete. The build now writes links for 561 products instead of 51, and a mistake in one of them can turn a wrong link into a new fact.
-
-Take a product whose indication link points at a substance by mistake. The property dm:hasIndication has the range dm:Indication. A reasoner does not read a range as a check but as a rule: whatever the property points at is an indication. So it concludes that empagliflozin is an indication, and through the IDMP-O superclass a therapeutic indication as well. Nothing is reported. The SHACL rule that a product's indications must be of type dm:Indication catches the mistake only with reasoning off. With reasoning on, the rule passes, because the reasoner has just supplied the missing type.
-
-A reasoner reports exactly one kind of error: a contradiction. A contradiction needs an axiom that rules something out, and up to version 0.5 the ontology had none. Nothing in it said that a substance cannot also be an indication, and under the open-world assumption, what is not ruled out is possible. Version 0.6.0 adds a single axiom that declares the 13 asserted classes pairwise disjoint (Code 5). Subclasses inherit it, so an SGLT2 product can never be a substance either. Superclasses are unaffected, so an indication remains a TherapeuticIndication of IDMP-O. With the axiom in place, the mistaken link makes the substance a member of two disjoint classes. OWL 2 RL names this rule cax-adc, and it ends in an inconsistency instead of a new fact.
-
-```c
-# Code 5. The disjointness axiom of ontology 0.6.0, and a wrong link it turns into an error
-[] a owl:AllDisjointClasses ;
-    owl:members (
-        dm:HealthcareProfessional dm:Prescription dm:MedicinalProduct dm:Substance dm:Indication
-        dm:Organization dm:QuantitySlice dm:TherapeuticClass dm:Specialty dm:Prefecture
-        dm:SexAgeGroup dm:CareSetting dm:JapaneseDrugClass
-    ) .
-
-# Test data: indication and substance swapped
-t:swappedProduct dm:hasIndication t:substanceAsIndication .
-t:substanceAsIndication a dm:Substance .
-
-# owlrl after the OWL 2 RL closure:
-# "Disjoint classes dm:Substance and dm:Indication have a common individual t:substanceAsIndication"
-```
-
-Wiring the axiom into the local checks exposed a gap. The Python reasoner owlrl does not raise an exception when it meets a contradiction. It writes the message into the graph as a triple and carries on. The local check ran owlrl and then counted only SHACL violations, so an inconsistent graph would have passed. The check now reads those messages back and fails on any of them. As with the SHACL rules, a test file proves that the axiom can fire. It holds one correct record and four wrong links: indication and substance swapped, a disease as an active substance, a product as its own manufacturer, and a substance typed as an SGLT2 product. Exactly those four are reported, and the correct record is not. With the axiom removed, none is reported. The real data passes. The OWL 2 RL closure of the 256,092 triples outside the NDB cells grows to 457,280 triples without a single contradiction, and SHACL still finds zero violations afterwards.
-
-Disjointness is reserved for things that can never coincide in the world: a person and a claim, a product and a company, a prefecture and an age band. Data-quality rules stay in SHACL, for a practical reason. Logically, an inconsistent graph entails every statement, so a reasoner cannot answer queries over it until the contradiction is fixed. SHACL reports each problem as a separate result and remains the gate inside the load transaction. Neo4j has no counterpart to either half of this. A relationship type has no range, so a HAS_INDICATION relationship to a :Substance node is stored as written, and nothing is concluded from it or held against it.
-
-<!-- Author notes: ontology 0.6.0 pushed to Stardog 2026-11-04 (incremental: schema graph 586 triples + provenance; SHACL gate 0 violations; validate.py 0 violations, 17 warnings, 130 info). Snowflake semantic views redeployed from 0.6.0 the same day (only the version string in their comments changed; all parity checks OK). The disjointness was tested with owlrl locally, not with Stardog's own consistency check. -->
-
 ## 2. From the graph to Snowflake
 
 ### 2.1 Tables as projections of the graph
 
-The export to Snowflake is not a second pipeline. Each table is one SPARQL SELECT over the validated graph, and each query reads only the named graphs the table comes from. The schemas mirror those graphs (Table 1). VOCAB holds the shared SKOS vocabularies, US the Connecticut claims and JP the Japanese products and cells. A script refuses to export unless the local checks of section 3 have passed on exactly these files.
-
-| Schema | Tables (rows) |
-|---|---|
-| VOCAB | THERAPEUTIC_CLASS (17), CLASS_ANCESTOR (48), SUBSTANCE (47), JP_DRUG_CLASS (6), JP_CLASS_MATCH (15), PREFECTURE (47), CARE_SETTING (4), SEX_AGE_GROUP (44), LABEL (2,568), and the specialty and indication schemes |
-| US | PRESCRIPTION (22,034), PRESCRIBER (3,896), PRODUCT (51), PRODUCT_CLASS (171), ORGANIZATION (9), and four more |
-| JP | PRODUCT (510), PRODUCT_SUBSTANCE (530), PRODUCT_CLASS (1,514), ORGANIZATION (51), NATIONAL_TOTAL (1,488), QUANTITY (150,288) |
-
-Table 1. The graph as 27 Snowflake tables.
-
-Three things that SPARQL does natively have to be spelled out for SQL. The first is skos:broader*. SQL has no property paths, so CLASS_ANCESTOR stores every pair of class and ancestor, and the PRODUCT_CLASS tables store every class above a product's substances. The second is the Data Cube. It becomes JP.QUANTITY, one row per cell with the product, care setting, breakdown and dimension value. A masked cell stays a row with an empty quantity and IS_MASKED set, the column form of confStatus-C. The third is the company link: JP.ORGANIZATION.CORPORATE_GROUP_ID points at the same row of US.ORGANIZATION that the US application holder uses.
-
-The export checks keys, foreign keys and row counts before it writes anything. It also checks that every product reaches the top of the class tree exactly once, which the semantic view relies on (section 2.2). Then it runs every Japanese business query in SPARQL on the graph and stores the answers as the expectations for Snowflake. The loader in turn accepts only files whose hashes match the checked export, and it verifies row counts and totals after the load. It records each load with the provenance hash of the graph in a log table and in the table comments.
+A script exports the graph to Snowflake. Each of the 27 tables comes from one SPARQL query over the validated graph. The tables sit in three schemas: shared vocabularies, Connecticut and Japan. SPARQL climbs the class hierarchy in one line, while SQL needs a recursive query. The script therefore stores every class with all its ancestors. Finally, a parity check makes sure the copy is faithful. The script answers ten business questions on the graph and saves the results. Snowflake must later return exactly the same numbers for the same questions.
 
 ### 2.2 A semantic view generated from the ontology
 
-A Snowflake semantic view describes tables in business terms: logical tables, relationships, dimensions, facts and metrics, each with a description and optional synonyms. Cortex Analyst reads it to turn a question into SQL. Nobody writes the view for this project by hand. A script generates it from the ontology and the vocabularies (Code 6). The only hand-written parts are the mapping of columns to ontology terms and a paragraph of instructions.
+A Snowflake semantic view describes tables in business terms, such as dimensions, metrics and synonyms. Cortex Analyst relies on it to turn a question into SQL. Here, a script generates the view from the ontology and the vocabularies, so no part of it is written by hand (Code 4).
 
 ```c
--- Code 6. Excerpts of the generated semantic view GLP.SEMANTIC.JAPAN_MARKET
+-- Code 4. Excerpts of the generated semantic view GLP.SEMANTIC.JAPAN_MARKET
 CREATE OR REPLACE SEMANTIC VIEW GLP.SEMANTIC.JAPAN_MARKET
   TABLES ( national_value AS GLP.SEMANTIC.SV_JP_NATIONAL_VALUE ..., product AS ..., prefecture AS ... )
   RELATIONSHIPS ( prefecture_value_to_prefecture AS prefecture_value (PREFECTURE_CODE) REFERENCES prefecture (PREFECTURE_CODE), ... )
@@ -239,119 +145,34 @@ CREATE OR REPLACE SEMANTIC VIEW GLP.SEMANTIC.JAPAN_MARKET
   ai_verified_queries ( jp_class_share_yen AS ( QUESTION 'What share of Japan''s diabetes drug value ...' ... ), ... );
 ```
 
-Each part of the view comes from a part of the graph. Synonyms are the en, ja and zh labels of the ontology terms, 48 of them, so 都道府県 points at the prefecture name. Descriptions are skos:definition texts. Value lists come from the SKOS schemes: the Japanese category names, the 47 prefectures and the company names. The company list also comes from dm:partOfCorporateGroup, so it reads "C.H. Boehringer Sohn AG & Co. KG (also: Nippon Boehringer Ingelheim Co., Ltd., 日本ベーリンガーインゲルハイム, ...)". The OWL defined classes become flags. The generator reads the owl:hasValue of each definition and writes the SQL that a reasoner would have run (Code 7).
+Each part of the view comes from a part of the graph. The labels in three languages become synonyms. The SKOS definitions become descriptions. The defined OWL classes become yes/no columns, such as “is this a GLP-1 product”. In addition, the business queries of the graph become reference queries that Cortex Analyst consults. They also serve as tests. After every deployment, a script runs them in Snowflake and compares the results with the graph's answers. All of them must match row for row.
 
-```c
--- Code 7. dm:GLP1Product and dm:SGLT2Product compiled into SQL (generated)
-SELECT pc.PRODUCT_ID,
-       BOOLOR_AGG(pc.CLASS_ID = 'GLP1ReceptorAgonist') AS IS_GLP1_PRODUCT,
-       BOOLOR_AGG(pc.CLASS_ID = 'SGLT2Inhibitor')      AS IS_SGLT2_PRODUCT
-FROM GLP.JP.PRODUCT_CLASS pc            -- hasActiveSubstance/inTherapeuticClass/skos:broader*, materialized
-GROUP BY pc.PRODUCT_ID
-```
+The same model was also deployed through OSI (Open Semantic Interchange), a vendor-neutral format for semantic models. The OSI view gives the same numbers, but it loses the synonyms, the instructions for Cortex Analyst and the verified queries.
 
-The Data Cube left its mark on the view as well. Each breakdown of the NDB tables adds up to the same national total, so cells of different breakdowns must never be added together. The view therefore has four fact tables, one for the national totals and one per breakdown (prefecture, month, and sex and age), and each knows only its own dimension. This is qb:sliceStructure turned into a schema. A second rule follows from the class tree. A combination product such as Tradiance belongs to two classes, and every product belongs to all classes above its own. The fact tables therefore hold one row per product and class. Metrics for all diabetes drugs read only the rows of the top class, *drugs used in diabetes*, which every product reaches exactly once.
+### 2.3 Virtual graph: SPARQL over the Snowflake tables
 
-The business questions of the SPARQL catalog (queries/jp-*.rq) become seven verified queries, worked examples that Cortex Analyst consults. They also serve as the test. After every deployment, a script runs them through the semantic view and compares the result with the graph's answer, row for row. All 225 rows of the seven questions match, from the class shares to the 47 prefectures and the 72 class-month generic shares. Two questions span both countries, which no single semantic view holds, so they are plain SQL files over the shared VOCAB tables (section 4). They match the graph too.
+The export copies the graph into tables. A virtual graph goes the other way without ETL: the data stays in Snowflake. Stardog can build a virtual graph from a mapping file that declares how table rows become triples. It then translates each SPARQL query into SQL and runs it in Snowflake with a read-only role, like the MCP server of the first article. The mapping is written in R2RML, the W3C standard for this task. A second R2RML engine, [Morph-KGC](https://github.com/morph-kgc/morph-kgc), confirmed that the mapping turns the Snowflake tables back into the original graph, triple for triple.
 
-The same model is also deployed through OSI (Open Semantic Interchange, now Apache Ossie), the vendor-neutral YAML format for semantic models. Snowflake builds a semantic view from OSI YAML with one procedure call. The OSI-built view gives the same numbers, but it loses all 48 synonyms, the instructions and the verified queries, because OSI 0.1.1 has no place for them that Snowflake reads. The next article looks at that gap in detail.
-
-### 2.3 The way back: SPARQL over the Snowflake tables
-
-The export copies the graph into tables. A virtual graph goes the other way without copying anything. A mapping declares how rows become triples, and the graph database translates each SPARQL query into SQL at query time and sends it to the warehouse. Stardog calls this a virtual graph, and Stardog Cloud Free includes it. One mapping turns 25 of the 27 Snowflake tables back into the knowledge graph: the SKOS vocabularies, the Medicare Part D claims and the NDB Data Cube, 727,728 triples in all, with none of them stored in Stardog. The two tables left out, US.PRODUCT_CLASS and JP.PRODUCT_CLASS, hold the materialized path from product to class, which the graph already expresses through substances and classes.
-
-The mapping is written in R2RML, the W3C standard for mapping relational data to RDF (Code 8). Each triples map pairs an SQL query with templates for subjects and objects. The IRIs are rebuilt from the ID columns, because the export kept the local part of every IRI, and the same template on both sides of a link lets Stardog push the join down to Snowflake. Two details of the standard shape the file. R2RML sets a language tag only as a constant, so the labels need one triples map per vocabulary, language and label type. And skos:broaderTransitive comes from CLASS_ANCESTOR and SPECIALTY_ANCESTOR, the closure tables of section 2.1, so the virtual graph answers class roll-ups without a reasoner. The result is 96 triples maps. A short script generates them from a table-by-table specification, and the R2RML file stays the artifact that the engines read.
-
-```turtle
-# Code 8. One of the 96 triples maps (mapping/glp.r2rml.ttl), and a query over the virtual graph
-map:TherapeuticClassPrefLabelJa a rr:TriplesMap ;
-    rr:logicalTable [ rr:sqlQuery """SELECT CONCEPT_ID AS "id", LABEL AS "label" FROM GLP.VOCAB.LABEL
-        WHERE CONCEPT_KIND = 'therapeutic_class' AND LABEL_TYPE = 'pref' AND "LANGUAGE" = 'ja'""" ] ;
-    rr:subjectMap [ rr:template "https://dgg32.github.io/glp/vocab/therapeutic-class/{id}" ] ;
-    rr:predicateObjectMap [ rr:predicate skos:prefLabel , rdfs:label ;
-        rr:objectMap [ rr:column "label" ; rr:language "ja" ] ] .
-
-SELECT ?ancestor ?ja WHERE {
-  GRAPH <virtual://snowflake_glp> {
-    ?c skos:prefLabel "SGLT2阻害薬"@ja ; skos:broaderTransitive ?ancestor .
-    ?ancestor skos:prefLabel ?ja . FILTER(lang(?ja) = "ja")
-  }
-}
-# → 血糖降下薬（インスリンを除く）, 糖尿病治療薬
-```
-
-The rule of section 3, check locally and publish once, applies to mappings too. Before the mapping reached Stardog, Morph-KGC, a Python R2RML engine, ran it against Snowflake, and the result was compared triple by triple with the Turtle files the tables were exported from. Stardog Studio then received the same mapping, converted by a script into Stardog's own mapping syntax, SMS2, because Studio parsed every uploaded mapping as SMS2. The engines and the source files agree on every triple (Table 2). Stardog returns 13 triples more than Morph-KGC, for a reason explained below.
-
-| Part of the graph | Turtle files | Morph-KGC over Snowflake | Stardog virtual graph |
-|---|---|---|---|
-| SKOS vocabularies (schema VOCAB) | 12,025 | 12,025 | |
-| Medicare Part D, Connecticut (schema US) | 235,408 | 235,408 | |
-| NDB Open Data as a Data Cube (schema JP) | 480,295 | 480,295 | |
-| Total | 727,728 | 727,728 | 727,741 |
-
-Table 2. Triples of the knowledge graph, from the source files and from the two mapping engines over the Snowflake tables. Numbers are compared by value. The vocabulary count includes the 1,562 skos:broaderTransitive triples of the closure tables. Stardog was counted in total only, with one COUNT over the whole virtual graph; its 13 extra triples are the NUCC "None" definitions.
-
-The comparison also lists what the tables do not carry: 6,594 triples. Most are the records of the concept schemes, the dataset and its slice keys (4,686). The rest are inverse skos:narrower links, editorial notes, the substance cross-references that the export stores as "|"-separated lists, the indication of the Japanese products, and alternative company names. None of them is used by a business query. The check found one more thing. Thirteen deactivated NUCC codes carry the definition "None", the placeholder of the NUCC file itself, which the graph copied as text. Morph-KGC reads that text as a missing value, so only Stardog returns these 13 triples.
-
-Each engine stumbled over a different detail of the same SQL. The Snowflake driver behind Morph-KGC returns column names in lower case and the JDBC driver behind Stardog in upper case, so every column carries a quoted lower-case alias that both understand. Morph-KGC turned SQL NULLs into the string "None" until it was told to treat that string as missing, and it fails on a NULL in an integer column, so the three nullable integer columns are cast to text in SQL and typed by the mapping. Booleans become the strings 'true' and 'false' for the same reason. Stardog parses the SQL itself before sending it on and treats LANGUAGE as a reserved word, which Snowflake accepts unquoted. A Stardog data source sees only the default schema of its connection until the other schemas are listed in its options. And an R2RML template percent-encodes its values, so a prescription IRI, whose ID contains slashes, is rebuilt from its three parts. None of this appears in the results, but the cross-check of two engines against the source files found every one of these problems before a query depended on them.
-
-Correct triples are not yet correct answers, because Stardog translates every query into SQL, and the translation has limits of its own. The two business queries tested on the virtual graph return the graph's numbers, row for row: the class shares in Japan (11 rows, 60 seconds over 150,288 cells in Snowflake) and the SGLT2 and GLP-1 claims by specialty in Connecticut (72 rows, 2 seconds). Both needed rewriting first, and each rewrite answers a limit of the translation (Table 3). Stardog refuses skos:broader* when both ends are variables, so the class roll-up uses skos:broaderTransitive from the closure table, the same table the semantic view relies on. Written as a UNION of "the class itself" and "an ancestor", the roll-up made Stardog push the GROUP BY into SQL with one column per branch, and every specialty came back up to four times; a LEFT JOIN avoids the UNION. And the share of SGLT2 claims came back as 30 instead of 30.5: the query plan typed the result as xsd:integer and turned the literal 1000.0 into 1000, so SPARQL's decimal division became SQL's integer division until one operand was cast to xsd:double.
-
-| What failed over the virtual graph | Symptom | Rewrite |
-|---|---|---|
-| skos:broader* with two variable ends | query refused | skos:broaderTransitive (closure table) |
-| UNION under an aggregate pushed to SQL | each group returned up to four times | LEFT JOIN (OPTIONAL and BIND) |
-| integer division typed as integer | 30 instead of 30.5 | cast one operand to xsd:double |
-| COUNT(*) without the subject | 1,345 instead of 4,035, silently | use the subject, e.g. COUNT(DISTINCT ?s) |
-
-Table 3. Limits of Stardog 12.2.1's translation of SPARQL into SQL found with the business queries. The mapping is correct in every case; the rewritten queries are in queries/virtual/.
-
-The last row is the most dangerous, because nothing signals it. The Japanese national totals appear on three slices per product, one for each breakdown, so three triples maps read the same column of the same table with different subjects. Counting the totals without using the subject returned 1,345 instead of 4,035. The query plan showed why: Stardog dropped the unused subjects, saw three identical scans, and sent a single SQL query. As soon as the subject took part in the query, the answer was 4,035. The business queries always name the slice structure, so their results are not affected. A virtual graph is only as correct as the engine's rewriting into SQL, and an independent reference, here the materialized graph and its stored results, is what makes such an error visible.
-
-The connection follows the same rule as the MCP server of the first article: it may read, never write. Stardog logs in to Snowflake as a dedicated user that holds a single role with USAGE, SELECT and REFERENCES only. The virtual graph therefore cannot change the tables it reads, whatever SQL it generates.
-
-The three routes from the graph to its users now sit side by side. Stardog stores the triples and reasons over them. The semantic view compiles the ontology into SQL ahead of time, so OWL definitions and skos:broader* become materialized columns and tables. The virtual graph keeps the data in the warehouse and translates SPARQL on demand, but it relies on the same materialized tables wherever the warehouse cannot follow the graph's logic. The mapping is the reusable part: the same R2RML file runs in Morph-KGC, in Stardog and, in principle, in any other R2RML engine such as the open-source Ontop.
+Correct triples, however, do not guarantee correct answers. Stardog's translation into SQL has limits of its own. Some queries had to be rewritten, and one returned a wrong count without any error. The mistake only showed up because the results could be compared with the original graph. A virtual graph is therefore only as reliable as its translation into SQL.
 
 <!-- Author notes (2026-11-07/08): virtual graph snowflake_glp in Stardog database `snowflake`, data source `snowflake` (recreated 2026-11-08 with glp.sms; SQL Schemas GLP.VOCAB,GLP.US,GLP.JP; JDBC URL with schema=VOCAB), Snowflake user GLP_STARDOG (LEGACY_SERVICE, password) holding only GLP_READER. Mapping: mapping/glp.r2rml.ttl generated by scripts/build_mapping.py (96 triples maps), mapping/glp.sms generated by scripts/r2rml_to_sms2.py, checked by scripts/check_mapping.py (2026-11-08: identical, 727,728 triples, Morph-KGC ~4 min). The 2026-11-07 proof of concept (vocabulary only, 391 triples, Code 8 query 2 results in 990 ms) used the earlier mapping/vocab.r2rml.ttl. Stardog results 2026-11-08: triple count 727,741 (= 727,728 + 13 NUCC "None" definitions); COUNT(*)/SUM over ?s dm:totalQuantity ?q without ?s → 1,345 (optimizer collapses three maps, Show Plan saved), COUNT(DISTINCT ?s) → 4,035; skos:broader* with two variable ends → "Cannot translate an unconstrained zero-or-more property path"; queries/virtual/jp-class-share-yen.rq (broaderTransitive rewrite) → all 11 rows identical to tables.json, 59.5 s; queries/virtual/sglt2-vs-glp1-by-specialty.rq: UNION version → SQL error, and without the share column 164 rows (GROUP BY pushed per UNION branch); LEFT JOIN rewrite → 72 rows, all claims as in tables.json, 1.96 s, but shares truncated to integers (30 for 30.5; plan: ?sglt2SharePct ^^xsd:integer, 1000.0 → 1000); decimal literals did not help, xsd:double cast did → all 72 rows identical incl. shares, 2.3 s. TODO: (1) rerun the Code 8 query on the full mapping; the other 8 business queries are not yet run on the virtual graph (Table 3 covers two); (2) Show Plan screenshot as a figure (would renumber Figures 5–7); (3) the reasoning queries need the ontology in the `snowflake` database. Caveat not in the text: in the trial account PUBLIC holds SNOWFLAKE_LEARNING_ROLE (CREATE SCHEMA on SNOWFLAKE_LEARNING_DB), so GLP_STARDOG can USE ROLE it; revoke before claiming strict read-only, or qualify the sentence. Studio ignored mappings.syntax=R2RML; whether the HTTP API honours it was not tested. Stardog server version 12.2.1. -->
 
 ## 3. Governance: check locally, publish once
 
-The governance design from the first article carried over unchanged. The NDB data sits in its own named graphs, graph:ndb-2024 for the cells and graph:ndb-products for the products, each with a PROV-O record of its source release, build time, triple count and content hash. The SHACL rules still run inside the load transaction, so a single violation rolls back the whole load.
+The governance design from the first article carried over unchanged. The Japanese data sits in its own named graphs, each with a provenance record of its source release and a hash of its content. The ontology carries a version number, and every generated semantic view states the version it came from.
 
-The Japanese build also produced an incident, and it changed the process. During development, the Stardog database was reloaded in full five times, and several validation runs used reasoning on top of the 150,000 observations. On the free tier, this filled the instance's disk. The sixth reload failed with "No space left on device", and from then on every query returned a corruption error. The database could neither be read nor dropped. Stardog Cloud Free has no backups, so the instance had to be recreated.
-
-Recovery took one load of two and a half minutes, because every graph in the database is rebuilt from files in the repository. Provenance and reproducibility, which sound like paperwork, turned out to be the disaster recovery plan. The development loop changed as well. All checks now run on the local machine first: the triple budget, the full SHACL contract with pySHACL, the test that every rule can fire, the disjointness test from section 1.7, an OWL 2 RL closure with owlrl that must find no contradiction, followed by SHACL again, and every business query on the embedded store pyoxigraph. These take about ten minutes. Downstream systems receive only what passed. The Stardog loader refuses files that have not passed the local check, and it rewrites only the graphs whose content hash differs. The Snowflake export refuses to run on unchecked files, and the Snowflake loader refuses files that changed after the export.
+The SHACL shapes are the data contract. They state what valid data looks like, and the pipeline enforces them. The shapes first run on the local machine, together with an OWL reasoner and every business query. The Stardog loader and the Snowflake export refuse files that have not passed this run. In Stardog, the shapes run once more inside the load transaction, so a single violation rolls back the whole load. The reasoner adds a second check. A disjointness axiom makes it report a contradiction when a link points at the wrong kind of thing, such as an indication link that points at a substance. Stardog and Snowflake therefore only receive valid data (Figure 4).
 
 <!-- Figure 4: pipeline diagram. NDB / CMS / RxNorm / UMLS → build RDF → local checks (pySHACL 59 rules, owlrl, pyoxigraph queries) → (a) Stardog (SPARQL, MCP server) and (b) export → Snowflake VOCAB / US / JP → generated semantic views → Cortex Analyst. Parity checks as dashed arrows back to the graph results. -->
 ![](figure4.png)
 
 Figure 4. One graph, checked once, published to two places. Image by author.
 
-The checks on the Snowflake side caught a problem of their own. The first table definition stored quantities with two decimals, but some NDB quantities have up to five. The parity checks round to millions of yen and passed. The loader's total check did not: the sum of all quantities in Snowflake was 0.88 units higher than in the export, so the load failed. The column now keeps five decimals. A tolerance in one check and an exact total in another together caught an error that neither would have caught alone.
-
 ## 4. Using the data in Snowflake
 
 ### 4.1 Japan and Connecticut side by side
 
-Because both countries share the class tree, one SQL query compares the two datasets (Code 9, Figure 5). Each class's share is computed within its own country: yen at NHI list prices for Japan and gross US dollars for Connecticut. The comparison uses single-ingredient products, so each product counts in exactly one class. Each country's total is its top class, which every product reaches once.
-
-```c
--- Code 9. Japan vs Connecticut through the shared class tree, shortened (queries/snowflake/jp-vs-connecticut-class-mix.sql)
-WITH value AS (
-  SELECT 'Japan' AS COUNTRY, pc.CLASS_ID, t.TOTAL_QUANTITY * p.NHI_PRICE AS VALUE
-  FROM GLP.JP.NATIONAL_TOTAL t JOIN GLP.JP.PRODUCT p ON ... JOIN GLP.JP.PRODUCT_CLASS pc ON ...
-  WHERE NOT t.IS_MASKED AND NOT p.IS_COMBINATION
-  UNION ALL
-  SELECT 'Connecticut', pc.CLASS_ID, rx.TOTAL_DRUG_COST
-  FROM GLP.US.PRESCRIPTION rx JOIN GLP.US.PRODUCT p ON ... JOIN GLP.US.PRODUCT_CLASS pc ON ...
-  WHERE NOT p.IS_COMBINATION),
-share AS (
-  SELECT COUNTRY, CLASS_ID,
-         SUM(VALUE) / SUM(SUM(IFF(CLASS_ID = 'DrugsUsedInDiabetes', VALUE, 0))) OVER (PARTITION BY COUNTRY) AS SHARE
-  FROM value GROUP BY COUNTRY, CLASS_ID)
-SELECT c.PREF_LABEL_EN, c.PREF_LABEL_JA, ...   -- one column per country
-FROM GLP.VOCAB.THERAPEUTIC_CLASS c LEFT JOIN share s ON s.CLASS_ID = c.CLASS_ID ...
-```
+Because both countries share the class tree, one SQL query compares them (Figure 5, Table 1). Each class's share is computed within its own country, in yen for Japan and in US dollars for Connecticut.
 
 | Class | Japan | Connecticut |
 |---|---:|---:|
@@ -363,47 +184,41 @@ FROM GLP.VOCAB.THERAPEUTIC_CLASS c LEFT JOIN share s ON s.CLASS_ID = c.CLASS_ID 
 | α-glucosidase inhibitors, glimins, glinides | 3.5% | —* |
 | Sulfonylureas, thiazolidinediones | 1.2% | 0.1% |
 
-Table 4. Share of diabetes drug value by class, single-ingredient products. Japan: NDB Open Data FY2024. Connecticut: Medicare Part D 2024. *Not in the 32 drugs of the Connecticut subset.
+Table 1. Share of diabetes drug value by class, single-ingredient products. Japan: NDB Open Data FY2024. Connecticut: Medicare Part D 2024. *Not in the 32 drugs of the Connecticut subset.
 
 <!-- Figure 5: Snowsight worksheet with queries/snowflake/jp-vs-connecticut-class-mix.sql and its result (CLASS_NAME, CLASS_NAME_JA, JAPAN_PCT, CONNECTICUT_PCT). -->
 ![](figure5.png)
 
 Figure 5. The query "compare the class mix of Japan and Connecticut" and its result in a Snowflake worksheet. Image by author.
 
-Japan spends twice the Connecticut share on DPP-4 (dipeptidyl peptidase-4) inhibitors and less than half on GLP-1 drugs. Three classes are missing from the Connecticut column. The α-glucosidase inhibitors and glinides are approved in the US but lie outside the 32 drugs of the first article's subset. Only the glimins, with their single member imeglimin, exist in Japan alone. The comparison has further limits. Prices differ between the two systems, the US costs are gross before rebates, and Medicare covers mostly people aged 65 and over, while NDB covers all ages. Shares are comparable, amounts are not. The Connecticut insulin figure covers only insulin glargine, the one insulin in the first article's scope.
+DPP-4 inhibitors take 24% of Japan's diabetes drug spending, twice their 11% share in Connecticut. GLP-1 drugs show the opposite: 21% in Japan against 51% in Connecticut. Some classes are missing in Connecticut, because the first article covered only 32 drugs. The comparison has other limits as well. Prices differ between the two countries, while US costs are counted before rebates. Moreover, Medicare covers mostly people aged 65 and over. The shares can therefore compare how each country splits its spending among the classes, but not which country spends more.
 
-Boehringer Ingelheim's position differs, too. In Connecticut, the group held 68% of SGLT2 claims. In Japan it holds 37.5% of SGLT2 value (¥116.4 billion), ahead of AstraZeneca with 32.2%, and 27.0% of DPP-4 value (¥67.3 billion), ahead of MSD with 22.2%. Combination products count in each of their classes, so Tradiance, which combines empagliflozin and linagliptin, counts for both. The semantic view groups by company once, and the company column already carries dm:partOfCorporateGroup: Nippon Boehringer Ingelheim's products count for the Boehringer Ingelheim group.
+Boehringer Ingelheim's position differs, too. In Connecticut, the group held 68% of SGLT2 claims. In Japan, it holds 37.5% of SGLT2 value, ahead of AstraZeneca with 32.2%. The company link from section 1.3 makes this comparison possible.
 
 ### 4.2 A defined class without a reasoner
 
-The question "how many GLP-1 products are there, by country and Japanese category" shows what the defined class from section 1.4 does. In Stardog, the question needs reasoning: without it, no product has the type dm:GLP1Product. In Snowflake, it is a filter on the generated flag (Figure 6). Both return the same three rows: 23 products in 249, 2 in 396 and 12 in the US. The 396 row is the one a category-based query would miss: Xultophy and Soliqua, the insulin and GLP-1 pens.
+The question “how many GLP-1 products are there per country” shows the defined class at work. In Stardog, a reasoner answers it. In Snowflake, it is a simple filter on the generated column (Figure 6). Both return the same result, including the two combination pens that a category-based query would miss. A reasoner applies a changed definition immediately. The column, in contrast, changes only when the view is regenerated, but any BI tool can filter on it.
 
 <!-- Figure 6: Snowsight worksheet with queries/snowflake/glp1-products-by-country.sql: Japan その他のホルモン剤 23, Japan 糖尿病用剤 2, US (Connecticut) 12. -->
 ![](figure6.png)
 
 Figure 6. GLP-1 products by country and Japanese category, from the OWL definition compiled into SQL. Image by author.
 
-The two approaches trade flexibility for speed. A reasoner applies a changed definition at query time, while the flag changes only when the generator runs again. The flag, in turn, is an ordinary column that any BI tool can filter on.
-
 ### 4.3 Age, months and prefectures
 
-The sex and age tables show who receives which drug. Of the value of DPP-4 inhibitors, 45.8% goes to patients aged 75 and over. For SGLT2 inhibitors the figure is 36.2%, and for GLP-1 drugs 20.2%. Among the three large classes, the older the patient, the more likely a DPP-4 inhibitor. DPP-4 inhibitors are tablets with a low risk of hypoglycemia, which may explain part of the pattern, but the data cannot say why a drug was chosen. Two small, older classes lean even further toward the elderly: the glinides (48.2%) and the α-glucosidase inhibitors (47.7%).
-
-The month tables show the arrival of tirzepatide. Mounjaro rose from ¥1.1 billion in April 2024 to ¥4.5 billion in March 2025 per month, a fourfold increase within one fiscal year. Semaglutide, as Ozempic, Wegovy and Rybelsus together, stayed flat at about ¥6.3 billion per month.
+The age tables show who receives which drug. Of the value of DPP-4 inhibitors, 45.8% goes to patients aged 75 and over, compared with 20.2% for GLP-1 drugs. The data, however, cannot say why a drug was chosen. The month tables show the rise of tirzepatide (Mounjaro). Its monthly value grew fourfold within one fiscal year, while semaglutide stayed flat. The prefecture tables, in contrast, show little variation. Across all 47 prefectures, the SGLT2 share stays between 39% and 45%. In Japan, the large differences lie between drug classes and age groups, not between regions.
 
 <!-- Optional Figure 7: Snowsight chart of the verified query jp_glp1_monthly_uptake (month × substance, yen), tirzepatide vs semaglutide. -->
 
-The prefecture tables tell the weakest story. The SGLT2 share of diabetes drug value ranges from 39.3% in Kyoto to 45.1% in Nara, with Tokyo at 42.1%. That is a narrow band. The prefecture is also where the claim was issued, not where the patient lives, and masked cells make small products in small prefectures disappear. In Japan's diabetes market, the class tells much more than the region.
-
 ### 4.4 A policy change in the data, and a definition trap
 
-From October 2024, patients in Japan pay part of the price difference when they choose an off-patent brand that has a generic. The policy is called 長期収載品の選定療養. The month tables show its effect in the same month. In every class with established generics, the generic share of tablets dispensed at community pharmacies stepped up in October 2024: from 91.3% to 94.0% for α-glucosidase inhibitors, from 77.2% to 81.5% for glinides, from 87.4% to 90.6% for sulfonylureas and from 92.0% to 94.4% for thiazolidinediones.
+From October 2024, patients in Japan pay extra when they choose an off-patent brand over its generic. Patients reacted at once, and the monthly data captures the reaction. In every class with established generics, the generic share of tablets jumped in October 2024.
 
-Metformin seems to defy the trend, with a generic share of 0.2% throughout the year. The cause is a definition, not the market. NDB's generic flag follows the reimbursement definition, and that definition leaves out generics priced at the same level as their originator. Most metformin generics, the "MT" products, are priced like the originator Metgluco and are therefore not flagged. A dashboard built on the flag would report that nobody in Japan takes generic metformin. The graph records the trap where the data lives: the property dm:isGeneric carries an rdfs:comment that explains the reimbursement rule and names metformin as the known case. The semantic view repeats the warning in the description of its is_generic column, where Cortex Analyst reads it. In a property graph, the warning would sit in a wiki page. Here it sits next to the data in both the graph and the warehouse.
+Metformin defies the trend because its generics cost the same as the brand. The surcharge is a share of the price gap, so it adds nothing here. Patients therefore have little reason to prefer the generics. Furthermore, the equal price hides these generics in the data. This is because NDB flags a drug as generic only if it costs less than the original. As a result, almost none of metformin's non-originator products are flagged. Only one small product costs less than the brand. A dashboard built on the flag would therefore show a generic share of just 0.2%. In fact, about 71% of metformin tablets are generics that carry no flag because they cost as much as the brand. In a property graph, a warning about such a trap would usually live in a separate wiki page. Here, the ontology records it next to the data as a comment on the generic flag. The generated semantic view carries the same warning for Cortex Analyst.
 
 ### 4.5 Cortex Analyst in Japanese
 
-Cortex Analyst answers questions about the semantic view in natural language and shows the SQL it ran. Five Japanese questions, worded differently from the verified queries, went through its REST API three times each, on the native view and on the OSI-built view. A script ran the returned SQL and scored the result against plain SQL on the tables (Table 5).
+Cortex Analyst answers questions in natural language and shows the SQL it ran. Five Japanese questions went through it three times each, on both the generated view and the OSI view. A script then checked every answer against plain SQL (Table 2).
 
 | Question | Check | Native | OSI |
 |---|---|---:|---:|
@@ -414,25 +229,23 @@ Cortex Analyst answers questions about the semantic view in natural language and
 | マンジャロの月別の金額の推移は？ | ¥1.1 billion in April, ¥4.5 billion in March | 1/3 | 3/3 |
 | 75歳以上の患者への割合が最も高い薬効群は？ | glinides, 48.2% | 3/3 | 3/3 |
 
-Table 5. Correct answers out of three runs per view, after the fixes described below. Native: the generated semantic view. OSI: the same model deployed through OSI YAML.
+Table 2. Correct answers out of three runs per view, after the fixes described below. Native: the generated semantic view. OSI: the same model deployed through OSI YAML.
 
 <!-- Figure 7: Snowsight, Cortex Analyst answering 「マンジャロの月別の金額の推移は？」 with a line chart. -->
 ![](figure7.png)
 
 Figure 7. Cortex Analyst answers a question about tirzepatide by its Japanese brand name. Image by author.
 
-The first round exposed two gaps in the model, and both had to do with companies. Asked about 日本ベーリンガーインゲルハイム, Analyst first filtered on "Boehringer Ingelheim" or on the subsidiary's Japanese name, while the company column holds the group's legal name. A value list that names each group together with its subsidiaries fixed the lookup in all six runs. That list is generated from dm:partOfCorporateGroup, so the link from section 1.4 now also grounds the language model. Analyst then divided Boehringer's SGLT2 sales by Boehringer's total sales, which gives 78%, a share of its own portfolio rather than of the market. A prepared metric, class_market_share, keeps the whole class as the denominator whatever company filter applies. After both fixes, the share question was right in all runs.
+The first round exposed two gaps, and both had to do with companies. First, Analyst did not recognize 日本ベーリンガーインゲルハイム as part of the Boehringer Ingelheim group. A list of each group's subsidiaries, generated from the company link in the graph, fixed this. Second, Analyst computed Boehringer's share of its own sales instead of its share of the market. A prepared market-share metric fixed that as well. The remaining misses were minor. Still, one lesson stands out: instructions for a language model need tests, just like code.
 
-The remaining misses are matters of form. The native view broke the Mounjaro months down by strength in two runs, but the rows add up to the right totals. The OSI view named both categories for the GLP-1 drugs but did not count the products. One instruction also backfired before it was reworded. It said that the metrics for all diabetes drugs count each product once, and the native view responded by adding a filter on the top class to a question by drug class, which returned nothing. The OSI view never receives the instructions, so it made no such mistake. Instructions are code, and they need tests like code.
-
-The MCP server from the first article answers the same kind of question over SPARQL, with Claude as the client. Cortex Analyst does it inside the warehouse, under the same access controls as every other table, and needs no graph database at query time.
+The MCP server from the first article answers the same kind of question over SPARQL. Cortex Analyst, in contrast, works inside the warehouse and needs no graph database at query time.
 
 ## Conclusion
 
-This project added a second country to a diabetes drug knowledge graph and moved its presentation into Snowflake. Japan's NDB Open Data differs from Medicare in almost every respect: a different classification, a different unit, different masking and no prescribers. Still, the graph absorbed it without a single change to the Connecticut results. The shared substance and class vocabulary made the two datasets comparable in one query, a computed SKOS crosswalk bridged the two classifications, a defined OWL class found every GLP-1 product in both countries, and an RDF Data Cube kept the data within the free tier's budget.
+This project added Japan to a diabetes drug knowledge graph and moved its data into Snowflake. Japan's data differs from Medicare in almost every respect: a different classification, a different unit, different masking and no prescribers. Still, the graph absorbed it without changing a single Connecticut result. The shared vocabulary made the two countries comparable in one query. Moreover, a computed SKOS crosswalk bridged the two classifications, and a defined OWL class found every GLP-1 product in both countries.
 
-In my view, the second dataset is where RDF's standards pay off, and the warehouse is where they reach their users. With one source, SKOS mappings, defined classes and SHACL rules look like extra work. With two, they keep the sources apart where they differ and joined where they agree. Exported to Snowflake, the same artifacts do a second job: SKOS labels become synonyms and value lists, definitions become descriptions, OWL restrictions become SQL flags and the SPARQL query catalog becomes the verified queries and the test suite of the semantic view. The semantic layer is generated, not written a second time, so it cannot drift from the graph. The way back is standardized as well: one R2RML mapping turns the tables into the same 727,728 triples in two different engines. The generator even found a flaw in the ontology. Two classes, the ATC-based therapeutic class and the Japanese category, shared the Japanese label 薬効分類, and a synonym can point at only one of them. In the Japan view, it pointed at the wrong one. The fix was a label change in the ontology: 薬効分類 now names only the Japanese classification, and the ATC-based tree is 薬効群, with ATC分類 as an alternative label.
+The second dataset is where RDF's standards pay off. With one source, SKOS mappings, defined classes and SHACL rules look like extra work. With two, they keep the sources apart where they differ and joined where they agree. In Snowflake, the same artifacts do a second job. Labels become synonyms, definitions become descriptions, and OWL classes become columns. Because the semantic view is generated, it cannot drift from the graph. The generator even found a flaw in the ontology. Two classes carried the same Japanese label 薬効分類. One is Japan's own drug category, such as 396 for antidiabetics. The other is the ATC-based class tree. In the semantic view, the synonym 薬効分類 therefore pointed at the ATC tree. A Japanese question about 薬効分類 would have used the wrong classification. Renaming the ATC tree to 薬効群 in the ontology fixed it.
 
-The costs remain. The Data Cube slices and the SHACL-SPARQL rules are hard to read, and the free tier's limits shaped the model more than any modeling principle did. A semantic view cannot express skos:broader* or an OWL definition directly, so both are materialized and must be regenerated when the graph changes. Cortex Analyst still needs tests, and its mistakes came from missing knowledge in the model rather than from the language. The incident showed that a cloud database is no place for development iterations, and that a graph rebuilt from version-controlled files recovers in minutes.
+The approach has costs, too. The free tier's limits shaped the model more than any modeling principle did. Every derived table must be regenerated when the graph changes. Moreover, a cloud database turned out to be no place for trial and error. During the Japanese build, repeated reloads filled the disk of the free Stardog instance. The database broke and had to be recreated. Since then, every check runs on the local machine, and the cloud only receives the finished result.
 
-The Japanese data also has clear limits. It shows what was dispensed, where and to whom, but not who prescribed it or why. Indications that exist only in Japan, such as heart failure and chronic kidney disease for empagliflozin and dapagliflozin, are not modeled yet. They would partly replace the missing specialty story, and the graph is ready for them.
+The Japanese data also has clear limits. It shows what was dispensed, where and to whom, but not who prescribed it or why. Japan-only indications, such as heart failure and chronic kidney disease for empagliflozin and dapagliflozin, are not modeled yet. They are the natural next step.
